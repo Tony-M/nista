@@ -6,7 +6,7 @@
 
 <table>
 	<tr>
-		<td><a href="index.php?p=site" class="menu_action">Отменить</a></td>
+		<td><a href="index.php?p=site" class="menu_action">К списку разделов</a></td>
 		
 		<td></td>
 		
@@ -25,3 +25,4 @@
 </div>
 <input name="new_dir" id="new_dir" value="" type="text">
 <input name="create" id="create" type="submit" class="input" value="Создать каталог" style="width:150px;" onclick="create_catalog(); return false;">
+<input type="submit" id="apply" name="apply" onclick="link_path(); return false;" value="Применить">
