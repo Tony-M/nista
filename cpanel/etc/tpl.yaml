@@ -1,0 +1,37 @@
+---
+layout: 
+  - 
+    title: основной шаблон
+    description: layout1 description
+    file: layout_test1.tpl
+  - 
+    title: второй шаблон
+    description: layout2 description
+    file: layout_test2.tpl
+zone: 
+  - 
+    name: LEFT_COLUMN
+    title: левая колонка 1
+    description: >
+      левая колонка главной
+      страници 1
+  - 
+    name: RIGHT_COLUMN
+    title: Правая колонка
+    description: >
+      правая колонка
+      главной таблицы
+  - 
+    name: bottom_baner
+    title: Место для банера
+    description: длинный банер
+layout_zone_link: 
+  - 
+    file: layout_test1.tpl
+    contain: 
+      - RIGHT_COLUMN
+  - 
+    file: layout_test2.tpl
+    contain: 
+      - LEFT_COLUMN
+      - RIGHT_COLUMN
