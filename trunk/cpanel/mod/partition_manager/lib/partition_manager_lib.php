@@ -352,6 +352,7 @@ class partition_manager
 							pid='1', 
 							title='Корневой раздел сайта', 
 							status='on', 
+							link='/',
 							modid='".$this->DATA['MOD_DATA']['modid']."', 
 							type='prt',
 							sequence='".$this->get_new_sequence()."', 
@@ -883,6 +884,15 @@ class partition_manager
 							$result[$i]['status'] = 'sys';
 						}
 						
+						$is_used = false;
+						$is_used = $this->is_path_used($result[$i]['path']);
+						if($is_used != false)
+						{
+							$result[$i]['status'] = 'busy';
+							$result[$i]['partition_title'] = $is_used['title'];
+							$result[$i]['partition_id'] = $is_used['id'];
+						}
+						
 						
 						if(is_readable(ROOT_WAY.$dir_way."/".$dir_content))				
 							$result[$i]['r'] = "r";
@@ -1015,6 +1025,12 @@ class partition_manager
 		return false;
 	}
 	
+	/**
+	 * Метод удаляет каталог
+	 *
+	 * @param string $path
+	 * @return boolean
+	 */
 	public function rm_catalog($path = "")
 	{
 		if($path == "")return false;
@@ -1061,7 +1077,7 @@ class partition_manager
 			
 		if(count($result)>1)return false; // если содержимого больше чем 1 то значит там чтото ещё лежит кроме index.php
 		
-		if(count($result==1))  // если содржимого 1 то надо проверить index.php это или нет
+		if(count($result==1))  // если содержимого 1 то надо проверить index.php это или нет
 		{
 			if(is_file(ROOT_WAY.$result[0]['path']))// проверяем является ли содержимое файлом
 			{
@@ -1093,6 +1109,246 @@ class partition_manager
 		return false;
 			
 			
+	}
+	
+	
+	/**
+	 * Метод осуществляет привязку раздела к каталогу
+	 *
+	 * @param string $path путь к каталогу
+	 * @param integer $partition_id идентификатор раздела
+	 * @return boolean
+	 */
+	public function link_catalog_to_partition($path = "", $partition_id=0)
+	{
+		$path=trim($path);
+		
+		if($path=="")return false;
+		if($path=="/")return false;
+		
+		$partition_id = (int)$partition_id;
+		if($partition_id==0)return false;
+		
+		
+		if(($partition_id==$this->get_root_partition_id()) && ($path!="/"))return false;
+		
+		$partition = $this->get_partition($partition_id);
+		
+		$is_path_used = $this->is_path_used($path);
+		if($is_path_used != false)
+			return false;
+		
+		if(eregi("(index\.php)",$partition['link']))
+		{
+			$pos = strpos($partition, "index.php?");
+			$partition['link'] = substr($partition['link'], 0, $pos - 1);
+		}
+		
+		if($partition)
+		{
+			$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE. " 
+						set 
+							link='".$path."' 
+						where 
+							id='".$partition_id."' and 
+							modid='".$this->DATA['MOD_DATA']['modid']."' and 
+							type='prt'";
+//			echo $query."<br>";
+			if(mysql_query($query))
+			{
+				if(eregi("(index\.php)", $path))
+				{
+					$index_pos = strpos($path, "index.php");
+					if($index_pos===false)
+					{}
+					else 
+					{
+						$path = substr($path, 0, $index_pos);
+					}
+				}
+				
+				$partitions = $this->get_partition_tree_for($partition_id);
+				
+				if($partitions!= false)
+				{
+					$n = count($partitions);
+					for($i=0; $i<$n; $i++)
+					{
+//						if($partition['link'] != "")$pos = strpos($partitions[$i]['link'], $partition['link']);
+//						else 
+//						{
+//							$pos = true;
+//							$pos_flag= 1;
+//						}
+						$pos = @strpos($partitions[$i]['link'], $partition['link']);
+						
+						if(($pos === false)&&($partitions[$i]['link']!=""))
+						{
+							//ничего не делать т к это не то что нам нужно
+						}
+						else 
+						{
+							if($pos_flag==1)
+								$link = $path;
+							else
+								$link = $partition['link'];
+							$link = $partition['link'];
+							$query = "";
+							$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE. " 
+									set 
+										link='".$path."/index.php?data=".$partitions[$i]['id']."' 
+									where 
+										id='".$partitions[$i]['id']."' and 
+										modid='".$this->DATA['MOD_DATA']['modid']."' and 
+										type='prt'";
+							mysql_query($query);
+						}
+					}
+				}
+			}
+		}		
+	}
+	
+	/**
+	 * метод осуществляет отлинковку раздела и каталога
+	 *
+	 * @param integer $partition_id id раздела
+	 * @return boolean
+	 */
+	public function unlink_partition($partition_id=0)
+	{
+		$query_err_flag = 0;
+		$partition_id = (int)$partition_id;
+		
+		if($partition_id==0)return  false;
+		
+		$partition = $this->get_partition($partition_id);
+		if($partition)
+		{
+			if($partition['id'] == $partition['pid'])
+				return false; // ибо нехер корневой раздел трогать
+			
+			$parent_partition = $this->get_partition($partition['pid']);
+			if($parent_partition)
+			{
+				// создаём path родителя к которому будем лепить
+				$parent_link = $parent_partition['link'];
+				
+				if(eregi("(/index\.php)", $parent_link))
+				{
+					$index_pos = strpos($parent_link, "/index.php");
+					if($index_pos !== false)
+					{
+						$parent_link = substr($parent_link, 0, $index_pos);
+					}
+					//else 
+						//return false;
+				}
+				unset($index_pos);
+				
+				//создаём path раздела по которому будем доставать детей для перелинковки
+				$link = $partition['link'];
+				
+				if(eregi("^(/index\.php)", $link))
+					return false;// типа если идёт отлинковка подкорневого раздела, то исключаем ошибку
+				
+				if(eregi("(/index\.php)", $link))
+				{
+					$index_pos = strpos($link, "/index.php");
+					if($index_pos !== false)
+					{
+						$link = substr($link, 0, $index_pos)."/index.php";
+					}
+					else 
+						return false;						
+				}
+				file_put_contents(ROOT_WAY."query_log.txt", "\n".$link, FILE_APPEND);
+				if($parent_link === "/")
+					$query_parrent_link = "";
+				else 
+					$query_parrent_link = $parent_link;
+					
+					//$query_parrent_link = $parent_link;
+				
+				//перелинковываем раздел к родителю
+				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+							set 
+								link='".$query_parrent_link."/index.php?data=".$partition_id."'
+							where
+								id='".$partition_id."' and 
+								modid='".$this->DATA['MOD_DATA']['modid']."' and 
+								type='prt'";
+				file_put_contents(ROOT_WAY."query_log.txt", "\n".$query, FILE_APPEND);
+				
+				
+				if(!mysql_query($query))
+					$query_err_flag = 1;
+				
+				// достаём всех дочерние подразделы
+				$all_subpartitions = $this->get_partition_tree_for($partition_id);
+				if ($all_subpartitions) 
+				{
+					// ищем разделы,  которые реально надо перелинковать
+					// т е тех которые сами куданить не подлинкованы
+					$n=count($all_subpartitions);
+					
+					for($i=0; $i<$n; $i++)
+					{
+						$flag = @strpos($all_subpartitions[$i]['link'], $link);
+						if($flag!== false)
+						{
+							$query = "";
+							$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+										set
+											link='".$query_parrent_link."/index.php?data=".$all_subpartitions[$i]['id']."'
+										where
+											id='".$all_subpartitions[$i]['id']."' and 
+											modid='".$this->DATA['MOD_DATA']['modid']."' and 
+											type='prt'";
+							if(!mysql_query($query))
+								$query_err_flag = 1;
+						}
+					}
+				}
+				
+				if($query_err_flag==0)
+					return true;
+				else 
+					return false;
+				
+			}
+			else 
+				return false;
+		}
+		else 
+			return false;
+	}
+	
+	/**
+	 * Метод проверяет заданный каталог на привязку к разделу. 
+	 *
+	 * @param string $path
+	 * @return Array of False
+	 */
+	public function is_path_used($path = "")
+	{
+		$path=htmlentities(strip_tags($path),ENT_QUOTES, "UTF-8");
+		$path=trim($path); 
+		
+		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." 
+					where
+						modid='".$this->DATA['MOD_DATA']['modid']."' and 
+						type='prt' and
+						link='".$path."'";
+		//echo $query."<br>";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			return $result;
+		}
+		
+		return false;
 	}
 	
 	public function unlink_catalog($path="")

@@ -27,7 +27,8 @@
 		<tr>
 			<td class="table_head" style="width:48px;" colspan="3">Сост</td>
 			<td class="table_head">Заглавие</td>
-			<td class="table_head" style="width:48px;" colspan="3">&nbsp;</td>
+			<td class="table_head">Линк</td>
+			<td class="table_head" style="width:74px;" colspan="4">&nbsp;</td>
 		</tr>
 		{section name=prt_num loop=$DOCUMENT.mod.data.partition_tree}
 		<tr onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
@@ -39,15 +40,17 @@
 			</td>
 			<td class="td_body" style="width: 16px; background-image: url({$DOCUMENT.ACP_IMG_WAY}{if $DOCUMENT.mod.data.partition_tree[prt_num].has_child=='yes'}plus1.gif{else}line.gif{/if}); background-repeat: repeat-y;">&nbsp;</td>
 			<td class="td_body" style="padding-left:{$DOCUMENT.mod.data.partition_tree[prt_num].tab}5px;">{$DOCUMENT.mod.data.partition_tree[prt_num].title}</td>
+			<td class="td_body">{$DOCUMENT.mod.data.partition_tree[prt_num].link}&nbsp;</td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=site&sp=ls_category&id={$DOCUMENT.mod.data.partition_tree[prt_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}shape_group.gif" width="16" height="16" alt="Категории раздела" title="Категории раздела" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=site&sp=edit_partition&id={$DOCUMENT.mod.data.partition_tree[prt_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
 			<td class="td_body" style="width: 16px;">
 				{if $DOCUMENT.mod.data.partition_tree[prt_num].link!=""}
-					<img src="{$DOCUMENT.ACP_IMG_WAY}dir.gif" width="16" height="16" alt="Редактировать" title="Редактировать">
+					<a href="index.php?p=site&sp=choose_folder&prt_id={$DOCUMENT.mod.data.partition_tree[prt_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}dir.gif" width="16" height="16" alt="Редактировать назначенный каталог" title="Редактировать назначенный каталог" border="0"></a>
 					{else}
 					<a href="index.php?p=site&sp=choose_folder&prt_id={$DOCUMENT.mod.data.partition_tree[prt_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}no_dir.gif" width="16" height="16" alt="Назначить каталог" title="Назначить каталог" border="0"></a>
 				{/if}
 			</td>
+			<td class="td_body" style="width: 26px;" align="right"><a href="" onclick="unlink_dir('{$DOCUMENT.mod.data.partition_tree[prt_num].id}'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}unlink_dir.gif" width="16" height="16" alt="Удалить привязку к каталогу" title="Удалить привязку к каталогу" border="0"></a></td>
 		</tr>
 		{/section}
 	</table>
