@@ -1,0 +1,31 @@
+.|Главная|index.php|Главная страница ACP CMS NightStalker v3
+.|Сайт
+..|Общие настройки|index.php?p=site_settings
+..|Менеджер шаблонов|index.php?p=tpl
+...|Добавить layout|index.php?p=tpl&sp=add_tpl
+...|Добавить Информационную зону|index.php?p=tpl&sp=add_zone
+..|Менеджер разделов|index.php?p=site&sp=ls_partition
+...|Список разделов|index.php?p=site&sp=ls_partition
+...|Добавить раздел|index.php?p=site&sp=new_partition
+..|Менеджер статей|index.php?p=item
+...|Список статей|index.php?p=item
+...|Добавить статью|index.php?p=item&sp=add_item
+..|Меню|index.php?p=menu&sp=ls_menu
+...|Список меню|index.php?p=menu&sp=ls_menu
+...|Создать меню|index.php?p=menu&sp=new_menu
+...|---
+...|Список информационных зон|index.php?p=menu&sp=ls_zones
+...|Создать информационную зону|index.php?p=menu&sp=new_zone
+..|Новости|index.php?p=news
+...|Список новостей|index.php?p=news
+...|Создать новость|index.php?p=news&sp=new_news
+..|Simple Gallery|index.php?p=sg
+...|Список альбомов|index.php?p=sg
+.|Main|
+..|Панель управления|index.php?p=set
+.|Перейти
+..|На главную страницу сайта
+..|На оффициальный сайт Night Stalker|http://nightstalker.ru
+.|Help
+..|Help Topics
+..|About...

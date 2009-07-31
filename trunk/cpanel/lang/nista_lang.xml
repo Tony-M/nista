@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<xliff version="1.0">
+  <file orginal="global" source-language="ru_RU" datatype="plaintext">
+    <body>
+      <group type="header">
+      	<trans_unit>
+      		<source lang="RU">Добро пожаловать в Night Stalker.</source>
+        	<target lang="EN">Welcome to Night Stalker.</target>
+        	<target lang="PADONAK">всем привет</target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Тестовый заголовок</source>
+        	<target lang="EN">Test header</target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Текущая версия</source>
+        	<target lang="EN">Version information</target>
+        </trans_unit>
+      </group>
+      <group type="text">
+      	<trans_unit>
+      		<source lang="RU">Благодарим вас за то, что сделали свой выбор в сторону использования системы Night Stalker в качестве CMS. На данной странице представлен краткий обзор и статистика по системе и её компонентам. Вы всегда можете вернуться на данную страницу нажав на изображение домика. Остальные элементы страницы позволят вам управлять всеми компонентами системы. Каждая страница будет снабжена всеми необходимыми инструкциями.</source>
+        	<target lang="EN">Thank you for choosing Night Stalker as your CMS solution. This screen will give you a quick overview of all the various statistics of your system. You can get back to this page by clicking on the \"Home\" image. The other links of this screen will allow you to control every aspect of your CMS experience. Each screen will have instructions on how to use the tools.</target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Тестовый текст</source>
+        	<target lang="EN">Test текст</target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Ваша версия продукта не требует обновления</source>
+        	<target lang="EN">Your installation is up to date, no updates are available for your version of CMS and modules.  </target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Все права защищены. Night Stalker v3 свободно распространяемое программное обеспечение по GNU/GPL лицензии.</source>
+        	<target lang="EN">All rights reserved. Night Stalker v3 open source software GNU / GPL license.</target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Правовая информация 2005 - </source>
+        	<target lang="EN">Copyright 2005 - </target>
+        </trans_unit>
+      </group>
+      
+    </body>
+  </file>
+</xliff>
