@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.12, created on 2009-07-15 18:09:56
+<?php /* Smarty version 2.6.12, created on 2009-08-01 22:11:12
          compiled from ../mod/partition_manager/tpl/mod_index.tpl */ ?>
 <h1>Менеджер по работе с разделами</h1>
 <p>В основные функции модуля входит работа с разделами сайта</p><hr>
@@ -31,7 +31,8 @@
 		<tr>
 			<td class="table_head" style="width:48px;" colspan="3">Сост</td>
 			<td class="table_head">Заглавие</td>
-			<td class="table_head" style="width:48px;" colspan="3">&nbsp;</td>
+			<td class="table_head">Линк</td>
+			<td class="table_head" style="width:74px;" colspan="4">&nbsp;</td>
 		</tr>
 		<?php unset($this->_sections['prt_num']);
 $this->_sections['prt_num']['name'] = 'prt_num';
@@ -72,6 +73,8 @@ publish.gif" width="16" height="16" alt="Опубликован" title="Опуб
 			<td class="td_body" style="padding-left:<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['tab']; ?>
 5px;"><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['title']; ?>
 </td>
+			<td class="td_body"><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['link']; ?>
+&nbsp;</td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=site&sp=ls_category&id=<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['id']; ?>
 "><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
 shape_group.gif" width="16" height="16" alt="Категории раздела" title="Категории раздела" border="0"></a></td>
@@ -80,14 +83,18 @@ shape_group.gif" width="16" height="16" alt="Категории раздела" 
 edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
 			<td class="td_body" style="width: 16px;">
 				<?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['link'] != ""): ?>
-					<img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
-dir.gif" width="16" height="16" alt="Редактировать" title="Редактировать">
+					<a href="index.php?p=site&sp=choose_folder&prt_id=<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['id']; ?>
+"><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
+dir.gif" width="16" height="16" alt="Редактировать назначенный каталог" title="Редактировать назначенный каталог" border="0"></a>
 					<?php else: ?>
 					<a href="index.php?p=site&sp=choose_folder&prt_id=<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['id']; ?>
 "><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
 no_dir.gif" width="16" height="16" alt="Назначить каталог" title="Назначить каталог" border="0"></a>
 				<?php endif; ?>
 			</td>
+			<td class="td_body" style="width: 26px;" align="right"><a href="" onclick="unlink_dir('<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['partition_tree'][$this->_sections['prt_num']['index']]['id']; ?>
+'); return false;"><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
+unlink_dir.gif" width="16" height="16" alt="Удалить привязку к каталогу" title="Удалить привязку к каталогу" border="0"></a></td>
 		</tr>
 		<?php endfor; endif; ?>
 	</table>

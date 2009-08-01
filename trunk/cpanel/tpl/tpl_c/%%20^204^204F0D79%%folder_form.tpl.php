@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.12, created on 2009-07-15 18:09:59
+<?php /* Smarty version 2.6.12, created on 2009-08-01 22:13:30
          compiled from ../mod/partition_manager/tpl/folder_form.tpl */ ?>
 <h1>Менеджер по работе с разделами</h1>
 <p>В основные функции модуля входит работа с разделами сайта</p><hr>
@@ -9,7 +9,7 @@
 
 <table>
 	<tr>
-		<td><a href="index.php?p=site" class="menu_action">Отменить</a></td>
+		<td><a href="index.php?p=site" class="menu_action">К списку разделов</a></td>
 		
 		<td></td>
 		
@@ -34,3 +34,4 @@ unset($_smarty_tpl_vars);
 </div>
 <input name="new_dir" id="new_dir" value="" type="text">
 <input name="create" id="create" type="submit" class="input" value="Создать каталог" style="width:150px;" onclick="create_catalog(); return false;">
+<input type="submit" id="apply" name="apply" onclick="link_path(); return false;" value="Применить">
