@@ -201,7 +201,7 @@ switch ($sp)
 			exit;			
 		}
 
-		$DOCUMENT['mod']['data']['category_list'] = $item_manager_obj->get_category_list_4_partition($DOCUMENT['mod']['data']['item_info']['pid']);		
+		$DOCUMENT['mod']['data']['category_list'] = $partition_manager_obj->get_category_list_4_partition($DOCUMENT['mod']['data']['item_info']['pid']);		
 		break;
 	case "update_item"://* Производится обновление данных статьи после редактирования
 		

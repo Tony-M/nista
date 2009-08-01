@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.12, created on 2009-07-09 18:54:27
+<?php /* Smarty version 2.6.12, created on 2009-08-01 22:14:07
          compiled from ../mod/item_manager/tpl/mod_index.tpl */ ?>
 <h1>Менеджер по работе со статьями сайта</h1>
 <p>В основные функции модуля входит работа с основным контентом сайта - статьями</p><hr>

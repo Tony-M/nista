@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.12, created on 2009-07-09 19:07:01
+<?php /* Smarty version 2.6.12, created on 2009-08-01 22:15:00
          compiled from ../mod/item_manager/tpl/item_form.tpl */ ?>
 <h1><?php if ($this->_tpl_vars['MOD_ACTION'] == 'create_partition'): ?>Создание<?php else: ?>Редактирование данных<?php endif; ?> статьи сайта</h1>
 <form action="index.php?p=item&sp=<?php echo $this->_tpl_vars['MOD_ACTION']; ?>

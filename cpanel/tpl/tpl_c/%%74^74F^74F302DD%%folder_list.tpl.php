@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.12, created on 2009-07-15 18:09:59
+<?php /* Smarty version 2.6.12, created on 2009-08-01 22:13:30
          compiled from ../mod/partition_manager/tpl/folder_list.tpl */ ?>
 <?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['msg'] <> ""): ?><div class="sys_msg"><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['msg']; ?>
 </div><?php endif;  if ($this->_tpl_vars['DOCUMENT']['mod']['data']['errmsg'] <> ""): ?><div class="sys_err_msg"><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['errmsg']; ?>
@@ -42,6 +42,8 @@ $this->_sections['full_path_num']['last']       = ($this->_sections['full_path_n
 		<tr>
 			<td class="table_head" style="width:80px;">Состояние</td>
 			<td class="table_head">Каталог</td>
+			<td class="table_head">Привязанный раздел</td>
+			
 			<td class="table_head"  style="width:95px;">Права доступа</td>
 			<td class="table_head"></td>
 		</tr>
@@ -70,12 +72,20 @@ $this->_sections['file_list_num']['first']      = ($this->_sections['file_list_n
 $this->_sections['file_list_num']['last']       = ($this->_sections['file_list_num']['iteration'] == $this->_sections['file_list_num']['total']);
 ?>
 			<tr  onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
-				<td class="td_body" align="center"><?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['status'] == 'sys'): ?><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
-lock.gif" width="16" height="16" alt="Системный каталог. Закрыт" title="Системный каталог. Закрыт"><?php else: ?><input name="selected_path" id="selected_path" value="<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['path']; ?>
+				<td class="td_body" align="center">
+					<?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['status'] == 'sys'): ?><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
+lock.gif" width="16" height="16" alt="Системный каталог. Закрыт" title="Системный каталог. Закрыт"><?php endif; ?>
+					<?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['status'] == 'busy'): ?><img src="<?php echo $this->_tpl_vars['DOCUMENT']['ACP_IMG_WAY']; ?>
+link.gif" width="16" height="16" alt="Каталог занят" title="Каталог занят"><?php endif; ?>
+					<?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['status'] == ""): ?><input name="selected_path" id="selected_path" value="<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['path']; ?>
 " type="radio"><?php endif; ?></td>	
 				<td class="td_body"><a <?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['status'] != 'sys'): ?>href="" onclick="get_folder_content('<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['path']; ?>
 '); return false;"<?php endif; ?>><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['title']; ?>
 </a> </td>
+				<td class="td_body"><a href="index.php?p=site&sp=edit_partition&id=<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['partition_id']; ?>
+"><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['partition_title']; ?>
+</a>&nbsp;</td>
+				
 				<td class="td_body" align="center"><span><?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['r'];  echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['w']; ?>
 </span></td>
 				<td class="td_body" style="width: 25px;" align="right"><?php if ($this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['status'] != 'sys'): ?><a href="" onclick="rm_catalog('<?php echo $this->_tpl_vars['DOCUMENT']['mod']['data']['catalog_list'][$this->_sections['file_list_num']['index']]['path']; ?>
