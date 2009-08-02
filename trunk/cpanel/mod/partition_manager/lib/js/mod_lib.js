@@ -58,7 +58,7 @@ function create_catalog()
 function link_path()
 {
 	path = $('input[name=selected_path]:checked').val();
-	
+	if(!path)path="";
 	current_path = $('#current_path').val();
 	id = $('#prt_id').val();
 	

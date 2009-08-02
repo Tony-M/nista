@@ -410,7 +410,7 @@ switch ($sp)
 		$id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
 		$path = ( isset($HTTP_POST_VARS['path']) ) ? $HTTP_POST_VARS['path'] : $HTTP_GET_VARS['path'];
 		$current_path = ( isset($HTTP_POST_VARS['current_path']) ) ? $HTTP_POST_VARS['current_path'] : $HTTP_GET_VARS['current_path'];
-		
+				
 		$partition_manager_obj->link_catalog_to_partition($path, $id);
 		
 		$layout_template = $THIS_MODULE_DIR_NAME."folder_list.tpl";
