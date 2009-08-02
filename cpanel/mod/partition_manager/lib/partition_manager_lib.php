@@ -874,12 +874,16 @@ class partition_manager
 			while (false !==($dir_content = readdir($dir)))
 			{
 				if(is_dir(ROOT_WAY.$dir_way."/".$dir_content))
-					if(($dir_content!=".")&&($dir_content!=".."))
+					if(($dir_content!=".")&&($dir_content!="..")&&($dir_content!=".snv"))
 					{
 						$result[$i]['title'] = $dir_content;
 						$result[$i]['path'] = $dir_way."/".$dir_content;
 						//echo $result[$i]['path']."<br>";
 						if(in_array($result[$i]['path'], $this->DATA['SYS']['FORBIDDEN_DIR'] ))
+						{
+							$result[$i]['status'] = 'sys';
+						}
+						if(eregi("(\.svn)+",$result[$i]['path']))
 						{
 							$result[$i]['status'] = 'sys';
 						}
@@ -1040,12 +1044,12 @@ class partition_manager
 			if(!is_dir(ROOT_WAY.$path))return false;			
 			
 		$dir = opendir(ROOT_WAY.$path);
-			
+		
 		$result = array();
 		$i = 0;
 		while (false !==($dir_content = readdir($dir)))
 		{
-			if(($dir_content!=".")&&($dir_content!=".."))
+			if(($dir_content!=".")&&($dir_content!="..")&&($dir_content!=".svn"))
 			{
 				$result[$i]['title'] = $dir_content;
 				$result[$i]['path'] = $path."/".$dir_content;
@@ -1100,7 +1104,7 @@ class partition_manager
 		}
 		
 		
-		if($this->unlink_catalog())
+		if($this->unlink_catalog("/".$path))
 		{
 			if(unlink(ROOT_WAY.$result[0]['path']))
 				return rmdir(ROOT_WAY.$path);
@@ -1262,7 +1266,7 @@ class partition_manager
 					else 
 						return false;						
 				}
-				file_put_contents(ROOT_WAY."query_log.txt", "\n".$link, FILE_APPEND);
+				//file_put_contents(ROOT_WAY."query_log.txt", "\n".$link, FILE_APPEND);
 				if($parent_link === "/")
 					$query_parrent_link = "";
 				else 
@@ -1278,7 +1282,7 @@ class partition_manager
 								id='".$partition_id."' and 
 								modid='".$this->DATA['MOD_DATA']['modid']."' and 
 								type='prt'";
-				file_put_contents(ROOT_WAY."query_log.txt", "\n".$query, FILE_APPEND);
+				//file_put_contents(ROOT_WAY."query_log.txt", "\n".$query, FILE_APPEND);
 				
 				
 				if(!mysql_query($query))
@@ -1334,7 +1338,7 @@ class partition_manager
 	{
 		$path=htmlentities(strip_tags($path),ENT_QUOTES, "UTF-8");
 		$path=trim($path); 
-		
+		//echo $path;
 		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." 
 					where
 						modid='".$this->DATA['MOD_DATA']['modid']."' and 
@@ -1353,6 +1357,78 @@ class partition_manager
 	
 	public function unlink_catalog($path="")
 	{
+		//return true;
+		if($path=="")return false;
+		if($path=="/")return false;
+		// ищем основной раздел к которому прилинкован каталог
+		$path_partition = $this->is_path_used($path);
+		if($path_partition == false)
+			return true;
+		
+		//ищем родителя радела
+		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE."
+					where
+						modid='".$this->DATA['MOD_DATA']['modid']."' and 
+						type='prt' and
+						id = '".$path_partition['pid']."'";
+		//echo "<hr>".$query."<br>";//return false;
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+		{
+			$parent_partition = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			$new_path = $parent_partition['link'];
+			if(eregi("(index\.php)", $new_path))
+			{
+				$index_pos = strpos($new_path, "/index.php");
+				if($index_pos===false)
+				{}
+				else 
+				{
+						$new_path = substr($new_path, 0, $index_pos);
+				}
+			}
+		}
+		else 
+			return false; // если нет родителя то не к кому перелинковывать значит это корень
+		if($new_path=="/")$new_path="";
+		// ищем дочерние разделы с линком в состав которого входит path
+		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." 
+					where
+						modid='".$this->DATA['MOD_DATA']['modid']."' and 
+						type='prt' and
+						link like '".$path."/%'";
+		//echo $query."<br>";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			
+			while($tmp = mysql_fetch_array($result_id, MYSQL_ASSOC))
+			{
+				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+							set 
+								link='".$new_path."/index.php?data=".$tmp['id']."'
+							where
+								modid='".$this->DATA['MOD_DATA']['modid']."' and 
+								type='prt' and
+								id='".$tmp['id']."'";
+				//echo $query."<br>";
+				if(!mysql_query($query))
+					return false; // незачем плодить ошибки поэтому при первом же сбое прерываемся
+			}
+			
+			mysql_free_result($result_id);
+		}
+		
+		$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+						set 
+							link='".$new_path."/index.php?data=".$path_partition['id']."'
+						where
+							modid='".$this->DATA['MOD_DATA']['modid']."' and 
+							type='prt' and
+							id='".$path_partition['id']."'";
+		//echo $query."<br>";
+		if(!mysql_query($query))
+			return false; 
+		
 		return true;
 	}
 }
