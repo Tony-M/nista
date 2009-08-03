@@ -128,7 +128,13 @@ switch ($sp)
 			if($partition_manager_obj->save_partition())
 			{
 				$MOD_MESSAGE = "Раздел сайта с заглавием '".$_POST['title']."' успешно создан ";
-				header("Location: index.php?p=site");
+				header("Location: index.php?p=site&msg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			}
+			else 
+			{
+				$MOD_MESSAGE = "Во время создания раздела сайта с заглавием '".$_POST['title']."' произошли ошибки";
+				header("Location: index.php?p=site&errmsg=".rawurlencode($MOD_MESSAGE));
 				exit;
 			}
 			

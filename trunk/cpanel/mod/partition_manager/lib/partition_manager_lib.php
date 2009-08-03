@@ -291,45 +291,113 @@ class partition_manager
 			
 			if($this->DATA['pid'] != "")
 			{
-				$query .= ", pid='".$this->DATA['pid']."' ";
+				$query .= ", pid='".(int)$this->DATA['pid']."' ";
 //				echo $query."<br>";
-				return mysql_query($query);
+				if(mysql_query($query)) // создаём раздел в БД
+				{
+					// теперь необходимо сделать линк к родительскому каталогу
+					$partition_id = mysql_insert_id();
+					
+					$parent_partition = $this->get_partition((int)$this->DATA['pid']);
+					if($parent_partition)
+					{
+						$path = $parent_partition['link'];
+						if(eregi("(index\.php)", $path))
+						{
+							$index_pos = strpos($path, "/index.php");
+							if($index_pos===false)
+							{}
+							else 
+							{
+									$path = substr($path, 0, $index_pos);
+							}
+						}
+						if($path=="/")$path="";
+						$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+									set
+										link='".$path."/index.php?data=".$partition_id."' 
+									where
+										type='prt' and 
+										modid='".$this->DATA['MOD_DATA']['modid']."' and
+										id='".$partition_id."'";
+						return mysql_query($query);
+					}
+				}
+				return false;
 			}			
 		}
 		if((int)$this->DATA['id'] != 0)
 		{
-			////// создаём новый раздел //////
-			
-			$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE." 
-						set 
-							creator_uid = '".$this->DATA['USER_DATA']['uid']."',
-							date_created='".$this->get_date()."', ";
-			
-			
-			if($this->DATA['title'] == "")return false;
-			$query .= " title='".$this->DATA['title']."' ";
-			
-			$query .= ", text='".$this->DATA['text']."' ";
-			$query .= ", meta_keyword='".$this->DATA['meta_keyword']."' ";
-			$query .= ", meta_description='".$this->DATA['meta_description']."' ";
-			$query .= ", status='".$this->DATA['status']."' ";
-			$query .= ", penname='".$this->DATA['penname']."' ";
-			$query .= ", template='".$this->DATA['template']."' ";
-			$query .= ", access_level='".$this->DATA['access_level']."' ";
-			
-			if($this->DATA['pid'] != "")
-			{
+			////// обновляем раздел //////
+			$partition_info = $this->get_partition($this->DATA['id']); // получаем информацию о разделе (до его изменения)
+			if($partition_info)
+			{//если не false то можно обновлять.....
 				
-				// проверяем на петли при перелинковке
-				if($this->check_partition_no_loop($this->DATA['id'], $this->DATA['pid']))
-					$query .= ", pid='".$this->DATA['pid']."' ";
-				else 
-					return false; // при перелинковке образовалась петля
-
+				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE." 
+							set 
+								creator_uid = '".$this->DATA['USER_DATA']['uid']."',
+								date_created='".$this->get_date()."', ";
 				
-				$query .= " where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and id='".$this->DATA['id']."' ";
-				//echo $query."<br>";exit;
-				return mysql_query($query);
+				
+				if($this->DATA['title'] == "")return false;
+				$query .= " title='".$this->DATA['title']."' ";
+				
+				$query .= ", text='".$this->DATA['text']."' ";
+				$query .= ", meta_keyword='".$this->DATA['meta_keyword']."' ";
+				$query .= ", meta_description='".$this->DATA['meta_description']."' ";
+				$query .= ", status='".$this->DATA['status']."' ";
+				$query .= ", penname='".$this->DATA['penname']."' ";
+				$query .= ", template='".$this->DATA['template']."' ";
+				$query .= ", access_level='".$this->DATA['access_level']."' ";
+				
+				if($this->DATA['pid'] != "")
+				{
+					
+					// проверяем на петли при перелинковке
+					if($this->check_partition_no_loop($this->DATA['id'], $this->DATA['pid']))
+						$query .= ", pid='".$this->DATA['pid']."' ";
+					else 
+						return false; // при перелинковке образовалась петля
+	
+					
+					$query .= " where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and id='".$this->DATA['id']."' ";
+					//echo $query."<br>";exit;
+					if(mysql_query($query)) // производим обновление основной информации
+					{
+						//теперь надо проверить нужно ли обновлять линк к каталогу
+						if((int)$this->DATA['pid'] != $partition_info['pid']) // ведётся ли перелинковка
+						{
+							if(!eregi("(/index\.php)",$partition_info['link']))
+								return true; // раздел прилинкован конкретно к каталогу а значит этот линк не меняется ( т е нет index.php?data=....)
+							
+							$new_parent_partition = $this->get_partition($this->DATA['pid']);
+							if($new_parent_partition == false)
+								return false;
+							
+							$path = $new_parent_partition['link'];
+							if(eregi("(index\.php)", $path))
+							{
+								$index_pos = strpos($path, "/index.php");
+								if($index_pos===false)
+								{}
+								else 
+								{
+										$path = substr($path, 0, $index_pos);
+								}
+							}
+							if($path=="/")$path="";
+							
+							$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+										set
+											link='".$path."/index.php?data=".$this->DATA['id']."' 
+										where
+											type='prt' and 
+											modid='".$this->DATA['MOD_DATA']['modid']."' and
+											id='".$this->DATA['id']."'";
+							return mysql_query($query);		
+						}						
+					}
+				}
 			}			
 		}
 		
