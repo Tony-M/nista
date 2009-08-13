@@ -4,6 +4,9 @@
 ..|Менеджер шаблонов|index.php?p=tpl
 ...|Добавить layout|index.php?p=tpl&sp=add_tpl
 ...|Добавить Информационную зону|index.php?p=tpl&sp=add_zone
+...|Добавить шаблон меню|index.php?p=tpl&sp=add_menu
+...|---
+...|Список шаблонов меню|index.php?p=tpl&sp=ls_menu
 ..|Менеджер разделов|index.php?p=site&sp=ls_partition
 ...|Список разделов|index.php?p=site&sp=ls_partition
 ...|Добавить раздел|index.php?p=site&sp=new_partition

@@ -27,7 +27,7 @@ if(!class_exists("tpl_manager"))
 	exit;
 }
 
-$tpl_manager_obj = new tpl_manager($SYS);
+$tpl_manager_obj = new tpl_manager($SYS, $MY_USER_DATA);
 $template_data = $tpl_manager_obj->load_config();
 
 
@@ -335,7 +335,76 @@ switch ($sp)
 		header("Location: index.php?p=tpl&msg=".rawurlencode($MOD_MESSAGE));
 		exit;
 		break;		
+	case "add_menu": //** Форма добавления шаблона меню
+		// проверяем необходимость отображения системного сообщения об ошибках
+		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
+	
+		$MOD_TEMPALE = "menu_form.tpl";
+		$MOD_ACTION = 'create_menu';
 		break;
+	case "create_menu":
+		$name = ( isset($HTTP_POST_VARS['name']) ) ? $HTTP_POST_VARS['name'] : $HTTP_GET_VARS['name'];
+		$title = ( isset($HTTP_POST_VARS['title']) ) ? $HTTP_POST_VARS['title'] : $HTTP_GET_VARS['title'];
+		$description = ( isset($HTTP_POST_VARS['description']) ) ? $HTTP_POST_VARS['description'] : $HTTP_GET_VARS['description'];
+				
+		$MOD_MESSAGE = ""; //сообщение об ошибках или удачах
+			
+		if(strtolower(substr($_FILES["tpl_file"]["name"], -4)) <> ".tpl")
+		{
+			$MOD_MESSAGE .= "Недопустимый формат файла<br>";
+		}
+		
+		if($title == "") $MOD_MESSAGE .= "Недопустимое имя шаблона меню<br>";
+		if($MOD_MESSAGE != "")
+		{
+			header("Location: index.php?p=tpl&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE));
+			exit;
+		}
+		
+		if(copy($_FILES["tpl_file"]["tmp_name"], $SYS['ROOT_WAY']."includes/tpl/menu_".$_FILES["tpl_file"]["name"]))
+		{
+			
+			$MOD_MESSAGE = "<b>Файл успешно загружен<b><br>";
+			$MOD_MESSAGE .= "<b>Характеристики файла:</b> <br>";
+			$MOD_MESSAGE .= "<b>Имя файла:</b> ";
+			$MOD_MESSAGE .= "menu_".$_FILES["tpl_file"]["name"];
+			$MOD_MESSAGE .= "<br><b>Размер файла:</b> ";
+			$MOD_MESSAGE .= $_FILES["tpl_file"]["size"];
+			
+			$n = count($template_data['menu']);
+			$template_data['menu'][$n]['name']=$name;
+			$template_data['menu'][$n]['title']=$title;
+			$template_data['menu'][$n]['description']=$description;
+			$template_data['menu'][$n]['file']="menu_".$_FILES["tpl_file"]["name"];
+			
+			$template_data_yaml = Spyc::YAMLDump($template_data);
+			file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+			
+			header("Location: index.php?p=tpl&msg=".rawurlencode($MOD_MESSAGE));
+			exit;
+		} 
+		else 
+		{
+			$MOD_MESSAGE = "Ошибка загрузки файла";
+			header("Location: index.php?p=tpl&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE));
+			exit;
+		}		
+		break;
+	case "ls_menu":
+		$MOD_TEMPALE = "ls_menu.tpl";
+		
+		// проверяем необходимость отображения системного сообщения
+		$msg = trim(rawurldecode(trim($_GET['msg'])));
+		if($msg != "") $DOCUMENT['MSG'] = $msg;
+		
+		$err_msg = trim(rawurldecode(trim($_GET['errmsg'])));
+		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+		
+		$DOCUMENT['mod']['data']['file_content'] = $template_data;
+		break;
+		
+	
 }
 
 

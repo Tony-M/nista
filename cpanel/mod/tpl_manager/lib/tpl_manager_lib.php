@@ -20,7 +20,7 @@ class tpl_manager
 	
 	public function __construct($SYS = array(), $USER_DATA = array())
 	{
-		if(!is_array($SYS))return false;
+		if(!is_array($SYS))return false; 
 		if(!is_array($USER_DATA))return false;
 		if(count($SYS)== 0)return false;
 		if(count($USER_DATA)== 0)return false;

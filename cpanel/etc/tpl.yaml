@@ -1,4 +1,4 @@
----
+ ---
 layout: 
   - 
     title: основной шаблон
@@ -35,3 +35,12 @@ layout_zone_link:
     contain: 
       - LEFT_COLUMN
       - RIGHT_COLUMN
+menu: 
+  - 
+    name: 1st_menu
+    title: |
+      тестовое меню - название
+    description: >
+      меню используется для
+      тестов
+    file: menu_MenuTemplate_1.tpl
