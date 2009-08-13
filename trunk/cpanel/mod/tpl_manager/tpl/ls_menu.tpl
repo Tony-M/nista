@@ -1,15 +1,13 @@
-<h1>Менеджер по работе с шаблонами</h1>
-<p>В основные функции модуля входит работа с элементами layout и Информационных зон.</p><hr>
+<h1>Менеджер по работе с шаблонами меню</h1>
+<p>Вы имеете возможность осуществлять основные операции с шаблонами отображения меню.</p><hr>
 
 {if $DOCUMENT.MSG <> ""}<div class="sys_msg">{$DOCUMENT.MSG}</div>{/if}
 {if $DOCUMENT.ERR_MSG <> ""}<div class="sys_err_msg">{$DOCUMENT.ERR_MSG}</div>{/if}
 
 <table>
 	<tr>
-		<td><a href="index.php?p=tpl" class="menu_action">Обновить</a></td>
-		<td><a href="index.php?p=tpl&sp=add_tpl" class="menu_action">Добавить Layout</a></td>
-		<td><a href="index.php?p=tpl&sp=add_zone" class="menu_action">Добавить Информационную зону</a></td>
-		<td><a href="index.php?p=tpl&sp=add_menu" class="menu_action">Добавить шаблон меню</a></td>
+		<td><a href="index.php?p=tpl" class="menu_action">Вернуться к шаблонам сайта</a></td>
+		<td><a href="index.php?p=tpl&sp=ls_menu" class="menu_action">Обновить</a></td>
 		<td></td>
 		
 	</tr>
@@ -17,19 +15,21 @@
 <table width="100%">
 	<tr>
 		<td valign="top" width="60%">
-			<h2>Список layout</h2>
+			<h2>Список шаблонов меню</h2>
 			<table border="0" cellspacing="1" cellpadding="1" width="100%" class="table_body">
 				<tr>
-					<td class="table_head">Имя layout</td>
-					<td class="table_head">Описание layout</td>
+					<td class="table_head">Имя меню</td>
+					<td class="table_head">Название меню</td>
+					<td class="table_head">описание меню</td>
 					<td class="table_head">Файл layout</td>
 				</tr>
 			
-				{section name=layout_num loop=$DOCUMENT.mod.data.file_content.layout}
+				{section name=menu_num loop=$DOCUMENT.mod.data.file_content.menu}
 				<tr onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
-					<td class="td_body">{$DOCUMENT.mod.data.file_content.layout[layout_num].title}</td>
-					<td class="td_body">{$DOCUMENT.mod.data.file_content.layout[layout_num].description}</td>
-					<td class="td_body"><a href="index.php?p=tpl&sp=ls_layout_zones&file={$DOCUMENT.mod.data.file_content.layout[layout_num].file}">{$DOCUMENT.mod.data.file_content.layout[layout_num].file}<a/></td>
+					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].name}</td>
+					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].title}</td>
+					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].description}</td>
+					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].file}</td>
 				</tr>
 				{/section}
 			</table>

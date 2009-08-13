@@ -27,7 +27,7 @@
 				{/section}
 	</table>
 	<hr>
-	<h2>Привязать Информационную зону следующим Layout</h2>
+	<h2>Привязать Информационные зоны к выбранному Layout</h2>
 	<table border="0" cellspacing="1" cellpadding="1" width="100%" class="table_body">
 				<tr>
 					<td class="table_head" colspan="2">Имя Layout</td>
