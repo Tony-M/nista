@@ -403,6 +403,99 @@ switch ($sp)
 		
 		$DOCUMENT['mod']['data']['file_content'] = $template_data;
 		break;
+	case "edit_menu":
+		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
+		
+		$menu_name = trim($_GET['menu_name']);
+		$DOCUMENT['mod']['data']['current_menu']=$tpl_manager_obj->get_menu_info($menu_name);
+		if($DOCUMENT['mod']['data']['current_menu'] == false)
+		{
+			$MOD_MESSAGE = "Шаблона меню с таким именем не существует";
+			header("Location: index.php?p=tpl&sp=ls_menu&errmsg=".rawurlencode($MOD_MESSAGE));
+			exit;
+		}
+		
+		$MOD_TEMPALE = "menu_form.tpl";
+		$MOD_ACTION = 'update_menu';
+		break;
+	case "update_menu":
+		$name = ( isset($HTTP_POST_VARS['name']) ) ? $HTTP_POST_VARS['name'] : $HTTP_GET_VARS['name'];
+		$current_name = ( isset($HTTP_POST_VARS['current_name']) ) ? $HTTP_POST_VARS['current_name'] : $HTTP_GET_VARS['current_name'];
+		$title = ( isset($HTTP_POST_VARS['title']) ) ? $HTTP_POST_VARS['title'] : $HTTP_GET_VARS['title'];
+		$description = ( isset($HTTP_POST_VARS['description']) ) ? $HTTP_POST_VARS['description'] : $HTTP_GET_VARS['description'];
+				
+		$MOD_MESSAGE = ""; //сообщение об ошибках или удачах
+			
+		if($_FILES["tpl_file"]["name"] != "")
+		{
+			if(strtolower(substr($_FILES["tpl_file"]["name"], -4)) <> ".tpl")
+			{
+				$MOD_MESSAGE .= "Недопустимый формат файла<br>";
+			}
+		}	
+		
+		if($title == "") $MOD_MESSAGE .= "Недопустимое имя шаблона меню<br>";
+		if($MOD_MESSAGE != "")
+		{
+			header("Location: index.php?p=tpl&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE));
+			exit;
+		}
+		
+		if($_FILES["tpl_file"]["tmp_name"] != "")
+		{
+			if(copy($_FILES["tpl_file"]["tmp_name"], $SYS['ROOT_WAY']."includes/tpl/menu_".$_FILES["tpl_file"]["name"]))
+			{
+				
+				$MOD_MESSAGE = "<b>Файл успешно загружен<b><br>";
+				$MOD_MESSAGE .= "<b>Характеристики файла:</b> <br>";
+				$MOD_MESSAGE .= "<b>Имя файла:</b> ";
+				$MOD_MESSAGE .= "menu_".$_FILES["tpl_file"]["name"];
+				$MOD_MESSAGE .= "<br><b>Размер файла:</b> ";
+				$MOD_MESSAGE .= $_FILES["tpl_file"]["size"];
+				
+				$n = count($template_data['menu']);
+				for($i = 0; $i<$n; $i++)
+				{
+					if($template_data['menu'][$i]['name']==$current_name)
+					{
+						$template_data['menu'][$i]['title']=$title;
+						$template_data['menu'][$i]['description']=$description;
+						$template_data['menu'][$i]['file']="menu_".$_FILES["tpl_file"]["name"];
+					}
+				}
+				$template_data_yaml = Spyc::YAMLDump($template_data);
+				file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+				
+				header("Location: index.php?p=tpl&sp=ls_menu&msg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			} 
+			else 
+			{
+				$MOD_MESSAGE = "Ошибка загрузки файла";
+				header("Location: index.php?p=tpl&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			}		
+		}
+		else 
+		{
+				$n = count($template_data['menu']);
+				for($i = 0; $i<$n; $i++)
+				{
+					if($template_data['menu'][$i]['name']==$current_name)
+					{
+						$template_data['menu'][$i]['title']=$title;
+						$template_data['menu'][$i]['description']=$description;
+					}
+				}
+				$template_data_yaml = Spyc::YAMLDump($template_data);
+				file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+				
+				$MOD_MESSAGE = "Данные меню успешно обновлены";
+				header("Location: index.php?p=tpl&sp=ls_menu&msg=".rawurlencode($MOD_MESSAGE));
+				exit;
+		}
+		break;
 		
 	
 }

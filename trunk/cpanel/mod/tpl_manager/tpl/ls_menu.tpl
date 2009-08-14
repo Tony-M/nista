@@ -22,6 +22,7 @@
 					<td class="table_head">Название меню</td>
 					<td class="table_head">описание меню</td>
 					<td class="table_head">Файл layout</td>
+					<td class="table_head" style="width:16px">&nbsp;</td>
 				</tr>
 			
 				{section name=menu_num loop=$DOCUMENT.mod.data.file_content.menu}
@@ -30,6 +31,7 @@
 					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].title}</td>
 					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].description}</td>
 					<td class="td_body">{$DOCUMENT.mod.data.file_content.menu[menu_num].file}</td>
+					<td style="width:16px;"><a href="index.php?p=tpl&sp=edit_menu&menu_name={$DOCUMENT.mod.data.file_content.menu[menu_num].name}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" height="16" width="16" border="0" title="Редактировать" alt="Редактировать"></a></td>
 				</tr>
 				{/section}
 			</table>
