@@ -1,5 +1,5 @@
 <h1>Создание/редактирование шаблона меню</h1>
-<a href="index.php?p=tpl"  class="menu_action">Отменить</a><hr>
+<a href="index.php?p=tpl&sp=ls_menu"  class="menu_action">К списку меню</a><hr>
 {if $DOCUMENT.ERR_MSG <> ""}<div class="sys_err_msg">{$DOCUMENT.ERR_MSG}</div>{/if}
 <form action="index.php?p=tpl&sp={$MOD_ACTION}" method="post" enctype="multipart/form-data">
 <table><tr><td  class="form_area">
@@ -21,7 +21,10 @@
 		</tr>
 		<tr>
 			<td><span>Файл шаблона* :</span></td>
-			<td><input type="file" name="tpl_file" class="input"></td>			
+			<td>
+				<input type="file" name="tpl_file" class="input">
+				<span>{$DOCUMENT.mod.data.current_menu.file}</span>
+			</td>			
 		</tr>
 		<tr>
 			<td colspan="2"><input type="submit" value="Сохранить" ></td>

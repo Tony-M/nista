@@ -1,4 +1,4 @@
- ---
+---
 layout: 
   - 
     title: основной шаблон
@@ -39,8 +39,8 @@ menu:
   - 
     name: 1st_menu
     title: |
-      тестовое меню - название
+      тестовое меню - название1
     description: >
       меню используется для
-      тестов
-    file: menu_MenuTemplate_1.tpl
+      тестов1
+    file: menu_MenuTemplate_2.tpl

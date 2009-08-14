@@ -76,6 +76,20 @@ class tpl_manager
 	}
 	
 	/**
+	 * Метод осуществляет проверку корректности имени шаблона меню
+	 *
+	 * @param string $menu_name
+	 * @return boolean
+	 */
+	public function is_valid_menu_name($menu_name = "")
+	{
+		$menu_name = trim($menu_name);
+		if($menu_name == "") return false;
+		
+		return true;
+	}
+	
+	/**
 	 * Метод првязывает информационную зону к layout
 	 *
 	 * @param string $zone_name имя информационной зоны
@@ -201,6 +215,25 @@ class tpl_manager
 		{
 			if($this->DATA['config']['zone'][$i]['name'] == $zone_name)
 				return $this->DATA['config']['zone'][$i];				
+		}
+		return false;
+	}
+	
+	/**
+	 * Метод возвращает параметры шаблона меню по имени меню
+	 *
+	 * @param string $menu_name
+	 * @return Array or false
+	 */
+	public function get_menu_info($menu_name = '')
+	{
+		if(!$this->is_valid_menu_name($menu_name))return false;
+		
+		$n = count($this->DATA['config']['menu']);
+		for($i=0; $i<$n; $i++)
+		{
+			if($this->DATA['config']['menu'][$i]['name'] == $menu_name)
+				return $this->DATA['config']['menu'][$i];				
 		}
 		return false;
 	}
