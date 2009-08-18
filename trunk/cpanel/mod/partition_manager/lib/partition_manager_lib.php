@@ -6,13 +6,11 @@ class partition_manager
 	private $DATA = array();
 	
 	// незыблимые прототипы
-	private $p_TBL_NISTA_DATA_STRUCTURE = "data_structure";
-	private $p_TBL_NISTA_DATA_STRUCTURE_CATEGORY  = "data_structure_category";
+	private $p_TBL_NISTA_MENU = "menu";
 	private $p_STATUS_LIST = array("on", "off", "wait", "del");
 	
 	// Рабочие переменные
-	private $TBL_NISTA_DATA_STRUCTURE = "data_structure";
-	private $TBL_NISTA_DATA_STRUCTURE_CATEGORY = "data_structure_category";
+	private $TBL_NISTA_MENU = "menu";
 	public $PREFIX = "tbl_nista_";
 	
 	/**
@@ -44,31 +42,31 @@ class partition_manager
 		
 		$this->DATA['STATUS_LIST']= $this->p_STATUS_LIST;
 		
-		$this->TBL_NISTA_DATA_STRUCTURE = $this->PREFIX.$this->p_TBL_NISTA_DATA_STRUCTURE;
-		$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY=$this->PREFIX.$this->p_TBL_NISTA_DATA_STRUCTURE_CATEGORY;
+		$this->TBL_NISTA_MENU = $this->PREFIX.$this->p_TBL_NISTA_MENU;
+		
 //		$this->debug();	
 	}
 	
 	/**
-	 * Метод устанавливет id раздела, с которым требуется произвести работу
+	 * Метод устанавливет id меню, с которым требуется произвести работу
 	 *
 	 * @param integer $id
 	 * @return boolean
 	 */
-	public function set_id($id="")
+	public function set_menu_id($id="")
 	{
 		
 		$id=trim($id); 
 		$id = (int)$id;
 		if($id==0)return false;
-		$this->DATA['id']=$id;
+		$this->DATA['menu_id']=$id;
 		return true;
 	}
 	
 	/**
-	 * Метод устанавливает значение заголовка раздела 
+	 * Метод устанавливает значение заголовка меню 
 	 *
-	 * @param string $title заголовок раздела
+	 * @param string $title заголовок меню
 	 * @return boolean
 	 */
 	public function set_title($title="")
@@ -83,9 +81,9 @@ class partition_manager
 	
 	
 	/**
-	 * Метод устанавливает описание раздела 
+	 * Метод устанавливает описание меню 
 	 *
-	 * @param string $text описание раздела
+	 * @param string $text описание меню
 	 * @return boolean
 	 */
 	public function set_text($text="")
@@ -96,9 +94,9 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод устанавливает Ключевые слова раздела
+	 * Метод устанавливает Ключевые слова меню
 	 *
-	 * @param string $key_word ключевые слова раздела через запятую
+	 * @param string $key_word ключевые слова меню через запятую
 	 * @return boolean
 	 */
 	public function set_meta_keyword($key_word = "")
@@ -113,9 +111,9 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод устанавливает метаописание раздела
+	 * Метод устанавливает метаописание меню
 	 *
-	 * @param string $description описание раздела 
+	 * @param string $description описание меню 
 	 * @return boolean
 	 */
 	public function set_meta_description($description = "")
@@ -158,9 +156,9 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод задаёт шаблон отображения раздела
+	 * Метод задаёт шаблон отображения меню
 	 *
-	 * @param string $template_name шаблон отображения раздела
+	 * @param string $template_name шаблон отображения меню
 	 * @return boolean
 	 */
 	public  function set_template($template_name= "")
@@ -197,7 +195,7 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод устанавливает id раздела сайта для  категории
+	 * Метод устанавливает id меню сайта для  категории
 	 *
 	 * @param integer $owner_id
 	 * @return boolean
@@ -240,7 +238,7 @@ class partition_manager
 	 */
 	public function count_all_partitions()
 	{
-		$query = "select count(id) as num from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."'";
+		$query = "select count(id) as num from ".$this->TBL_NISTA_MENU." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."'";
 		//echo $query."<br>";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
@@ -269,7 +267,7 @@ class partition_manager
 		{
 			////// создаём новый раздел //////
 			
-			$query = "insert into ".$this->TBL_NISTA_DATA_STRUCTURE." 
+			$query = "insert into ".$this->TBL_NISTA_MENU." 
 						set 
 							type='prt', 
 							modid='".$this->DATA['MOD_DATA']['modid']."',
@@ -313,7 +311,7 @@ class partition_manager
 							}
 						}
 						if($path=="/")$path="";
-						$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+						$query = "update ".$this->TBL_NISTA_MENU."
 									set
 										link='".$path."/index.php?data=".$partition_id."' 
 									where
@@ -333,7 +331,7 @@ class partition_manager
 			if($partition_info)
 			{//если не false то можно обновлять.....
 				
-				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE." 
+				$query = "update ".$this->TBL_NISTA_MENU." 
 							set 
 								creator_uid = '".$this->DATA['USER_DATA']['uid']."',
 								date_created='".$this->get_date()."', ";
@@ -387,7 +385,7 @@ class partition_manager
 							}
 							if($path=="/")$path="";
 							
-							$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+							$query = "update ".$this->TBL_NISTA_MENU."
 										set
 											link='".$path."/index.php?data=".$this->DATA['id']."' 
 										where
@@ -414,7 +412,7 @@ class partition_manager
 		if(!$this->is_exist_root_partition())
 		{
 			$query = "insert into ". 
-							$this->TBL_NISTA_DATA_STRUCTURE." 
+							$this->TBL_NISTA_MENU." 
 						set 
 							id='1', 
 							pid='1', 
@@ -433,13 +431,13 @@ class partition_manager
 	}
 		
 	/**
-	 * метод проверяет наличие корневого раздела сайта
+	 * метод проверяет наличие корневого меню сайта
 	 *
 	 * @return boolean
 	 */
 	public function is_exist_root_partition()
 	{
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and id='1' and pid='1' and modid='".$this->DATA['MOD_DATA']['modid']."'";
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='prt' and id='1' and pid='1' and modid='".$this->DATA['MOD_DATA']['modid']."'";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			mysql_free_result($result_id);
@@ -450,13 +448,13 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод возвращает id корневого раздела
+	 * Метод возвращает id корневого меню
 	 *
 	 * @return integer or False
 	 */
 	public function get_root_partition_id()
 	{
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and id='1' and pid='1' and modid='".$this->DATA['MOD_DATA']['modid']."'";
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='prt' and id='1' and pid='1' and modid='".$this->DATA['MOD_DATA']['modid']."'";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
@@ -474,7 +472,7 @@ class partition_manager
 	 */
 	public function get_max_sequence()
 	{
-		$query = "select max(sequence) as num from ".$this->TBL_NISTA_DATA_STRUCTURE;
+		$query = "select max(sequence) as num from ".$this->TBL_NISTA_MENU;
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			$sequence = mysql_fetch_array($result_id, MYSQL_ASSOC);
@@ -497,9 +495,9 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод возвращает список подразделов данного раздела сайта
+	 * Метод возвращает список подразделов данного меню сайта
 	 *
-	 * @param integer $partition_id id родительского раздела
+	 * @param integer $partition_id id родительского меню
 	 * @return Array or false
 	 */
 	public function get_daughter_partition($partition_id = 0)
@@ -508,7 +506,7 @@ class partition_manager
 		
 		if($partition_id==0)return false;
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and pid='".$partition_id."'";
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and pid='".$partition_id."'";
 		
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
@@ -535,7 +533,7 @@ class partition_manager
 		
 		$result = array();
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and pid='".$partition_id."' and pid!=id";
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and pid='".$partition_id."' and pid!=id";
 		//echo $query."<br>".$tab."<br>";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
@@ -571,7 +569,7 @@ class partition_manager
 	public function get_all_partition_trees()
 	{
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."'  and pid=id ";
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."'  and pid=id ";
 		$query .= " order by id asc";
 		//echo $query."<br>";
 		$result = array();
@@ -613,7 +611,7 @@ class partition_manager
 		
 		if($id==0)return false;
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and id='".$id."'";
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='prt' and modid='".$this->DATA['MOD_DATA']['modid']."' and id='".$id."'";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)==1))
 		{
 			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
@@ -630,8 +628,8 @@ class partition_manager
 	 * В случае если петли нет то возвращается True.
 	 * Если петля есть то возвращается False
 	 *
-	 * @param integer $current_id id раздела, который пперелинковываем
-	 * @param integer $parent_id id раздела, к которому линкуем
+	 * @param integer $current_id id меню, который пперелинковываем
+	 * @param integer $parent_id id меню, к которому линкуем
 	 * @return boolean
 	 */
 	public function check_partition_no_loop($current_id = 0, $parent_id=0)
@@ -663,7 +661,7 @@ class partition_manager
 	 */
 	public function purge_variables()
 	{
-		$query = "describe ".$this->TBL_NISTA_DATA_STRUCTURE;
+		$query = "describe ".$this->TBL_NISTA_MENU;
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			
@@ -674,7 +672,7 @@ class partition_manager
 			}
 		}
 		
-		$query = "describe ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY;
+		$query = "describe ".$this->TBL_NISTA_MENU_CATEGORY;
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			
@@ -703,7 +701,7 @@ class partition_manager
 				{
 					if(!$this->check_category_existanse($this->DATA['title'], $this->DATA['prt_id']))
 					{
-						$query = "insert into ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY."
+						$query = "insert into ".$this->TBL_NISTA_MENU_CATEGORY."
 									set
 										title='".$this->DATA['title']."', 
 										prt_id='".$this->DATA['prt_id']."'";
@@ -718,7 +716,7 @@ class partition_manager
 			if($this->DATA['title'] != "")
 			{
 				
-					$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY."
+					$query = "update ".$this->TBL_NISTA_MENU_CATEGORY."
 									set
 										title='".$this->DATA['title']."'
 									where
@@ -734,10 +732,10 @@ class partition_manager
 	}
 	
 	/**
-	 * Метод проверяет существование категории title для раздела с заданным id
+	 * Метод проверяет существование категории title для меню с заданным id
 	 *
 	 * @param string $title заголовок категории
-	 * @param integer $prt_id id раздела
+	 * @param integer $prt_id id меню
 	 * @return integer of False
 	 */
 	public function check_category_existanse($title="", $prt_id=0)
@@ -749,7 +747,7 @@ class partition_manager
 		$prt_id = (int)$prt_id;
 		if($prt_id==0)return false;
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY." 
+		$query = "select * from ".$this->TBL_NISTA_MENU_CATEGORY." 
 					where
 						prt_id='".$prt_id."' and
 						title='".$title."'";
@@ -765,9 +763,9 @@ class partition_manager
 	}
 	
 	/**
-	 * метод возвращает список категорий для выбранного раздела
+	 * метод возвращает список категорий для выбранного меню
 	 *
-	 * @param integer $partition_id id раздела сайта
+	 * @param integer $partition_id id меню сайта
 	 * @return array or False
 	 */
 	public function get_category_list_4_partition($partition_id = 0)
@@ -775,7 +773,7 @@ class partition_manager
 		$partition_id = (int)trim($partition_id);
 		if($partition_id == 0)return false;
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY." 
+		$query = "select * from ".$this->TBL_NISTA_MENU_CATEGORY." 
 					where 
 						prt_id='".$partition_id."' 
 					order by title asc";
@@ -795,7 +793,7 @@ class partition_manager
 	
 	
 	/**
-	 * Метод удаляет категорию раздела и обновляет записи таблицы данных
+	 * Метод удаляет категорию меню и обновляет записи таблицы данных
 	 *
 	 * @param integer $id id категории
 	 * @return "ok" on success of  "err_no_priv_delete" "err_no_priv_to_update" on fail
@@ -804,11 +802,11 @@ class partition_manager
 		$id = (int)trim($id);
 		if($id == 0) return false;
 		
-		$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE." set category_id='0' where id='".$id."'";
+		$query = "update ".$this->TBL_NISTA_MENU." set category_id='0' where id='".$id."'";
 		//echo $query."<br>";
 		if(mysql_query($query))
 		{
-			$query = "delete from ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY." where id='".$id."'";
+			$query = "delete from ".$this->TBL_NISTA_MENU_CATEGORY." where id='".$id."'";
 			//echo $query."<br>";
 			if(mysql_query($query))
 			{
@@ -832,7 +830,7 @@ class partition_manager
 		$id = (int)trim($id);
 		if($id ==0)return false;
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY." 
+		$query = "select * from ".$this->TBL_NISTA_MENU_CATEGORY." 
 					where 
 						id='".$id."'";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
@@ -847,7 +845,7 @@ class partition_manager
 	
 	
 	/**
-	 * Метод производит обновление статуса раздела
+	 * Метод производит обновление статуса меню
 	 *
 	 * @return boolean
 	 */
@@ -857,7 +855,7 @@ class partition_manager
 		{
 			if(in_array($this->DATA['status'], $this->DATA['STATUS_LIST']))
 			{
-				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE." 
+				$query = "update ".$this->TBL_NISTA_MENU." 
 							set 
 								status='".$this->DATA['status']."' 
 							where 
@@ -874,7 +872,7 @@ class partition_manager
 	
 		
 	/**
-	 * Метод возвращает xml список категорий для заданного раздела в формате id->title
+	 * Метод возвращает xml список категорий для заданного меню в формате id->title
 	 *
 	 * @param integer $partition_id
 	 * @return array or False
@@ -885,7 +883,7 @@ class partition_manager
 		
 		if($partition_id == 0)return false;
 		
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE_CATEGORY." where prt_id='".$partition_id."' order by title asc";
+		$query = "select * from ".$this->TBL_NISTA_MENU_CATEGORY." where prt_id='".$partition_id."' order by title asc";
 		//echo $query."<br>";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
@@ -1079,7 +1077,7 @@ class partition_manager
 	 */
 	public function get_partition_array()
 	{
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." 
+		$query = "select * from ".$this->TBL_NISTA_MENU." 
 					where 
 						type='prt' and 
 						modid='".$this->DATA['MOD_DATA']['modid']."' 
@@ -1185,10 +1183,10 @@ class partition_manager
 	
 	
 	/**
-	 * Метод осуществляет привязку раздела к каталогу
+	 * Метод осуществляет привязку меню к каталогу
 	 *
 	 * @param string $path путь к каталогу
-	 * @param integer $partition_id идентификатор раздела
+	 * @param integer $partition_id идентификатор меню
 	 * @return boolean
 	 */
 	public function link_catalog_to_partition($path = "", $partition_id=0)
@@ -1218,7 +1216,7 @@ class partition_manager
 		
 		if($partition)
 		{
-			$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE. " 
+			$query = "update ".$this->TBL_NISTA_MENU. " 
 						set 
 							link='".$path."' 
 						where 
@@ -1266,7 +1264,7 @@ class partition_manager
 								$link = $partition['link'];
 							$link = $partition['link'];
 							$query = "";
-							$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE. " 
+							$query = "update ".$this->TBL_NISTA_MENU. " 
 									set 
 										link='".$path."/index.php?data=".$partitions[$i]['id']."' 
 									where 
@@ -1282,9 +1280,9 @@ class partition_manager
 	}
 	
 	/**
-	 * метод осуществляет отлинковку раздела и каталога
+	 * метод осуществляет отлинковку меню и каталога
 	 *
-	 * @param integer $partition_id id раздела
+	 * @param integer $partition_id id меню
 	 * @return boolean
 	 */
 	public function unlink_partition($partition_id=0)
@@ -1318,11 +1316,11 @@ class partition_manager
 				}
 				unset($index_pos);
 				
-				//создаём path раздела по которому будем доставать детей для перелинковки
+				//создаём path меню по которому будем доставать детей для перелинковки
 				$link = $partition['link'];
 				
 				if(eregi("^(/index\.php)", $link))
-					return false;// типа если идёт отлинковка подкорневого раздела, то исключаем ошибку
+					return false;// типа если идёт отлинковка подкорневого меню, то исключаем ошибку
 				
 				if(eregi("(/index\.php)", $link))
 				{
@@ -1343,7 +1341,7 @@ class partition_manager
 					//$query_parrent_link = $parent_link;
 				
 				//перелинковываем раздел к родителю
-				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+				$query = "update ".$this->TBL_NISTA_MENU."
 							set 
 								link='".$query_parrent_link."/index.php?data=".$partition_id."'
 							where
@@ -1370,7 +1368,7 @@ class partition_manager
 						if($flag!== false)
 						{
 							$query = "";
-							$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+							$query = "update ".$this->TBL_NISTA_MENU."
 										set
 											link='".$query_parrent_link."/index.php?data=".$all_subpartitions[$i]['id']."'
 										where
@@ -1407,7 +1405,7 @@ class partition_manager
 		$path=htmlentities(strip_tags($path),ENT_QUOTES, "UTF-8");
 		$path=trim($path); 
 		//echo $path;
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." 
+		$query = "select * from ".$this->TBL_NISTA_MENU." 
 					where
 						modid='".$this->DATA['MOD_DATA']['modid']."' and 
 						type='prt' and
@@ -1434,7 +1432,7 @@ class partition_manager
 			return true;
 		
 		//ищем родителя радела
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE."
+		$query = "select * from ".$this->TBL_NISTA_MENU."
 					where
 						modid='".$this->DATA['MOD_DATA']['modid']."' and 
 						type='prt' and
@@ -1460,7 +1458,7 @@ class partition_manager
 			return false; // если нет родителя то не к кому перелинковывать значит это корень
 		if($new_path=="/")$new_path="";
 		// ищем дочерние разделы с линком в состав которого входит path
-		$query = "select * from ".$this->TBL_NISTA_DATA_STRUCTURE." 
+		$query = "select * from ".$this->TBL_NISTA_MENU." 
 					where
 						modid='".$this->DATA['MOD_DATA']['modid']."' and 
 						type='prt' and
@@ -1471,7 +1469,7 @@ class partition_manager
 			
 			while($tmp = mysql_fetch_array($result_id, MYSQL_ASSOC))
 			{
-				$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+				$query = "update ".$this->TBL_NISTA_MENU."
 							set 
 								link='".$new_path."/index.php?data=".$tmp['id']."'
 							where
@@ -1486,7 +1484,7 @@ class partition_manager
 			mysql_free_result($result_id);
 		}
 		
-		$query = "update ".$this->TBL_NISTA_DATA_STRUCTURE."
+		$query = "update ".$this->TBL_NISTA_MENU."
 						set 
 							link='".$new_path."/index.php?data=".$path_partition['id']."'
 						where
