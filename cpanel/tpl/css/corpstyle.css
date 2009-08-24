@@ -184,6 +184,11 @@ a, label, b, p, span{
         font-size:8pt;
         color:#494949;
 }
+span.red{color:#ff0000;}
+p.comment, span.comment {
+	color:#a9a9a9;
+	font-style:italic;
+}
 a.menu_action{
 	border:1px solid #656565;
 	padding:3 3 3 3;
