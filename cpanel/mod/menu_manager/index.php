@@ -52,6 +52,14 @@ if(!class_exists("menu_manager"))
 
 $partition_manager_obj = new menu_manager($SYS, $nista->get_module_info_by_par("site"), $MY_USER_DATA);
 
+// получаем информацию о шаблонах
+if(class_exists("tpl_manager"))
+{
+	$tpl_manager_obj = new tpl_manager($SYS, $MY_USER_DATA);
+	$template_data = $tpl_manager_obj->load_config();
+}
+
+
 switch ($sp)
 {
 	default:
@@ -63,6 +71,11 @@ switch ($sp)
 		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		$DOCUMENT['mod']['data']['sub_tpl']=$THIS_MODULE_DIR_NAME."menu_list.tpl"; // шаблон листа статей
+		break;
+	case "add_menu":
+		$MOD_TEMPALE = "menu_form.tpl";
+		
+		$DOCUMENT['mod']['data']['template_content'] = $template_data;
 		break;
 }
 
