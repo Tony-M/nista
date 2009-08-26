@@ -6,13 +6,13 @@ class menu_manager
 	private $DATA = array();
 
 	// незыблимые прототипы
-	private $p_TBL_NISTA_MENU = "data_structure";
-	private $p_TBL_NISTA_MENU_CATEGORY  = "data_structure_category";
+	private $p_TBL_NISTA_MENU = "menu";
+	
 	private $p_STATUS_LIST = array("on", "off", "wait", "del");
 
 	// Рабочие переменные
-	private $TBL_NISTA_MENU = "data_structure";
-	private $TBL_NISTA_MENU_CATEGORY = "data_structure_category";
+	private $TBL_NISTA_MENU = "menu";
+
 	public $PREFIX = "tbl_nista_";
 
 	/**
@@ -45,7 +45,7 @@ class menu_manager
 		$this->DATA['STATUS_LIST']= $this->p_STATUS_LIST;
 
 		$this->TBL_NISTA_MENU = $this->PREFIX.$this->p_TBL_NISTA_MENU;
-		$this->TBL_NISTA_MENU_CATEGORY=$this->PREFIX.$this->p_TBL_NISTA_MENU_CATEGORY;
+		
 		//		$this->debug();
 	}
 
@@ -83,60 +83,80 @@ class menu_manager
 
 
 	/**
-	 * Метод устанавливает описание статьи 
+	 * Метод устанавливает значение флака show_title для заголовка меню
 	 *
-	 * @param string $text описание статьи
+	 * @param string $show_title values: show | hide
 	 * @return boolean
 	 */
-	public function set_text($text="")
+	public function set_show_title($show_title="show")
 	{
-		$text=trim($text);
-		$this->DATA['text']=htmlentities($text,ENT_QUOTES, "UTF-8");
+
+		$show_title=htmlentities(strip_tags($show_title),ENT_QUOTES, "UTF-8");
+		$show_title=trim($show_title);
+		if($show_title == "")$show_title =  "show";
+		$show_title = strtolower($show_title);
+		if(($show_title!="show") && ($show_title!="hide"))$show_title = "show";
+		if($show_title=="show")$this->DATA['show_title'] = 1;
+		else $this->DATA['show_title'] = 0;
+		
 		return true;
 	}
 
-	
 	/**
-	 * Метод устанавливает статус материала
+	 * Метод устанавливает комментарий к элементам меню
 	 *
-	 * @param string $status статус материала (поумолчанию = wait)
+	 * @param string $comment
 	 * @return boolean
 	 */
-	public function set_status($status="wait")
+	public function set_comment($comment="")
 	{
-		$status = trim(strip_tags($status));
-		if($status == "")$status = "wait" ;
-		$status = htmlentities($status,ENT_QUOTES, "UTF-8");
-		if(!in_array($status, $this->DATA['STATUS_LIST']))
-		return false;
-		$this->DATA['status'] = $status;
+		$comment=htmlentities(strip_tags($comment),ENT_QUOTES, "UTF-8");
+		$comment=trim($comment);
+		$this->DATA['comment']=$comment;
 		return true;
 	}
 
-	
 	/**
-	 * Метод устанавливает значение id родительского раздела
+	 * Метод создаёт новый контейнер меню (plain)
 	 *
-	 * @param integer $owner_id
-	 * @return boolean
+	 * @return integer or False
 	 */
-	public function set_owner_id($owner_id=0)
+	public function create_new_menu_container()
 	{
-		$owner_id = (int)$owner_id;
-		if($owner_id==0)
-		{
-			$this->DATA['pid'] = 0;
-			return false;
-		}
+		if($this->DATA['title'] == "") return false;
+		$query = "insert into ".$this->TBL_NISTA_MENU." set ";
+		$query .= " title='".$this->DATA['title']."' ";
+		$query .= " , comment='".$this->DATA['comment']."' ";
+
+		if(($this->DATA['show_title']!=1) && ($this->DATA['show_title']!=0))$this->DATA['show_title']=1;
+
+		$query .= " , show_title='".$this->DATA['show_title']."'";
+		if(mysql_query($query))
+			return mysql_insert_id();
 		else
+			return false;
+	}
+
+	/**
+	 * Метод проверяет является ли создаваемый контейнер меню по своим параметрам дупликатом существующего
+	 *
+	 * @return boolean
+	 */
+	public function is_duplicate_new_menu_container()
+	{
+		$query = "select * from ".$this->TBL_NISTA_MENU."
+					where
+						title='".$this->DATA['title']."'
+						and comment = '".$this->DATA['comment']."'";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
-			$this->DATA['pid'] = $owner_id;
+			mysql_free_result($result_id);
 			return true;
 		}
-
+		
+		return false;
 	}
 
-	
 	/**
 	 * Метод возвращаеттекущую дату и время для datecreated
 	 *
@@ -147,7 +167,7 @@ class menu_manager
 		return date("Y-m-d H:i:s");
 	}
 
-	
+
 	/**
 	 * метод возвращает максимальное значение порядка следования последовательностей
 	 *
@@ -175,7 +195,7 @@ class menu_manager
 	{
 		$seq = $this->get_max_sequence() + 1;
 		return $seq;
-	}	
+	}
 
 	/**
 	 * Метод очищает переменные
@@ -192,9 +212,9 @@ class menu_manager
 				$desc = $tmp['Field'];
 				$this->DATA[$desc] = '';
 			}
-		}	
+		}
 	}
 
-	
+
 
 }

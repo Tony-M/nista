@@ -75,6 +75,9 @@ input.input, textarea.input, select.input{
 border: 1px solid rgb( 145, 155, 156 );
 width:100%;
 }
+input.input_nw, textarea.input_nw, select.input_nw{
+border: 1px solid rgb( 145, 155, 156 );
+}
 
 .btn_login{
 
