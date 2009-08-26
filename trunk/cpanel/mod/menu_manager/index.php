@@ -50,7 +50,7 @@ if(!class_exists("menu_manager"))
 	exit;
 }
 
-$partition_manager_obj = new menu_manager($SYS, $nista->get_module_info_by_par("site"), $MY_USER_DATA);
+$menu_manager_obj = new menu_manager($SYS, $nista->get_module_info_by_par("menu"), $MY_USER_DATA);
 
 // получаем информацию о шаблонах
 if(class_exists("tpl_manager"))
@@ -72,10 +72,47 @@ switch ($sp)
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		$DOCUMENT['mod']['data']['sub_tpl']=$THIS_MODULE_DIR_NAME."menu_list.tpl"; // шаблон листа статей
 		break;
-	case "add_menu":
+	case "add_menu": // Форма создания нового контейнера меню
 		$MOD_TEMPALE = "menu_form.tpl";
+		$MOD_ACTION = 'create_menu';
+		
+		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+		
+		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim($_GET['title']))));
+		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim($_GET['show_title']))));
+		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim($_GET['comment']))));
 		
 		$DOCUMENT['mod']['data']['template_content'] = $template_data;
+		break;
+	case "create_menu": // Создаём в БД новый контейнер меню
+		$title = ( isset($HTTP_POST_VARS['title']) ) ? $HTTP_POST_VARS['title'] : $HTTP_GET_VARS['title'];
+		$show_title = ( isset($HTTP_POST_VARS['show_title']) ) ? $HTTP_POST_VARS['show_title'] : $HTTP_GET_VARS['show_title'];
+		$comment = ( isset($HTTP_POST_VARS['comment']) ) ? $HTTP_POST_VARS['comment'] : $HTTP_GET_VARS['comment'];
+		
+		if($menu_manager_obj->set_title($title) && $menu_manager_obj->set_comment($comment))
+		{
+			// если в БД есть контейнер меню с такими же данными то это может привести к путанице => исключаем её
+			if($menu_manager_obj->is_duplicate_new_menu_container())
+			{
+				$MOD_MESSAGE = "В базе данных уже существует контейнер меню с таким же заголовком и комментарием. ";
+				header("Location: index.php?p=menu&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE)."&title=".rawurlencode($title)."&comment=".rawurlencode($comment)."&show_title=".rawurlencode($show_title));
+				exit;
+			}
+			// создаём контейнер меню
+			$menu_manager_obj->set_show_title($show_title);
+			if($menu_manager_obj->create_new_menu_container())
+			{
+				$MOD_MESSAGE = "Контейнер меню '".$title."' успешно создан ";
+				header("Location: index.php?p=menu&msg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			}
+		}
+		
+		$MOD_MESSAGE = "Во время создания контейнера меню произошли ошибки ";
+		header("Location: index.php?p=menu&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE)."&title=".rawurlencode($title)."&comment=".rawurlencode($comment)."&show_title=".rawurlencode($show_title));
+		exit;
+		
 		break;
 }
 
