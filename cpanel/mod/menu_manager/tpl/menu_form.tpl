@@ -11,6 +11,7 @@
 					<td><span>Заголовок Меню<span class="red">*</span> :</span></td>
 					<td>
 						<div align="justify">
+							<input type="hidden" name="menu_id" id="menu_id" value="{$DOCUMENT.menu_id}" maxlength="11">
 							<input type="text" name="title" id="title" maxlength="255" size="70" class="input_nw" value="{$DOCUMENT.title}">
 							<select id="show_title" name="show_title"  class="input_nw">
 								<option value="show" {if $DOCUMENT.show_title=="show"}selected{/if}>Отображать</option>
