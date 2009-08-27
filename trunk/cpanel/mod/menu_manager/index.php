@@ -70,7 +70,10 @@ switch ($sp)
 		
 		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
-		$DOCUMENT['mod']['data']['sub_tpl']=$THIS_MODULE_DIR_NAME."menu_list.tpl"; // шаблон листа статей
+		
+		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();
+		
+		$DOCUMENT['mod']['data']['sub_tpl']=$THIS_MODULE_DIR_NAME."menu_list.tpl"; // шаблон списка меню
 		break;
 	case "add_menu": // Форма создания нового контейнера меню
 		$MOD_TEMPALE = "menu_form.tpl";
@@ -82,6 +85,54 @@ switch ($sp)
 		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim($_GET['title']))));
 		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim($_GET['show_title']))));
 		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim($_GET['comment']))));
+		
+		$DOCUMENT['mod']['data']['template_content'] = $template_data;
+		break;
+	case "edit_menu":
+		$MOD_TEMPALE = "menu_form.tpl";
+		$MOD_ACTION = 'update_menu';
+		
+		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+		
+		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim($_GET['title']))));
+		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim($_GET['show_title']))));
+		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim($_GET['comment']))));
+		
+		$id = ( isset($HTTP_POST_VARS['id']) ) ? $HTTP_POST_VARS['id'] : $HTTP_GET_VARS['id'];
+		if((int)$id != 0)
+		{
+			$menu_container = $menu_manager_obj->get_menu_container_by_id($id);
+			if($menu_container!= false)
+			{
+				$DOCUMENT['title'] = $menu_container['title'];
+				if($menu_container['show_title'] == 1)
+					$DOCUMENT['show_title'] = "show";
+				if($menu_container['show_title'] == 0) 
+					$DOCUMENT['show_title'] = "hide";
+				$DOCUMENT['comment'] = $menu_container['comment'];
+				$DOCUMENT['menu_id'] = $id;
+			}
+			else 
+			{
+				$MOD_MESSAGE = "Контейнер меню с таким id не существует ";
+				header("Location: index.php?p=menu&errmsg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			}
+		}
+		else 
+		{
+			$id = ( isset($HTTP_POST_VARS['menu_id']) ) ? $HTTP_POST_VARS['menu_id'] : $HTTP_GET_VARS['menu_id'];
+			$menu_container = $menu_manager_obj->get_menu_container_by_id($id);
+			if($menu_container!= false)
+				$DOCUMENT['menu_id'] = $id;
+			else 
+			{
+				$MOD_MESSAGE = "Контейнер меню с таким id не существует ";
+				header("Location: index.php?p=menu&errmsg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			}
+		}
 		
 		$DOCUMENT['mod']['data']['template_content'] = $template_data;
 		break;
@@ -111,6 +162,47 @@ switch ($sp)
 		
 		$MOD_MESSAGE = "Во время создания контейнера меню произошли ошибки ";
 		header("Location: index.php?p=menu&sp=add_menu&errmsg=".rawurlencode($MOD_MESSAGE)."&title=".rawurlencode($title)."&comment=".rawurlencode($comment)."&show_title=".rawurlencode($show_title));
+		exit;
+		
+		break;
+	case "update_menu": // обновляем в БД  контейнер меню
+		$title = ( isset($HTTP_POST_VARS['title']) ) ? $HTTP_POST_VARS['title'] : $HTTP_GET_VARS['title'];
+		$show_title = ( isset($HTTP_POST_VARS['show_title']) ) ? $HTTP_POST_VARS['show_title'] : $HTTP_GET_VARS['show_title'];
+		$comment = ( isset($HTTP_POST_VARS['comment']) ) ? $HTTP_POST_VARS['comment'] : $HTTP_GET_VARS['comment'];
+		$menu_id = ( isset($HTTP_POST_VARS['menu_id']) ) ? $HTTP_POST_VARS['menu_id'] : $HTTP_GET_VARS['menu_id'];
+		$menu_id = (int)$menu_id;
+		
+		$menu_container= $menu_manager_obj->get_menu_container_by_id($menu_id);
+		if($menu_container == false)
+		{
+			$MOD_MESSAGE = "Контейнер меню с таким id не существует ";
+			header("Location: index.php?p=menu&errmsg=".rawurlencode($MOD_MESSAGE));
+			exit;
+		}
+		
+		if($menu_manager_obj->set_title($title) && $menu_manager_obj->set_comment($comment) && ($menu_manager_obj->set_menu_id($menu_id)))
+		{
+			// если в БД есть контейнер меню с такими же данными то это может привести к путанице => исключаем её
+			if($menu_manager_obj->is_duplicate_new_menu_container())
+			{
+				$MOD_MESSAGE = "В базе данных уже существует контейнер меню с таким же заголовком и комментарием. ";
+				header("Location: index.php?p=menu&sp=edit_menu&errmsg=".rawurlencode($MOD_MESSAGE)."&title=".rawurlencode($title)."&comment=".rawurlencode($comment)."&show_title=".rawurlencode($show_title)."&menu_id=".rawurlencode($menu_id));
+				exit;
+			}
+			// обновляем контейнер меню
+			$menu_manager_obj->set_show_title($show_title);
+			
+						
+			if($menu_manager_obj->update_menu_container())
+			{
+				$MOD_MESSAGE = "информация о контейнере меню '".$title."' успешно обновена ";
+				header("Location: index.php?p=menu&msg=".rawurlencode($MOD_MESSAGE));
+				exit;
+			}
+		}
+		
+		$MOD_MESSAGE = "Во время обновления контейнера меню произошли ошибки ";
+		header("Location: index.php?p=menu&sp=edit_menu&errmsg=".rawurlencode($MOD_MESSAGE)."&title=".rawurlencode($title)."&comment=".rawurlencode($comment)."&show_title=".rawurlencode($show_title)."&menu_id=".rawurlencode($menu_id));
 		exit;
 		
 		break;

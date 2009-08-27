@@ -50,18 +50,18 @@ class menu_manager
 	}
 
 	/**
-	 * Метод устанавливет id статьи, с которой требуется произвести работу
+	 * Метод устанавливет menu_id 
 	 *
-	 * @param integer $id
+	 * @param integer $menu_id
 	 * @return boolean
 	 */
-	public function set_id($id="")
+	public function set_menu_id($menu_id="")
 	{
 
-		$id=trim($id);
-		$id = (int)$id;
-		if($id==0)return false;
-		$this->DATA['id']=$id;
+		$menu_id=trim($menu_id);
+		$menu_id = (int)$menu_id;
+		if($menu_id==0)return false;
+		$this->DATA['menu_id']=$menu_id;
 		return true;
 	}
 
@@ -124,7 +124,8 @@ class menu_manager
 	public function create_new_menu_container()
 	{
 		if($this->DATA['title'] == "") return false;
-		$query = "insert into ".$this->TBL_NISTA_MENU." set ";
+		$query = "insert into ".$this->TBL_NISTA_MENU." set 
+					type='container', ";
 		$query .= " title='".$this->DATA['title']."' ";
 		$query .= " , comment='".$this->DATA['comment']."' ";
 
@@ -136,6 +137,50 @@ class menu_manager
 		else
 			return false;
 	}
+	
+	/**
+	 * Метод обновляет информацию о контейнере меню по его id
+	 *
+	 * @return boolean
+	 */
+	public function update_menu_container()
+	{
+		if($this->DATA['title'] == "") return false;
+		if($this->DATA['menu_id'] == "") return false;
+		
+		$query = "update ".$this->TBL_NISTA_MENU." set ";
+		$query .= " title='".$this->DATA['title']."' ";
+		$query .= " , comment='".$this->DATA['comment']."' ";
+
+		if(($this->DATA['show_title']!=1) && ($this->DATA['show_title']!=0))$this->DATA['show_title']=1;
+
+		$query .= " , show_title='".$this->DATA['show_title']."' ";
+		
+		$query .= " where  type='container' and menu_id='".$this->DATA['menu_id']."'";
+		return mysql_query($query);
+	}
+	
+	/**
+	 * Метод возвращает информацию о контейнере мееню по его id
+	 *
+	 * @param integer $id
+	 * @return Array or False
+	 */
+	public function get_menu_container_by_id($id = 0)
+	{
+		$id = (int)$id;
+		if(!$id)return false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='container' and menu_id='".$id."'";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+		{
+			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			$this->DATA['menu_container']=$result;
+			return $result;
+		}
+		return false;
+	}
 
 	/**
 	 * Метод проверяет является ли создаваемый контейнер меню по своим параметрам дупликатом существующего
@@ -145,15 +190,39 @@ class menu_manager
 	public function is_duplicate_new_menu_container()
 	{
 		$query = "select * from ".$this->TBL_NISTA_MENU."
-					where
-						title='".$this->DATA['title']."'
+					where 
+						type = 'container'
+						and title='".$this->DATA['title']."'
 						and comment = '".$this->DATA['comment']."'";
+		if((int)$this->DATA['menu_id']!=0) $query .= " and menu_id!='".$this->DATA['menu_id']."'";
 		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			mysql_free_result($result_id);
 			return true;
 		}
 		
+		return false;
+	}
+	
+	/**
+	 * Метод возвращяет полный смисок контейнеров меню
+	 *
+	 * @return Array or False
+	 */
+	public function get_menu_list()
+	{
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='container' order by title asc" ;
+//		echo $query."<br>";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = array();
+			while ($tmp=mysql_fetch_array($result_id,MYSQL_ASSOC)) 
+			{
+				$result[] = $tmp;
+			}
+			mysql_free_result($result_id);
+			return $result;
+		}
 		return false;
 	}
 
