@@ -22,6 +22,12 @@
 
 <form method="POST" enctype="multipart/form-data" id="frm_menu_list" name="frm_menu_list" action="index.php?p=menu&sp=update_menu_status">
 <h2>Список меню сайта</h2>
+<select name="owner_partition" id="owner_partition" style="width:100%;" class="input" onchange="get_item_list(this.options[this.selectedIndex].value);">
+	<option value="0" {if $DOCUMENT.mod.data.ptr_id=='0'}selected style="font-weight:bold;"{/if}>Все меню</option>
+	{section name=prt_num loop=$DOCUMENT.mod.data.partition_tree}
+		<option value="{$DOCUMENT.mod.data.partition_tree[prt_num].id}" {if $DOCUMENT.mod.data.partition_tree[prt_num].id == $DOCUMENT.mod.data.ptr_id}selected style="font-weight:bold;"{/if}>|-{$DOCUMENT.mod.data.partition_tree[prt_num].tab_char}{$DOCUMENT.mod.data.partition_tree[prt_num].title}</option>
+	{/section}
+</select><br><br>
 <div name="main_div" id="main_div">
 {include file=$DOCUMENT.mod.data.sub_tpl}
 </div>

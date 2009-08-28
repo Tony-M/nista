@@ -7,12 +7,14 @@ class menu_manager
 
 	// незыблимые прототипы
 	private $p_TBL_NISTA_MENU = "menu";
+	private $p_TBL_NISTA_MENU_LINKS = "menu_links";
 	
 	private $p_STATUS_LIST = array("on", "off", "wait", "del");
 
 	// Рабочие переменные
 	private $TBL_NISTA_MENU = "menu";
-
+	private $TBL_NISTA_MENU_LINKS = "menu_links";
+	
 	public $PREFIX = "tbl_nista_";
 
 	/**
@@ -45,6 +47,7 @@ class menu_manager
 		$this->DATA['STATUS_LIST']= $this->p_STATUS_LIST;
 
 		$this->TBL_NISTA_MENU = $this->PREFIX.$this->p_TBL_NISTA_MENU;
+		$this->TBL_NISTA_MENU_LINKS = $this->PREFIX.$this->p_TBL_NISTA_MENU_LINKS;
 		
 		//		$this->debug();
 	}
@@ -116,6 +119,25 @@ class menu_manager
 		return true;
 	}
 
+	
+	/**
+	 * Метод устанавливает статус 
+	 *
+	 * @param string $status статус  (поумолчанию = wait)
+	 * @return boolean
+	 */
+	public function set_status($status="wait")
+	{
+		$status = trim(strip_tags($status));
+		if($status == "")$status = "wait" ;
+		$status = htmlentities($status,ENT_QUOTES, "UTF-8");
+		if(!in_array($status, $this->DATA['STATUS_LIST']))
+			return false;		
+		$this->DATA['status'] = $status;
+		return true;
+	}
+	
+	
 	/**
 	 * Метод создаёт новый контейнер меню (plain)
 	 *
@@ -157,6 +179,27 @@ class menu_manager
 		$query .= " , show_title='".$this->DATA['show_title']."' ";
 		
 		$query .= " where  type='container' and menu_id='".$this->DATA['menu_id']."'";
+		return mysql_query($query);
+	}
+	
+	/**
+	 * Метод обновляет статус контейнера меню по его id
+	 *
+	 * @return boolean
+	 */
+	public function update_menu_container_status()
+	{
+		if($this->DATA['menu_id'] == "") return false;
+		
+		if(!in_array($this->DATA['status'], $this->DATA['STATUS_LIST'])) return false;		
+		
+		$query = "update ".$this->TBL_NISTA_MENU." 
+					set
+						status='".$this->DATA['status']."' 
+					where
+						type='container'
+						and menu_id='".$this->DATA['menu_id']."'";
+		//echo $query."<br>";
 		return mysql_query($query);
 	}
 	

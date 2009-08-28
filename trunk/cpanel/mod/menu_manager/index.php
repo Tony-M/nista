@@ -7,7 +7,7 @@ $MOD_TEMPALE = "mod_index.tpl"; // Шаблон модуля поумолчан�
 
 $ThisModuleInfo = $nista->get_module_info_by_par($p); // информация о данном модуле
 
-$SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page'] = 20; // количество строк отображаемых на 1 страницу
+$SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page'] = 5; // количество строк отображаемых на 1 страницу
 $DOCUMENT['mod']['data'] = array(); // очищаем данные модуля для вывода
 
 //****************** Подключаем JS библиотеки модуля ********************
@@ -59,6 +59,8 @@ if(class_exists("tpl_manager"))
 	$template_data = $tpl_manager_obj->load_config();
 }
 
+$partition_manager_obj = new partition_manager($SYS, $nista->get_module_info_by_par("site"), $MY_USER_DATA);
+$partition_manager_obj->create_root_partition();
 
 switch ($sp)
 {
@@ -71,9 +73,55 @@ switch ($sp)
 		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
+		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
+		
+		//список статей для выбранного раздела
+		$prt_id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		if((int)$prt_id==0)$prt_id=0; // Если не задан id раздела то отображать все меню
+		//$DOCUMENT['mod']['data']['item_list'] =$item_manager_obj->get_item_list_for_partition((int)$prt_id);
+		
 		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();
 		
+		//*** начинаем генерацию страниц и меню страниц статей
+		$pagination_obj = new pagination_manager();
+		$pagination_obj->set_total_records(count($DOCUMENT['mod']['data']['menu_containers']));
+		$pagination_obj->set_records_on_page_limit($SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page']); // количество строк на страницу
+		$pagination_obj->set_current_page(trim($_GET['page'])); // устанавливаем номер текущей страницы
+		$pagination_obj->set_left_page_num_limit(5);
+		$pagination_obj->set_right_page_num_limit(5);
+		$DOCUMENT['mod']['data']['menu_page_list'] = $pagination_obj->get_result();
+		$pagination_obj->set_full_data($DOCUMENT['mod']['data']['menu_containers']);
+		$DOCUMENT['mod']['data']['menu_containers'] = $pagination_obj->get_generated_content();
+		
+		$DOCUMENT['mod']['data']['sub_tpl_pagination_menu_list']=$THIS_MODULE_DIR_NAME."page_list.tpl";
+		//------------------
+				
+		$DOCUMENT['mod']['data']['ptr_id'] = (int)$prt_id;
+		
 		$DOCUMENT['mod']['data']['sub_tpl']=$THIS_MODULE_DIR_NAME."menu_list.tpl"; // шаблон списка меню
+		break;
+	case "get_ls_menu":
+		$layout_template = $THIS_MODULE_DIR_NAME."menu_list.tpl";
+		//список статей для выбранного раздела
+		$prt_id = (isset($HTTP_POST_VARS['prt_id'])) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$DOCUMENT['mod']['data']['ptr_id'] = (int)$prt_id;
+		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();
+		
+		//*** начинаем генерацию страниц и меню страниц статей
+		$page_num = (isset($HTTP_POST_VARS['page'])) ? $HTTP_POST_VARS['page'] : $HTTP_GET_VARS['page'];
+		
+		$pagination_obj = new pagination_manager();
+		$pagination_obj->set_total_records(count($DOCUMENT['mod']['data']['menu_containers']));
+		$pagination_obj->set_records_on_page_limit($SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page']); // количество строк на страницу
+		$pagination_obj->set_current_page(trim($page_num)); // устанавливаем номер текущей страницы
+		$pagination_obj->set_left_page_num_limit(5);
+		$pagination_obj->set_right_page_num_limit(5);
+		$DOCUMENT['mod']['data']['menu_page_list'] = $pagination_obj->get_result();
+		$pagination_obj->set_full_data($DOCUMENT['mod']['data']['menu_containers']);
+		$DOCUMENT['mod']['data']['menu_containers'] = $pagination_obj->get_generated_content();
+				
+		$DOCUMENT['mod']['data']['sub_tpl_pagination_menu_list']=$THIS_MODULE_DIR_NAME."page_list.tpl";
+		//------------------
 		break;
 	case "add_menu": // Форма создания нового контейнера меню
 		$MOD_TEMPALE = "menu_form.tpl";
@@ -205,6 +253,22 @@ switch ($sp)
 		header("Location: index.php?p=menu&sp=edit_menu&errmsg=".rawurlencode($MOD_MESSAGE)."&title=".rawurlencode($title)."&comment=".rawurlencode($comment)."&show_title=".rawurlencode($show_title)."&menu_id=".rawurlencode($menu_id));
 		exit;
 		
+		break;
+	case "update_menu_status":
+		$menu_id = ( isset($HTTP_POST_VARS['menu_id']) ) ? $HTTP_POST_VARS['menu_id'] : $HTTP_GET_VARS['menu_id'];
+		$status = ( isset($HTTP_POST_VARS['status_action']) ) ? $HTTP_POST_VARS['status_action'] : $HTTP_GET_VARS['status_action'];
+		
+		$n = count($menu_id);
+		for($i=0; $i<$n; $i++)
+		{
+			$id = (int)$menu_id[$i];
+			
+			$mc_obj = new menu_manager($SYS, $nista->get_module_info_by_par("menu"), $MY_USER_DATA);
+			if(($mc_obj->set_menu_id($id)) && ($mc_obj->set_status($status)))
+				$mc_obj->update_menu_container_status();
+		}
+		header("Location: index.php?p=menu");
+		exit;
 		break;
 }
 
