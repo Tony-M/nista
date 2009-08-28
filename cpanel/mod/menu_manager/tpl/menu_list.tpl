@@ -1,3 +1,11 @@
+<input type="hidden" name="prt_id" id="prt_id" value="{$DOCUMENT.mod.data.ptr_id}">
+{capture name=menu_item_page_nums}
+	<div style="margin-left:10pt; background-color:#ffffff; "><center>
+	{include file=$DOCUMENT.mod.data.sub_tpl_pagination_menu_list}
+	</center></div>
+{/capture}
+{$smarty.capture.menu_item_page_nums}
+
 <table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body">
 		<tr>
 			<td class="table_head" style="width:48px;" colspan="3">Сост</td>
@@ -6,7 +14,7 @@
 		</tr>
 		{section name=mc_num loop=$DOCUMENT.mod.data.menu_containers}
 		<tr onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
-			<td class="td_body"  style="width:16px;"><input type="checkbox" value="{$DOCUMENT.mod.data.menu_containers[mc_num].id}" name="menu_id[]" id="menu_id[]"></td>
+			<td class="td_body"  style="width:16px;"><input type="checkbox" value="{$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}" name="menu_id[]" id="menu_id[]"></td>
 			<td class="td_body"  style="width:16px;">
 				{if $DOCUMENT.mod.data.menu_containers[mc_num].status == "off"}<img src="{$DOCUMENT.ACP_IMG_WAY}unpublish.gif" width="16" height="16" alt="Отключено" title="Отключено"> {/if}
 				{if $DOCUMENT.mod.data.menu_containers[mc_num].status == "wait"}<img src="{$DOCUMENT.ACP_IMG_WAY}draft.gif" width="16" height="16" alt="В черновиках" title="В черновиках"> {/if}
@@ -20,3 +28,5 @@
 		</tr>
 		{/section}
 </table>
+
+{$smarty.capture.menu_item_page_nums}
