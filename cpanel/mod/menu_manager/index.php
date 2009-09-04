@@ -270,6 +270,37 @@ switch ($sp)
 		header("Location: index.php?p=menu");
 		exit;
 		break;
+	case  "link_menu":
+		$MOD_TEMPALE = "menu_link.tpl";
+		
+		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
+		
+		$DOCUMENT['mod']['data']['menu_tpl_list'] = $tpl_manager_obj->get_menu_list();
+		
+				
+//		for($i=0; $i<$n; $i++)
+//		{
+//			if($info_zones = $tpl_manager_obj->get_layout_zones($DOCUMENT['mod']['data']['partition_tree'][$i]['template']))
+//			{
+//				foreach ($info_zones as $info_zone)
+//					$DOCUMENT['mod']['data']['partition_tree'][$i]['info_zones'][] = $tpl_manager_obj->get_zone_info($info_zone);
+//			}
+//			unset($info_zones);
+//		}
+		//$partition_manager_obj->debug($DOCUMENT);
+		break;
+	case "get_zones":
+		$layout_template = $THIS_MODULE_DIR_NAME."jq_zone_select_list.tpl";
+		
+		$prt_file = ( isset($HTTP_POST_VARS['file']) ) ? $HTTP_POST_VARS['file'] : $HTTP_GET_VARS['file'];
+		
+		
+		if($info_zones = $tpl_manager_obj->get_layout_zones($prt_file))
+		{
+			foreach ($info_zones as $info_zone)
+				$DOCUMENT['mod']['data']['info_zones'][] = $tpl_manager_obj->get_zone_info($info_zone);
+		}
+		break;
 }
 
 

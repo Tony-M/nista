@@ -59,16 +59,17 @@ $partition_manager_obj->create_root_partition();
 
 $item_manager_obj = new item_manager($SYS, $ThisModuleInfo, $MY_USER_DATA);
 
+// проверяем необходимость отображения системного сообщения
+$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+if($msg != "") $DOCUMENT['MSG'] = $msg;
+		
+$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+		
 switch ($sp)
 {
 	default:
-	case "ind":
-		// проверяем необходимость отображения системного сообщения
-		$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
-		if($msg != "") $DOCUMENT['MSG'] = $msg;
-		
-		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
-		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+	case "ind":		
 		
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
 		
@@ -307,6 +308,7 @@ switch ($sp)
 			exit;
 		}
 		break;
+
 }
 
 
