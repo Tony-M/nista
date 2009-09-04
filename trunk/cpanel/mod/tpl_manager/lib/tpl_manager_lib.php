@@ -239,6 +239,16 @@ class tpl_manager
 	}
 	
 	/**
+	 * Метод возвращает список шаблонов для контейнеров меню
+	 *
+	 * @return array
+	 */
+	public function get_menu_list()
+	{
+		return $this->DATA['config']['menu'];
+	}
+	
+	/**
 	 * Метод возвращает параметры layout по имени файла
 	 *
 	 * @param string $layout_file имя файла layout

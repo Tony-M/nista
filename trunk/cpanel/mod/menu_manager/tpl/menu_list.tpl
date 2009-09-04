@@ -22,7 +22,7 @@
 			</td>
 			<td class="td_body" style="width: 16px; background-image: url({$DOCUMENT.ACP_IMG_WAY}{if $DOCUMENT.mod.data.menu_containers[mc_num].has_child=='yes'}plus1.gif{else}line.gif{/if}); background-repeat: repeat-y;">&nbsp;</td>
 			<td class="td_body" style="padding-left:{$DOCUMENT.mod.data.menu_containers[mc_num].tab}5px;">{$DOCUMENT.mod.data.menu_containers[mc_num].title}</td>
-			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=ls_category&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}shape_group.gif" width="16" height="16" alt="Категории раздела" title="Категории раздела" border="0"></a></td>
+			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=link_menu&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}link.gif" width="16" height="16" alt="привязка меню к разделу" title="привязка меню к разделу" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=edit_menu&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
 			<td class="td_body" style="width: 25px;" align="right"><a href="" onclick="delete_menu({$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
 		</tr>
