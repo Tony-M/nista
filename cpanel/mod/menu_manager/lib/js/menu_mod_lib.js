@@ -53,7 +53,7 @@ function get_zones(obj, opt_value)
 
 	if(opt_value != "")
 	{		
-		var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: "p=menu&sp=get_zones&file="+opt_value, async: false }).responseText;
+		var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: "p=menu&sp=get_zones&prt_id="+opt_value, async: false }).responseText;
 		obj.html(otvet);		
 	}
 	else
