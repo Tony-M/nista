@@ -1,7 +1,7 @@
 <?php
 if(!defined('IN_NISTA')) header("Location: http://".$_SERVER['SERVER_NAME']."");
 
-class menu_manager
+class menu_manager extends base_validation
 {
 	private $DATA = array();
 
@@ -327,6 +327,154 @@ class menu_manager
 		}
 	}
 
-
+	/**
+	 * Метод возвращает список разделов, к которым привязано меню
+	 *
+	 * @param integer $menu_id
+	 * @return array or False
+	 */
+	public function get_menu_links_2_partition($menu_id = 0)
+	{
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU_LINKS." where menu_id='".$menu_id."'";
+		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result= array();
+			while($tmp = mysql_fetch_array($result_id,MYSQL_ASSOC))
+			{
+				$result[] = $tmp;
+			}
+			mysql_free_result($result_id);
+			return $result;
+		}
+		return false;
+	}
+	
+	public function set_menu_links_2_partition($partition_id = array(), $zone_name = array(), $template_file=array())
+	{
+		if((!is_array($partition_id)) || (!count($partition_id))) return false;
+		if((!is_array($zone_name)) || (!count($zone_name))) return false;
+		if((!is_array($template_file)) || (!count($template_file))) return false;
+		
+		if((count($partition_id) != count($zone_name)) || (count($partition_id) !=  count($template_file)))return  false;
+		
+		//выбираем уже существующие привязки этого меню к разделам
+		if($this->DATA['menu_id']==0)return false;
+		$old_menu_links_array = $this->get_menu_links_2_partition($this->DATA['menu_id']);
+		
+		// для удобства объединим 3 переменные в один массив
+		$input_links_array = array();
+		$input_links_array['prt_id'] = $partition_id;
+		$input_links_array['zone_name'] = $zone_name;
+		$input_links_array['tpl_file'] = $template_file;
+		
+		
+		$inp_num = count($input_links_array['prt_id']);
+		
+		if(($links_num = count($menu_links_array))>0)
+		{	
+			
+			$old_num = count($old_menu_links_array);
+			
+			//Начинаем искать линки меню, которы требуется удалить
+			// для этого открываем цик по массиву существующих ссылко
+			// и вложенный цикл по новому набору ссылок
+			// Если в новом наборе нет старой ссылки то делаем делит из БД этой ссылки
+			
+			for($i=0; $i<$old_num; $i++)
+			{
+				$flag_exist = 0; // флаг равен 0 если строка ненайдена в новом наборе
+				for($j=0; $j<$inp_num; $j++)
+				{
+					if(($input_links_array['prt_id'][$j]==$old_menu_links_array['prt_id'][$i])&&($input_links_array['zone_name'][$j]==$old_menu_links_array['zone_name'][$i])&&($input_links_array['tpl_file'][$j]==$old_menu_links_array['tpl_file'][$i]))
+						$flag_exist = 1;					
+				}
+				
+				if(!$flag_exist)
+				{
+					$query = "delete from ".$this->TBL_NISTA_MENU_LINKS." where id='".$old_menu_links_array['id'][$i]."'";
+					mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
+//					echo $query."<br>";
+					$query ="";
+				}
+				$flag_exist = 0;
+			}
+			
+			// Теперь необходимо найти те линки, которые надо добавить в БД
+			// для этого открываем цикл по новоым линкам и ищем в старом списке тепункты, которых нет
+			for($j=0; $j<$inp_num; $j++)
+			{
+				$flag_exist = 0; // флаг равен 0 если строка ненайдена в старом наборе
+				for($i=0; $i<$old_num; $i++)
+				{
+					if(($input_links_array['prt_id'][$j]==$old_menu_links_array['prt_id'][$i])&&($input_links_array['zone_name'][$j]==$old_menu_links_array['zone_name'][$i])&&($input_links_array['tpl_file'][$j]==$old_menu_links_array['tpl_file'][$i]))
+						$flag_exist = 1;					
+				}
+				
+				if(!$flag_exist)
+				{
+					$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
+									set
+										menu_id='".$this->DATA['menu_id']."' , 
+										prt_id='".$input_links_array['prt_id'][$j]."' , 
+										zone_name='".$input_links_array['zone_name'][$j]."' ,
+										tpl_file='".$input_links_array['tpl_file'][$j]."'";
+					mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
+//					echo $query."<br>";
+					$query ="";
+				}
+				$flag_exist = 0;
+			}
+		}
+		else 
+		{
+			for($i=0;$i<$inp_num; $i++)
+			{
+				$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
+								set
+									menu_id='".$this->DATA['menu_id']."' , 
+									prt_id='".$input_links_array['prt_id'][$i]."' , 
+									zone_name='".$input_links_array['zone_name'][$i]."' ,
+									tpl_file='".$input_links_array['tpl_file'][$i]."'";
+				mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
+//				echo $query."<br>";
+				$query ="";
+			}
+		}
+	}
+	
+	/**
+	 * Метод проверяет существование связи меню и раздела
+	 *
+	 * @param integer $menu_id
+	 * @param integer $prt_id
+	 * @param string $zone_name
+	 * @param string $tpl_file
+	 * @return array or False
+	 */
+	public function check_menu_link_existanse($menu_id=0, $prt_id=0, $zone_name="", $tpl_file="")
+	{
+		$prt_id = (int)$prt_id;
+		if(!$prt_id)return false;
+		
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU_LINKS." 
+						where
+							menu_id='".$menu_id."' and
+							prt_id='".$prt_id."' and
+							zone_name='".$zone_name."' and
+							tpl_file='".$tpl_file."'";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			return $result;
+		}
+		return false;		
+	}
 
 }

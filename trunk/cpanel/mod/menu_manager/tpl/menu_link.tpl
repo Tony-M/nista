@@ -2,10 +2,12 @@
 <a href="index.php?p=menu"  class="menu_action">Отменить</a>
 <hr>
 {if $DOCUMENT.ERR_MSG <> ""}<div class="sys_err_msg">{$DOCUMENT.ERR_MSG}</div>{/if}
-<form action="index.php?p=menu&sp=" method="post" enctype="multipart/form-data">
+<form action="index.php?p=menu&sp={$MOD_ACTION}" method="post" enctype="multipart/form-data">
+<input type="hidden" value="{$DOCUMENT.mod.data.menu_id}" maxlength="11" name="menu_id" id="menu_id">
 	<table width="100%">
 		<tr>
 			<td class="form_area">
+			<input type="submit" value="Сохранить">
 			<table border="0" cellspacing="1" cellpadding="0" width="100%" id="tb_data" name="tb_data">
 				<tr>
 					<td class="table_head">Раздел</td>
@@ -15,10 +17,10 @@
 				</tr>
 				<tr>
 					<td class="td_body">
-						<select id="prt_id[]" name="prt_id[]"  class="input" onchange="get_zones($(this).parent().next(), this.options[this.selectedIndex].value);">
+						<select id="prt_id[]" name="prt_id[]"  class="input" onchange="get_zones($(this).parent().next(), this.options[this.selectedIndex].value );">
 							<option value="0"></option>
 							{section name=prt_num loop=$DOCUMENT.mod.data.partition_tree}
-								<option value="{$DOCUMENT.mod.data.partition_tree[prt_num].template}">|-{$DOCUMENT.mod.data.partition_tree[prt_num].tab_char}{$DOCUMENT.mod.data.partition_tree[prt_num].title}</option>
+								<option value="{$DOCUMENT.mod.data.partition_tree[prt_num].id}">|-{$DOCUMENT.mod.data.partition_tree[prt_num].tab_char}{$DOCUMENT.mod.data.partition_tree[prt_num].title}</option>
 								{/section}
 						</select>
 					</td>
@@ -40,7 +42,7 @@
 					</td>					
 				</tr>
 			</table>
-			
+			<input type="submit" value="Сохранить">
 			</td>
 		</tr>
 	</table>

@@ -86,6 +86,18 @@ class base_validation{
 		$val = trim($val);
 		return empty($val);
 	}
+	
+	/**
+	 * Метод проверяет состоит ли перименная только из букв латинского алфавита и _ или нет
+	 *
+	 * @param string $variable
+	 * @return boolean
+	 */
+	public function is_valid_english_name($variable="")
+	{
+		if(!eregi("[a-zA-Z_]+", $variable))return false;
+		else return true;
+	}
 }
 
 ?>

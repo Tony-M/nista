@@ -270,12 +270,13 @@ switch ($sp)
 		header("Location: index.php?p=menu");
 		exit;
 		break;
-	case  "link_menu":
+	case  "link_menu": // вывод формы подлинковки меню к разделам
 		$MOD_TEMPALE = "menu_link.tpl";
-		
+		$MOD_ACTION = 'update_menu_link';
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
 		
 		$DOCUMENT['mod']['data']['menu_tpl_list'] = $tpl_manager_obj->get_menu_list();
+		$DOCUMENT['mod']['data']['menu_id'] = ( isset($HTTP_POST_VARS['id']) ) ? $HTTP_POST_VARS['id'] : $HTTP_GET_VARS['id'];
 		
 				
 //		for($i=0; $i<$n; $i++)
@@ -292,8 +293,10 @@ switch ($sp)
 	case "get_zones":
 		$layout_template = $THIS_MODULE_DIR_NAME."jq_zone_select_list.tpl";
 		
-		$prt_file = ( isset($HTTP_POST_VARS['file']) ) ? $HTTP_POST_VARS['file'] : $HTTP_GET_VARS['file'];
-		
+		$prt_id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$partition_info = $partition_manager_obj->get_partition($prt_id);
+		//$partition_manager_obj->debug($partition_info);
+		$prt_file = $partition_info['template'];
 		
 		if($info_zones = $tpl_manager_obj->get_layout_zones($prt_file))
 		{
@@ -301,6 +304,19 @@ switch ($sp)
 				$DOCUMENT['mod']['data']['info_zones'][] = $tpl_manager_obj->get_zone_info($info_zone);
 		}
 		break;
+	case "update_menu_link":
+		
+		$prt_id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$zone_name = ( isset($HTTP_POST_VARS['zone_name']) ) ? $HTTP_POST_VARS['zone_name'] : $HTTP_GET_VARS['zone_name'];
+		$menu_tpl = ( isset($HTTP_POST_VARS['menu_tpl']) ) ? $HTTP_POST_VARS['menu_tpl'] : $HTTP_GET_VARS['menu_tpl'];
+		$menu_id = ( isset($HTTP_POST_VARS['menu_id']) ) ? $HTTP_POST_VARS['menu_id'] : $HTTP_GET_VARS['menu_id'];
+		
+		$menu_manager_obj->set_menu_id($menu_id);
+		$menu_manager_obj->set_menu_links_2_partition($prt_id, $zone_name, $menu_tpl);
+		
+		exit;
+		break;
+		
 }
 
 
