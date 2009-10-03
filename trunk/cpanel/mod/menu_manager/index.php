@@ -62,16 +62,18 @@ if(class_exists("tpl_manager"))
 $partition_manager_obj = new partition_manager($SYS, $nista->get_module_info_by_par("site"), $MY_USER_DATA);
 $partition_manager_obj->create_root_partition();
 
+// проверяем необходимость отображения системного сообщения
+$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+if($msg != "") $DOCUMENT['MSG'] = $msg;
+
+$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+
 switch ($sp)
 {
 	default:
 	case "ind":
-		// проверяем необходимость отображения системного сообщения
-		$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
-		if($msg != "") $DOCUMENT['MSG'] = $msg;
 		
-		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
-		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
 		
@@ -278,7 +280,21 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['menu_tpl_list'] = $tpl_manager_obj->get_menu_list();
 		$DOCUMENT['mod']['data']['menu_id'] = ( isset($HTTP_POST_VARS['id']) ) ? $HTTP_POST_VARS['id'] : $HTTP_GET_VARS['id'];
 		
-				
+		$DOCUMENT['mod']['data']['menu_links'] = $menu_manager_obj->get_menu_links_2_partition($DOCUMENT['mod']['data']['menu_id']);
+		$n =  count($DOCUMENT['mod']['data']['menu_links']);
+		for($i=0; $i<$n; $i++)
+		{
+			$DOCUMENT['mod']['data']['menu_links'][$i]['partition_info'] = $partition_manager_obj->get_partition($DOCUMENT['mod']['data']['menu_links'][$i]['prt_id']);
+			$DOCUMENT['mod']['data']['menu_links'][$i]['zones_list'] = $tpl_manager_obj->get_layout_zones($DOCUMENT['mod']['data']['menu_links'][$i]['partition_info']['template']);
+			$m = count($DOCUMENT['mod']['data']['menu_links'][$i]['zones_list']);
+			for($j=0; $j<$m; $j++)
+			{
+				$DOCUMENT['mod']['data']['menu_links'][$i]['zones_list'][$j] = $tpl_manager_obj->get_zone_info($DOCUMENT['mod']['data']['menu_links'][$i]['zones_list'][$j]);
+			}
+			
+			
+		}
+			
 //		for($i=0; $i<$n; $i++)
 //		{
 //			if($info_zones = $tpl_manager_obj->get_layout_zones($DOCUMENT['mod']['data']['partition_tree'][$i]['template']))
@@ -314,6 +330,8 @@ switch ($sp)
 		$menu_manager_obj->set_menu_id($menu_id);
 		$menu_manager_obj->set_menu_links_2_partition($prt_id, $zone_name, $menu_tpl);
 		
+		$MOD_MESSAGE = "Изменения внесены";
+		header("Location: index.php?p=menu&sp=link_menu&msg=".rawurlencode($MOD_MESSAGE)."&id=".$menu_id);
 		exit;
 		break;
 		
