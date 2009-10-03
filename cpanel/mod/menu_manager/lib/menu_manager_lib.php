@@ -366,17 +366,24 @@ class menu_manager extends base_validation
 		
 		// для удобства объединим 3 переменные в один массив
 		$input_links_array = array();
-		$input_links_array['prt_id'] = $partition_id;
-		$input_links_array['zone_name'] = $zone_name;
-		$input_links_array['tpl_file'] = $template_file;
+		$inp_num = count($partition_id);
+		for($t=0; $t<$inp_num; $t++)
+		{
+			$input_links_array[$t]['prt_id'] = $partition_id[$t];
+			$input_links_array[$t]['zone_name'] = $zone_name[$t];
+			$input_links_array[$t]['tpl_file'] = $template_file[$t];
+		}
 		
 		
-		$inp_num = count($input_links_array['prt_id']);
+		//$this->debug($input_links_array);
+		//$this->debug($old_menu_links_array);
 		
-		if(($links_num = count($menu_links_array))>0)
-		{	
-			
-			$old_num = count($old_menu_links_array);
+		
+		if($old_menu_links_array)$old_num = count($old_menu_links_array);
+		else $old_num = 0;
+		
+		if($old_num>0)
+		{				
 			
 			//Начинаем искать линки меню, которы требуется удалить
 			// для этого открываем цик по массиву существующих ссылко
@@ -385,18 +392,19 @@ class menu_manager extends base_validation
 			
 			for($i=0; $i<$old_num; $i++)
 			{
+				
 				$flag_exist = 0; // флаг равен 0 если строка ненайдена в новом наборе
 				for($j=0; $j<$inp_num; $j++)
 				{
-					if(($input_links_array['prt_id'][$j]==$old_menu_links_array['prt_id'][$i])&&($input_links_array['zone_name'][$j]==$old_menu_links_array['zone_name'][$i])&&($input_links_array['tpl_file'][$j]==$old_menu_links_array['tpl_file'][$i]))
+					if(($input_links_array[$j]['prt_id']==$old_menu_links_array[$i]['prt_id'])&&($input_links_array[$j]['zone_name']==$old_menu_links_array[$i]['zone_name'])&&($input_links_array[$j]['tpl_file']==$old_menu_links_array[$i]['tpl_file']))
 						$flag_exist = 1;					
 				}
 				
 				if(!$flag_exist)
 				{
-					$query = "delete from ".$this->TBL_NISTA_MENU_LINKS." where id='".$old_menu_links_array['id'][$i]."'";
+					$query = "delete from ".$this->TBL_NISTA_MENU_LINKS." where id='".$old_menu_links_array[$i]['id']."'";
 					mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
-//					echo $query."<br>";
+					//echo $query."<br>";
 					$query ="";
 				}
 				$flag_exist = 0;
@@ -409,7 +417,7 @@ class menu_manager extends base_validation
 				$flag_exist = 0; // флаг равен 0 если строка ненайдена в старом наборе
 				for($i=0; $i<$old_num; $i++)
 				{
-					if(($input_links_array['prt_id'][$j]==$old_menu_links_array['prt_id'][$i])&&($input_links_array['zone_name'][$j]==$old_menu_links_array['zone_name'][$i])&&($input_links_array['tpl_file'][$j]==$old_menu_links_array['tpl_file'][$i]))
+					if(($input_links_array[$j]['prt_id']==$old_menu_links_array[$i]['prt_id'])&&($input_links_array[$j]['zone_name']==$old_menu_links_array[$i]['zone_name'])&&($input_links_array[$j]['tpl_file']==$old_menu_links_array[$i]['tpl_file']))
 						$flag_exist = 1;					
 				}
 				
@@ -418,9 +426,9 @@ class menu_manager extends base_validation
 					$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
 									set
 										menu_id='".$this->DATA['menu_id']."' , 
-										prt_id='".$input_links_array['prt_id'][$j]."' , 
-										zone_name='".$input_links_array['zone_name'][$j]."' ,
-										tpl_file='".$input_links_array['tpl_file'][$j]."'";
+										prt_id='".$input_links_array[$j]['prt_id']."' , 
+										zone_name='".$input_links_array[$j]['zone_name']."' ,
+										tpl_file='".$input_links_array[$j]['tpl_file']."'";
 					mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
 //					echo $query."<br>";
 					$query ="";
@@ -435,9 +443,9 @@ class menu_manager extends base_validation
 				$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
 								set
 									menu_id='".$this->DATA['menu_id']."' , 
-									prt_id='".$input_links_array['prt_id'][$i]."' , 
-									zone_name='".$input_links_array['zone_name'][$i]."' ,
-									tpl_file='".$input_links_array['tpl_file'][$i]."'";
+									prt_id='".$input_links_array[$i]['prt_id']."' , 
+									zone_name='".$input_links_array[$i]['zone_name']."' ,
+									tpl_file='".$input_links_array[$i]['tpl_file']."'";
 				mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
 //				echo $query."<br>";
 				$query ="";
