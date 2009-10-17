@@ -281,7 +281,9 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['menu_id'] = ( isset($HTTP_POST_VARS['id']) ) ? $HTTP_POST_VARS['id'] : $HTTP_GET_VARS['id'];
 		
 		$DOCUMENT['mod']['data']['menu_links'] = $menu_manager_obj->get_menu_links_2_partition($DOCUMENT['mod']['data']['menu_id']);
+		if($DOCUMENT['mod']['data']['menu_links'] == false)$DOCUMENT['mod']['data']['menu_links'] = NULL;
 		$n =  count($DOCUMENT['mod']['data']['menu_links']);
+		
 		for($i=0; $i<$n; $i++)
 		{
 			$DOCUMENT['mod']['data']['menu_links'][$i]['partition_info'] = $partition_manager_obj->get_partition($DOCUMENT['mod']['data']['menu_links'][$i]['prt_id']);
@@ -294,7 +296,7 @@ switch ($sp)
 			
 			
 		}
-			
+//		$menu_manager_obj->debug($DOCUMENT['mod']['data']['menu_links']);
 //		for($i=0; $i<$n; $i++)
 //		{
 //			if($info_zones = $tpl_manager_obj->get_layout_zones($DOCUMENT['mod']['data']['partition_tree'][$i]['template']))

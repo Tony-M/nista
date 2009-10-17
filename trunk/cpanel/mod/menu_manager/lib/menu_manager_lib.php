@@ -440,17 +440,33 @@ class menu_manager extends base_validation
 		{
 			for($i=0;$i<$inp_num; $i++)
 			{
-				$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
-								set
-									menu_id='".$this->DATA['menu_id']."' , 
-									prt_id='".$input_links_array[$i]['prt_id']."' , 
-									zone_name='".$input_links_array[$i]['zone_name']."' ,
-									tpl_file='".$input_links_array[$i]['tpl_file']."'";
-				mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
-//				echo $query."<br>";
-				$query ="";
+				$this->set_new_link_menu_2_partition($input_links_array[$i]['prt_id'], $input_links_array[$i]['zone_name'], $input_links_array[$i]['tpl_file']);
 			}
 		}
+	}
+	
+	/**
+	 * Метод создаёт связь меню и раздела
+	 *
+	 * @param integer $prt_id
+	 * @param string $zone_name
+	 * @param string $tpl_file
+	 * @return boolean
+	 */
+	private  function set_new_link_menu_2_partition($prt_id=0, $zone_name="", $tpl_file="")
+	{
+		if((int)$prt_id == 0)return false;
+		if(!eregi("[0-9a-z_]+", $zone_name))return false;
+		if(!eregi("[0-9a-z_]+", $tpl_file))return false;
+		
+		$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
+						set
+							menu_id='".$this->DATA['menu_id']."' , 
+							prt_id='".$prt_id."' , 
+							zone_name='".$zone_name."' ,
+							tpl_file='".$tpl_file."'";
+		return mysql_query($query); 
+//		echo $query."<br>";
 	}
 	
 	/**
