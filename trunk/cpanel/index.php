@@ -100,7 +100,7 @@ $dir = opendir(JS_DIR);
 //$SYS_JS_LIB_ARRAY = array(); // системная переменная хранящая все js файлы, которые надо подгрузить
 while (false !==($file = readdir($dir)))
 {
-	if(eregi("[a-zA-Z0-9_@\.\-]+.(js)", $file))
+	if(eregi("[a-zA-Z0-9_@\.\-]+.(js)$", $file))
     {
     	$DOCUMENT['js'][] =  $DOCUMENT['NISTA_URL'].JS_DIR.$file;
     }
@@ -112,7 +112,7 @@ closedir($dir);
 $dir = opendir(CSS_DIR);
 while (false !==($file = readdir($dir)))
 {
-	if(eregi("[a-zA-Z0-9_@\.\-]+.(css)", $file))
+	if(eregi("[a-zA-Z0-9_@\.\-]+.(css)$", $file))
     {
     	$DOCUMENT['css'][] =  $DOCUMENT['NISTA_URL'].CSS_DIR.$file;
     }

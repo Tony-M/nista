@@ -8,12 +8,16 @@ class menu_manager extends base_validation
 	// незыблимые прототипы
 	private $p_TBL_NISTA_MENU = "menu";
 	private $p_TBL_NISTA_MENU_LINKS = "menu_links";
+	private $p_TBL_NISTA_MENU_RELATION = "menu_relation";
 	
 	private $p_STATUS_LIST = array("on", "off", "wait", "del");
 
 	// Рабочие переменные
 	private $TBL_NISTA_MENU = "menu";
 	private $TBL_NISTA_MENU_LINKS = "menu_links";
+	private $TBL_NISTA_MENU_RELATION = "menu_relation";
+	
+	private $_TARGET = array("_self", "_parent", "_top", "_blank");
 	
 	public $PREFIX = "tbl_nista_";
 
@@ -48,8 +52,24 @@ class menu_manager extends base_validation
 
 		$this->TBL_NISTA_MENU = $this->PREFIX.$this->p_TBL_NISTA_MENU;
 		$this->TBL_NISTA_MENU_LINKS = $this->PREFIX.$this->p_TBL_NISTA_MENU_LINKS;
+		$this->TBL_NISTA_MENU_RELATION = $this->PREFIX.$this->p_TBL_NISTA_MENU_RELATION;
+		
+		$this->load_config();
 		
 		//		$this->debug();
+	}
+	
+	
+	/**
+	 * Метод загружает конфигурационную информацию из файла конфигурации
+	 *
+	 * @return array
+	 */
+	public function load_config()
+	{
+		$this->DATA['config'] = Spyc::YAMLLoad($this->DATA['SYS']['CONFIG_DIR'].'menu_manager.yaml');
+		//$this->debug($this->DATA['config']);		
+		return $this->DATA['config'];
 	}
 
 	/**
@@ -84,6 +104,35 @@ class menu_manager extends base_validation
 		return true;
 	}
 
+	/**
+	 * Метод устанавливает значение всплывающей подсказки alt меню
+	 *
+	 * @param string $alt
+	 * @return boolean
+	 */
+	public function set_alt($alt="")
+	{
+
+		$alt=htmlentities(strip_tags($alt),ENT_QUOTES, "UTF-8");
+		$alt=trim($alt);
+		$this->DATA['alt']=$alt;
+		return true;
+	}
+	
+	/**
+	 * Метод устанавливает значение опционного поля текст для меню
+	 *
+	 * @param string $text
+	 * @return boolean
+	 */
+	public function set_text($text="")
+	{
+
+		$text=htmlentities(strip_tags($text),ENT_QUOTES, "UTF-8");
+		$text=trim($text);
+		$this->DATA['text']=$text;
+		return true;
+	}
 
 	/**
 	 * Метод устанавливает значение флака show_title для заголовка меню
@@ -118,7 +167,51 @@ class menu_manager extends base_validation
 		$this->DATA['comment']=$comment;
 		return true;
 	}
+	
+	/**
+	 * Метод устанавливает значение иконки меню
+	 *
+	 * @param string $ico
+	 * @return boolean
+	 */
+	public function set_ico($ico="")
+	{
+		$ico=htmlentities(strip_tags($ico),ENT_QUOTES, "UTF-8");
+		$ico=trim($ico);
+		$this->DATA['ico']=$ico;
+		return true;
+	}
+	
+	/**
+	 * Методу устанавливает url ссылки
+	 *
+	 * @param string $url
+	 * @return boolean
+	 */
+	public function set_url($url="")
+	{
 
+		$url=htmlentities(strip_tags($url),ENT_QUOTES, "UTF-8");
+		$url=trim($url);
+		if($url == "")return false;
+		$this->DATA['url']=$url;
+		return true;
+	}
+
+	/**
+	 * Метод устанавливает свойство _target ссылки
+	 *
+	 * @param string $target
+	 * @return boolean
+	 */
+	public function set_target($target = "")
+	{
+		$target = strtolower(trim($target));
+		if(!in_array($target, $this->_TARGET))return false;
+		
+		$this->DATA['target'] = $target;
+		return true;
+	}
 	
 	/**
 	 * Метод устанавливает статус 
@@ -134,6 +227,25 @@ class menu_manager extends base_validation
 		if(!in_array($status, $this->DATA['STATUS_LIST']))
 			return false;		
 		$this->DATA['status'] = $status;
+		return true;
+	}
+	
+	/**
+	 * Метод создаёт запись об исходных данных для формирования данной строки в таблице
+	 *
+	 * @param array $obj
+	 * @return boolean
+	 */
+	public function set_obj($obj = array())
+	{
+		if(!is_array($obj))return false;
+		
+		$n=count($obj);
+		for($i=0; $i<$n; $i++)
+			$obj[$i] = htmlentities($obj[$i],ENT_QUOTES, "UTF-8");
+		
+		$obj = serialize($obj);
+		$this->DATA['obj'] = $obj;
 		return true;
 	}
 	
@@ -386,7 +498,7 @@ class menu_manager extends base_validation
 		{				
 			
 			//Начинаем искать линки меню, которы требуется удалить
-			// для этого открываем цик по массиву существующих ссылко
+			// для этого открываем цик по массиву существующих ссылок
 			// и вложенный цикл по новому набору ссылок
 			// Если в новом наборе нет старой ссылки то делаем делит из БД этой ссылки
 			
@@ -411,30 +523,28 @@ class menu_manager extends base_validation
 			}
 			
 			// Теперь необходимо найти те линки, которые надо добавить в БД
-			// для этого открываем цикл по новоым линкам и ищем в старом списке тепункты, которых нет
-			for($j=0; $j<$inp_num; $j++)
+			// для этого открываем цикл по новым линкам и ищем в старом списке те пункты, которых нет
+			
+			for($i=0;$i<$inp_num; $i++)
 			{
-				$flag_exist = 0; // флаг равен 0 если строка ненайдена в старом наборе
-				for($i=0; $i<$old_num; $i++)
-				{
-					if(($input_links_array[$j]['prt_id']==$old_menu_links_array[$i]['prt_id'])&&($input_links_array[$j]['zone_name']==$old_menu_links_array[$i]['zone_name'])&&($input_links_array[$j]['tpl_file']==$old_menu_links_array[$i]['tpl_file']))
-						$flag_exist = 1;					
-				}
-				
-				if(!$flag_exist)
-				{
-					$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
-									set
-										menu_id='".$this->DATA['menu_id']."' , 
-										prt_id='".$input_links_array[$j]['prt_id']."' , 
-										zone_name='".$input_links_array[$j]['zone_name']."' ,
-										tpl_file='".$input_links_array[$j]['tpl_file']."'";
-					mysql_query($query); // сюда вставить не просто удаление а удаление пунктов этого меню, чтоб они не заполоняли БД мёртвым грузом
-//					echo $query."<br>";
-					$query ="";
-				}
-				$flag_exist = 0;
+				$this->set_new_link_menu_2_partition($input_links_array[$i]['prt_id'], $input_links_array[$i]['zone_name'], $input_links_array[$i]['tpl_file']);
 			}
+//			for($j=0; $j<$inp_num; $j++)
+//			{
+//				$flag_exist = 0; // флаг равен 0 если строка ненайдена в старом наборе
+//				for($i=0; $i<$old_num; $i++)
+//				{
+//					if(($input_links_array[$j]['prt_id']==$old_menu_links_array[$i]['prt_id'])&&($input_links_array[$j]['zone_name']==$old_menu_links_array[$i]['zone_name'])&&($input_links_array[$j]['tpl_file']==$old_menu_links_array[$i]['tpl_file']))
+//						$flag_exist = 1;					
+//				}
+//				
+//				if(!$flag_exist)
+//				{
+//					
+//					$this->set_new_link_menu_2_partition($input_links_array[$i]['prt_id'], $input_links_array[$i]['zone_name'], $input_links_array[$i]['tpl_file']);
+//				}
+//				$flag_exist = 0;
+//			}
 		}
 		else 
 		{
@@ -459,6 +569,21 @@ class menu_manager extends base_validation
 		if(!eregi("[0-9a-z_]+", $zone_name))return false;
 		if(!eregi("[0-9a-z_]+", $tpl_file))return false;
 		
+		// проверяем существует ли уже эта связь или нет
+		$query = "select * from ".$this->TBL_NISTA_MENU_LINKS."
+					where
+						menu_id='".$this->DATA['menu_id']."' and  
+						prt_id='".$prt_id."' and  
+						zone_name='".$zone_name."' and 
+						tpl_file='".$tpl_file."'";
+		//echo $query."<br>";
+		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			mysql_free_result($result_id);
+			return false;
+		}
+		
+		
 		$query = "insert into ".$this->TBL_NISTA_MENU_LINKS."
 						set
 							menu_id='".$this->DATA['menu_id']."' , 
@@ -466,7 +591,7 @@ class menu_manager extends base_validation
 							zone_name='".$zone_name."' ,
 							tpl_file='".$tpl_file."'";
 		return mysql_query($query); 
-//		echo $query."<br>";
+		//$query."<br>";
 	}
 	
 	/**
@@ -501,4 +626,179 @@ class menu_manager extends base_validation
 		return false;		
 	}
 
+	
+	/**
+	 * Загрузка иконки меню
+	 *
+	 * @param string $file_field_name
+	 * @return boolean
+	 */
+	public function upload_ico($file_field_name="")
+	{
+		if($file_field_name == "")return false;
+		
+		if(!in_array($_FILES[$file_field_name]["type"], $this->DATA['config']['ico_type']))
+			return false;
+
+		if($_FILES[$file_field_name]["size"]>$this->DATA['config']['ico_max_size'])return false;
+		
+		if($_FILES[$file_field_name]["error"] > 0)return false;
+		
+		if(!is_dir(ROOT_WAY.$this->DATA['config']['ico_dir']))return false;
+		
+		$new_file_name = $_FILES[$file_field_name]["name"];
+		
+		$flag=0;		
+		while(!$flag)
+		{
+			if(file_exists(ROOT_WAY.$this->DATA['config']['ico_dir'].$new_file_name))
+			{
+				sleep(1);
+				$new_file_name = mktime()."_".$_FILES[$file_field_name]["name"];
+			}
+			else 
+				$flag = 1;
+		}
+		
+		if(move_uploaded_file($_FILES[$file_field_name]['tmp_name'], ROOT_WAY.$this->DATA['config']['ico_dir'].$new_file_name))
+			return $this->DATA['config']['ico_dir'].$new_file_name;
+		else 
+			return false;
+				
+	}
+	
+	/**
+	 * Метод создаёт в БД новый пункт меню
+	 *
+	 * @return integer or False
+	 */
+	public function create_menu_item()
+	{
+		$query = "";
+		
+		$query .= "insert into ".$this->TBL_NISTA_MENU." set ";
+		
+		if($this->DATA['title']!="") $query .= " title='".$this->DATA['title']."' ";
+		else return false;
+		
+		if($this->DATA['url']!="") $query .= ", url='".$this->DATA['url']."' ";
+		else return false;
+		
+		$query .= ", type='item' ";
+		
+		$query .= ", status='wait' ";
+		
+		if($this->DATA['alt']!="") $query .= ", alt='".$this->DATA['alt']."' ";
+		
+		if($this->DATA['text']!="") $query .= ", text='".$this->DATA['text']."' ";
+		
+		if($this->DATA['show_title']!="") $query .= ", show_title='".$this->DATA['show_title']."' ";
+		
+		if($this->DATA['target']!="") $query .= ", target='".$this->DATA['target']."' ";
+		
+		if($this->DATA['ico']!="") $query .= ", ico='".$this->DATA['ico']."' ";
+		
+		if($this->DATA['obj']!="") $query .= ", obj='".$this->DATA['obj']."' ";
+		
+		echo $query."<br>";
+	}
+	
+	/**
+	 * Метод задаёт массив id контейнеров меню, содержащих  пункт меню
+	 *
+	 * @param array $id
+	 * @return boolean
+	 */
+	public function set_relation_container_id($id = array())
+	{
+		if(!is_array($id))return false;
+		$n =count($id);
+		if(!$n)return false;
+		
+		for($i=0; $i<$n; $i++)
+			if((int)$id[$i] == 0) return false;
+				
+		$this->DATA['parent_id'] = $id;
+		return true;
+	}
+	
+	/**
+	 * Метод сзадаёт массив id разделов к которым привязывается пункт меню.
+	 * если элемент массива = 0 то пункт привязывается ко всем разделам,
+	 * к которым привязан контейнер меню
+	 *
+	 * @param array $id
+	 * @return boolean
+	 */
+	public function set_relation_partition_id($id = array())
+	{
+		if(!is_array($id))return false;
+		if(!count($id))return false;
+		
+		for($i=0; $i<$n; $i++)
+			if((int)$id[$i] != $id[$i]) return false;
+		
+		$this->DATA['rel_prt_id'] = $id;
+		return true;
+	}
+	
+	/**
+	 * Метод задаёт id пункта меню
+	 *
+	 * @param integer $id
+	 * @return boolean
+	 */
+	public function set_relation_menu_item_id($id = 0)
+	{
+		if((int)$id==0)return false;
+				
+		$this->DATA['item_id'] = $id;
+		return true;
+	}
+	
+	public function create_relation()
+	{
+		if(!is_array($this->DATA['parent_id']))return false;
+		$parent_num = count($this->DATA['parent_id']);
+		if(!$parent_num)return false;
+		
+		
+	}
+	
+	public function get_menu_for_partition($partition_id = 0)
+	{
+		$partition_id = (int)$partition_id;
+		if(!$partition_id)return false;
+		
+		$query = "select tb1.menu_id as menu_id, tb1.title as title, tb1.comment as comment  
+					from 
+						".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_LINKS." as tb2
+					where
+						tb1.menu_id=tb2.menu_id and tb2.prt_id='".$partition_id."'";
+		
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$xml = new XMLWriter();
+			$xml->openMemory();			
+			$xml->startDocument('1.0', 'UTF-8');			
+    		$xml->endDtd();			
+    		$xml->startElement('items');
+    		
+    		while($tmp = mysql_fetch_array($result_id, MYSQL_ASSOC))
+			{
+				$xml->startElement('item');
+				$xml->writeAttribute( 'id', $tmp['menu_id']);
+				$xml->writeAttribute( 'title', $tmp['title']);
+				$xml->writeAttribute( 'comment', $tmp['comment']);
+				$xml->endElement(); 				
+			}
+			
+			$xml->endElement();   
+   			//$xml->endDtd();   			 
+   			mysql_free_result($result_id);			
+   			return  $xml->outputMemory(true);
+		}
+		else return false;
+	}
+	
 }

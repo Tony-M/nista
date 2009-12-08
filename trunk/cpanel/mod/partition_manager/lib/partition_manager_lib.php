@@ -15,6 +15,7 @@ class partition_manager
 	private $TBL_NISTA_DATA_STRUCTURE_CATEGORY = "data_structure_category";
 	public $PREFIX = "tbl_nista_";
 	
+	private $MENU_OBJECTS = array("prt"); // типы объектов для создания меню prt - раздел сайта
 	
 	/**
 	 * Метод отображает структурноедерево данных передаваемого аргумента в целях отладки
@@ -554,6 +555,11 @@ class partition_manager
 					$result[$i]['has_child'] = "yes";
 					$result = @array_merge($result, $tmp_result);
 				}
+				
+				//следующая строка формирует ссылку на объект для менеджера меню
+				if($object_link=$this->get_object_link_for_partition($result[$i]['id']))
+					$result[$i]['object_link']=$object_link;
+				
 
 				$i = count($result);			
 			}
@@ -593,6 +599,10 @@ class partition_manager
 					$result = @array_merge($result, $tmp_result);
 				}	
 				
+				//следующая строка формирует ссылку на объект для менеджера меню
+				if($object_link=$this->get_object_link_for_partition($result[$i]['id']))
+					$result[$i]['object_link']=$object_link;
+					
 				$i = count($result);
 			}
 			
@@ -1499,5 +1509,59 @@ class partition_manager
 			return false; 
 		
 		return true;
+		
+		
+	}
+	
+	/**
+	 * Метод возвращает ссылку на раздел для менеджера меню
+	 *
+	 * @param integer $id
+	 * @return String or false
+	 */
+	private function get_object_link_for_partition($id=0)
+	{
+		$id = (int)$id;
+		if(!$id)return false;
+		
+		//следующая строка формирует ссылку на объект для менеджера меню
+		$result="obj[0]=".$this->DATA['MOD_DATA']['modid']."&obj[1]=prt&obj[2]=".$id;
+		return $result;
+			
+	}
+	
+	
+	/**
+	 * Метод возвращает менеджеру меню ссылку и информацию о объекте для вормирования пунктов меню сайта
+	 *
+	 * @param array $obj
+	 * @return array or False
+	 */
+	public function get_task_object($obj = array())
+	{
+		if(!is_array($obj))return false;
+		
+		if(!in_array($obj[1], $this->MENU_OBJECTS))
+			return false;
+			
+		switch ($obj[1])
+		{
+			case "prt":
+				if(!(int)$obj[2])return false; // ссылка на раздел неверная
+				
+				$result = $this->get_partition($obj[2]);
+				if($result)
+				{
+					$result['object_title'] = $result['title'];
+					$result['object_type'] = "Раздел сайта";
+					$result['object_url'] = $result['link'];
+				}
+				break;
+			default: // тип объекта не обрабатывается
+				return false;
+				break;
+		}
+		
+		return $result;
 	}
 }

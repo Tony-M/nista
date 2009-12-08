@@ -275,12 +275,12 @@ class nista{
 	{
 		global $TBL_NISTA_MOD;
 
-		if(!ereg("[0-9]", $id))  return false;
+		if(!(int)$id)  return false;
 		// running module defined by parametr $p
 		$query = "SELECT  *
-                         FROM ".$TBL_NISTA_MOD."
+                         FROM ".$this->PREFIX."mod 
                          WHERE modid='$id'";
-
+		//echo $query."<br>";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			$mod_info =  mysql_fetch_array($result_id, MYSQL_ASSOC) ;
