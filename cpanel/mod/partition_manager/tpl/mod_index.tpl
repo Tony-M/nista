@@ -28,7 +28,7 @@
 			<td class="table_head" style="width:48px;" colspan="3">Сост</td>
 			<td class="table_head">Заглавие</td>
 			<td class="table_head">Линк</td>
-			<td class="table_head" style="width:74px;" colspan="4">&nbsp;</td>
+			<td class="table_head" style="width:90px;" colspan="5">&nbsp;</td>
 		</tr>
 		{section name=prt_num loop=$DOCUMENT.mod.data.partition_tree}
 		<tr onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
@@ -41,6 +41,7 @@
 			<td class="td_body" style="width: 16px; background-image: url({$DOCUMENT.ACP_IMG_WAY}{if $DOCUMENT.mod.data.partition_tree[prt_num].has_child=='yes'}plus1.gif{else}line.gif{/if}); background-repeat: repeat-y;">&nbsp;</td>
 			<td class="td_body" style="padding-left:{$DOCUMENT.mod.data.partition_tree[prt_num].tab}5px;">{$DOCUMENT.mod.data.partition_tree[prt_num].title}</td>
 			<td class="td_body">{$DOCUMENT.mod.data.partition_tree[prt_num].link}&nbsp;</td>
+			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=ln&{$DOCUMENT.mod.data.partition_tree[prt_num].object_link}"><img src="{$DOCUMENT.ACP_IMG_WAY}menu_ln.gif" width="16" height="16" alt="Создать пункт меню" title="Создать пункт меню" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=site&sp=ls_category&id={$DOCUMENT.mod.data.partition_tree[prt_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}shape_group.gif" width="16" height="16" alt="Категории раздела" title="Категории раздела" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=site&sp=edit_partition&id={$DOCUMENT.mod.data.partition_tree[prt_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
 			<td class="td_body" style="width: 16px;">

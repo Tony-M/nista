@@ -182,7 +182,7 @@ h2{
         color:#FE5312;
 }
 
-a, label, b, p, span{
+a, label, b, p, span, li, ul, ol{
         font-family:Tahoma;
         font-size:8pt;
         color:#494949;
@@ -356,6 +356,27 @@ border: 1px solid rgb( 145, 155, 156 );
 	/*244, 243, 238*/
 	/* 145, 155, 156*/
 	padding:	5px;
+}
 
-
+div.ajax_activity{
+	height:18px;
+	font-size:11px;
+	color:9E9FA7;
+	display:none;
+}
+div.ajax_activity_num{
+	
+	font-size:11px;
+	color:9E9FA7;
+	font-weight:bold;
+	padding-top:2px;
+	padding-left:5px;
+}
+div.ajax_activity_text{
+	
+	font-size:11px;
+	color:9E9FA7;
+	font-style:italic;
+	padding-top:2px;
+	padding-left:5px;
 }

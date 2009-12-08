@@ -1,0 +1,3 @@
+ico_dir: img/ico/
+ico_max_size: 102400
+ico_type: [image/jpg, image/jpeg, image/gif, image/png]

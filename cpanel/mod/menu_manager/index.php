@@ -336,7 +336,61 @@ switch ($sp)
 		header("Location: index.php?p=menu&sp=link_menu&msg=".rawurlencode($MOD_MESSAGE)."&id=".$menu_id);
 		exit;
 		break;
+	case "ln":// принимаем ссылку на объект модуля, для формирования пункта меню и выводим форму создания пункта меню
+		$MOD_TEMPALE = "menu_item_form.php";
+		$MOD_ACTION = 'create_item';
+		$object_link = $_GET['obj'];
+		//$menu_manager_obj->debug($object_link);
 		
+		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();// получаем список всех меню
+		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees(); // Список всех разделов сайта
+		if((int)($object_link[0]))
+		{
+			$module = $nista->get_module_by_id((int)$object_link[0]);
+						
+			if($module!=false)
+			{
+				//$menu_link_provider_obj = new $$module['mod_name'];
+				$task_class = $module['mod_name'];
+				if(class_exists($task_class))
+				{
+					$task_obj=new $task_class($SYS, $module, $MY_USER_DATA);
+					$object = $task_obj->get_task_object($object_link);
+					if($object)
+					{
+						$DOCUMENT['mod']['data']['object'] = $object;
+						$DOCUMENT['mod']['data']['menu_item'] = $object['object_title'];
+						$DOCUMENT['mod']['data']['object_link'] = $object_link;
+						
+					}
+				}
+
+			}
+		}
+		break;
+	case "create_item":// создание нового пункиа меню
+	
+		$menu_manager_obj->set_title($_POST['title']);
+		$menu_manager_obj->set_alt($_POST['alt']);
+		$menu_manager_obj->set_text($_POST['text']);
+		$menu_manager_obj->set_show_title('show_title');
+		$menu_manager_obj->set_url($_POST['link_url']);
+		$menu_manager_obj->set_target($_POST['target']);
+		$menu_manager_obj->set_obj($_POST['obj']);
+		if($uploaded_ico_name = $menu_manager_obj->upload_ico("ico_img"))
+			$menu_manager_obj->set_ico($uploaded_ico_name);
+		$menu_manager_obj->create_menu_item();
+		break;
+	case "get_prt_menu": // Возвращаем список меню для выбранного аздела в формате xml
+		$xml = $menu_manager_obj->get_menu_for_partition($_GET['id']);
+		if($xml)
+		{
+			header ("content-type: text/xml");	
+			echo $xml;			
+		}
+		else echo "";
+		exit;
+		break;
 }
 
 

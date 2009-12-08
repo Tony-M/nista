@@ -12,6 +12,8 @@
 		<script language="JavaScript" type="text/javascript" src="{$DOCUMENT.js[js_num]}"></script>
 	{/section}
 	
+	
+	
 	{if $DOCUMENT.OPTION.xinha == 'enabled'}
 		<script type="text/javascript">
 		    _editor_url  = "{$SYS.LIB_DIR}xinha/"  // (preferably absolute) URL (including trailing slash) where Xinha is installed
@@ -36,11 +38,22 @@
     </td>
  </tr>
    <tr>
-    <td align="left" valign="top" style="height:20px; background-image:url({$DOCUMENT.ACP_IMG_WAY}nista_v2_2_top_menu_bg.jpg); padding-left:10pt;">
+    <td align="left" valign="top" style="height:20px; background-color:#f5f5f5; padding-left:10pt;">
 
     <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%" style="height:20px;">
        <TR>
           <TD class="td_top_menu" width="10%">{$MENU}{$MENU_FOOTER}</TD>
+          <td class="td_top_menu">
+          	<div id="div_ajax_activity" name="div_ajax_activity" class="ajax_activity">
+          		<table border="0" cellpadding="0" cellspacing="0">
+          			<tr>
+          				<td><img src="{$DOCUMENT.ACP_IMG_WAY}ajax_loader.gif" width="16" height="16" border="0"></td>
+          				<td nowrap="nowrap"><div id="div_ajax_num" name="div_ajax_num" class="ajax_activity_num">3</div></td>
+          				<td nowrap="nowrap"><div id="div_ajax_text" name="div_ajax_text" class="ajax_activity_text">процесса</div></td>
+          			</tr>
+          		</table>
+          	</div>
+          </td>
           <TD class="td_top_menu" width="10%" align="right" valign="middle" style="padding-right:15pt; "><DIV  id=m3 ><A  onclick="javascript:do_menu('m3x')" onmouseover="do_check('m3x')" href="logout.php" class="a_top_menu" {popup text="click if u wanna logout"}><img src="{$DOCUMENT.ACP_IMG_WAY}off_16.png" width="15" height="15" border=0  hspace="5"  align="top">{$LOGOUT}</A> </DIV></TD>
        </TR>
       </table>
