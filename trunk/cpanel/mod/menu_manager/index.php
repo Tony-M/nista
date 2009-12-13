@@ -340,6 +340,7 @@ switch ($sp)
 		$MOD_TEMPALE = "menu_item_form.php";
 		$MOD_ACTION = 'create_item';
 		$object_link = $_GET['obj'];
+		$DOCUMENT['mod']['data']['http_referer'] = rawurlencode($_SERVER['HTTP_REFERER']); // ссылка на страницу источник для возврата
 		//$menu_manager_obj->debug($object_link);
 		
 		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();// получаем список всех меню
@@ -369,7 +370,9 @@ switch ($sp)
 		}
 		break;
 	case "create_item":// создание нового пункиа меню
-	
+		
+		$DOCUMENT['mod']['data']['http_referer'] = $_POST['page_referer']; // ссылка на страницу источник для возврата
+		
 		$menu_manager_obj->set_title($_POST['title']);
 		$menu_manager_obj->set_alt($_POST['alt']);
 		$menu_manager_obj->set_text($_POST['text']);
@@ -379,9 +382,37 @@ switch ($sp)
 		$menu_manager_obj->set_obj($_POST['obj']);
 		if($uploaded_ico_name = $menu_manager_obj->upload_ico("ico_img"))
 			$menu_manager_obj->set_ico($uploaded_ico_name);
-		$menu_manager_obj->create_menu_item();
+		$result_item_id = $menu_manager_obj->create_menu_item();
+		if($result_item_id)
+		{
+			$menu_manager_obj->set_relation_container_id($_POST['mc_id']);
+			$menu_manager_obj->set_relation_status($_POST['it_status']);
+			$menu_manager_obj->set_relation_partition_id($_POST['mc_prt_id']);
+				if($menu_manager_obj->create_relation($result_item_id))
+				{
+					//Связи успешно созданы
+					$MOD_MESSAGE = "Пункт меню '".$_POST['title']."' успешно создан ";
+					header("Location: index.php?p=menu&sp=item_creation_result&msg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
+					exit;
+				}
+				else 
+				{
+					//при создании были косяки
+					$MOD_MESSAGE = "В процессе создания пункта меню '".$_POST['title']."' возникли ошибки ";
+					header("Location: index.php?p=menu&sp=item_creation_result&errmsg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
+					exit;
+				}
+		}
+		
+		header("Location: index.php?p=menu&sp=item_creation_result");
+		exit;
 		break;
-	case "get_prt_menu": // Возвращаем список меню для выбранного аздела в формате xml
+	case "item_creation_result": // диалог после создания пункта меню
+		$MOD_TEMPALE =  "menu_item_after_creation_dialog.tpl";
+		$DOCUMENT['mod']['data']['http_referer'] = trim(rawurldecode($_GET['pr'])); // страница источник
+		
+		break;
+	case "get_prt_menu": // Возвращаем список меню для выбранного раздела в формате xml
 		$xml = $menu_manager_obj->get_menu_for_partition($_GET['id']);
 		if($xml)
 		{
@@ -390,6 +421,33 @@ switch ($sp)
 		}
 		else echo "";
 		exit;
+		break;
+	case "item_list":// для выбранного меню выводим список его пунктов
+		$MOD_TEMPALE = "item_list.tpl";
+	
+		$menu_id = ( isset($HTTP_POST_VARS['mid']) ) ? $HTTP_POST_VARS['mid'] : $HTTP_GET_VARS['mid'];
+		$menu_id = (int)$menu_id;
+		
+		$item_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
+		$item_id = (int)$item_id;
+				
+		if($menu_id) // список пунктов меню по id меню
+		{
+			$DOCUMENT['mod']['data']['menu_data'] = $menu_manager_obj->get_menu_container_by_id($menu_id);
+			$DOCUMENT['mod']['data']['menu_item_list'] = $menu_manager_obj->get_item_list_for_menu_container($menu_id);
+		}
+		
+		if(!$menu_id && $item_id) // Список пунктов мею по id одного из этих пунктов
+		{
+			// Данный кусок кода можно будет написать только тогда, когда
+			// будет реализована галочка при создании меню, указывающая на то что
+			// пункт меню создаётся для каждого меню свой а не как сейчас единый
+		}
+		
+		if(!$menu_id && !$item_id)
+		{
+			//не задан ни id контейнера меню ни пункта меню, для поиска контейнера
+		}
 		break;
 }
 

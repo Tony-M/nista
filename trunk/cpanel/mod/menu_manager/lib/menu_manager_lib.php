@@ -688,6 +688,8 @@ class menu_manager extends base_validation
 		
 		$query .= ", status='wait' ";
 		
+		$query .= ", sequence='".$this->get_new_sequence()."' ";
+		
 		if($this->DATA['alt']!="") $query .= ", alt='".$this->DATA['alt']."' ";
 		
 		if($this->DATA['text']!="") $query .= ", text='".$this->DATA['text']."' ";
@@ -700,13 +702,17 @@ class menu_manager extends base_validation
 		
 		if($this->DATA['obj']!="") $query .= ", obj='".$this->DATA['obj']."' ";
 		
-		echo $query."<br>";
+		//echo $query."<br>";
+		if(mysql_query($query))
+			return mysql_insert_id();
+		else 
+			return false;
 	}
 	
 	/**
 	 * Метод задаёт массив id контейнеров меню, содержащих  пункт меню
 	 *
-	 * @param array $id
+	 * @param array of integers $id
 	 * @return boolean
 	 */
 	public function set_relation_container_id($id = array())
@@ -718,12 +724,12 @@ class menu_manager extends base_validation
 		for($i=0; $i<$n; $i++)
 			if((int)$id[$i] == 0) return false;
 				
-		$this->DATA['parent_id'] = $id;
+		$this->DATA['rel_parent_id'] = $id;
 		return true;
 	}
 	
 	/**
-	 * Метод сзадаёт массив id разделов к которым привязывается пункт меню.
+	 * Метод задаёт массив id разделов к которым привязывается пункт меню.
 	 * если элемент массива = 0 то пункт привязывается ко всем разделам,
 	 * к которым привязан контейнер меню
 	 *
@@ -756,13 +762,70 @@ class menu_manager extends base_validation
 		return true;
 	}
 	
-	public function create_relation()
+	/**
+	 * метод устанавливает массив статусов для пункта меню в контейнерах и разделах
+	 *
+	 * @param array $status_array
+	 * @return boolean
+	 */
+	public function set_relation_status($status_array = array())
 	{
-		if(!is_array($this->DATA['parent_id']))return false;
-		$parent_num = count($this->DATA['parent_id']);
-		if(!$parent_num)return false;
+		if(!is_array($status_array))return false;
+		if(!count($status_array))return false;
+		
+		$n = count($status_array);
+		for($i=0; $i<$n; $i++)
+		{
+			if(!in_array($status_array[$i], $this->p_STATUS_LIST))
+				return false; // error
+		}
+		
+		$this->DATA['rel_status'] = $status_array;
+		return true;
 		
 		
+	}
+	
+	
+	/**
+	 * Метод создаёт связь пункта меню с контейнером для требуемых разделов
+	 *
+	 * @param штеупук $item_id
+	 * @return boolean
+	 */
+	public function create_relation($item_id=0)
+	{
+		$item_id = (int)$item_id;
+		if(!$item_id)return false;
+		
+		if(!is_array($this->DATA['rel_parent_id']))return false;
+		$rel_parent_num = count($this->DATA['rel_parent_id']);
+		if(!$rel_parent_num)return false;
+		
+		$rel_status_num = count($this->DATA['rel_status']);
+		if(!$rel_status_num)return false;
+		
+		$rel_prt_id_num = count($this->DATA['rel_prt_id']);
+		if(!$rel_prt_id_num)return false;	
+		
+		if(($rel_parent_num!=$rel_prt_id_num) || ($rel_prt_id_num!=$rel_status_num) || ($rel_parent_num!=$rel_status_num))	
+			return false;
+			
+		for($i=0; $i<$rel_parent_num; $i++)
+		{
+			
+			$query = "insert into ".$this->TBL_NISTA_MENU_RELATION."
+						set
+							parent_id='".$this->DATA['rel_parent_id'][$i]."', 
+							item_id='".$item_id."',  
+							prt_id='".$this->DATA['rel_prt_id']."',  
+							status ='".$this->DATA['rel_status'][$i]."'";
+			if(!mysql_query($query))
+				return false;
+		}
+		
+		return true;
+			
 	}
 	
 	public function get_menu_for_partition($partition_id = 0)
@@ -800,5 +863,38 @@ class menu_manager extends base_validation
 		}
 		else return false;
 	}
+	
+	/**
+	 * Метод возвращает список пунктов меню по id контейнера меню
+	 *
+	 * @param integer $menu_id
+	 * @return Array or False
+	 */
+	public function get_item_list_for_menu_container($menu_id = 0)
+	{
+		$menu_id=(int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$query = "select tb1.* from ".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_RELATION." as tb2
+					where 
+						tb2.parent_id='".$menu_id."' and 
+						tb1.menu_id = tb2.item_id and
+						tb1.type='item' 
+					order by tb1.sequence asc";
+//		echo $query."<br>";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = array();
+			while ($tmp = mysql_fetch_array($result_id, MYSQL_ASSOC))
+			{
+				$result[] = $tmp;
+			}
+			mysql_free_result($result_id);
+			return $result;
+		}
+		return false;
+	}
+	
+	
 	
 }

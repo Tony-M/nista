@@ -217,7 +217,7 @@ td.body1{
         font-weight:normal;
         color:#444A51;
 }
-
+tr.tr:hover{background-color:#F4FAFF;}
 .table_head{
        background-image:url(/cpanel/tpl/img/table_head_bg.jpg);
        text-align: center;

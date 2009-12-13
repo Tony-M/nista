@@ -11,6 +11,7 @@
 {section name=obj_link_num loop=$DOCUMENT.mod.data.object_link}
 	<input name="obj[]" id="obj[]" type="hidden" value="{$DOCUMENT.mod.data.object_link[obj_link_num]}">
 {/section}
+<input name="page_referer" id="page_referer" type="hidden" value="{$DOCUMENT.mod.data.http_referer}">
 
 <table class="form" width="100%" border="0">
 	<tr>
@@ -130,6 +131,7 @@
 		<td class="table_head" style="width:40px;">Удалить</td>
 		<td class="table_head">Меню</td>
 		<td class="table_head">Привязать к разделам, содержащим данное меню</td>
+		<td class="table_head" style="width:60px;">Статус</td>
 	</tr>
 </table>
 <input type="submit" name="ok" id="ok" value="Сохранить">
