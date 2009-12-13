@@ -89,6 +89,7 @@ function append_menu_item_table(partition_id)
 	new_row += '<td style="width:40px; height:16px;" align="center" valign="top"><input id="remove_row" type="image" onclick="delete_row_from_link_table(this); return false;" src="tpl/img/minus.gif" name="remove_row"/></td>';
 	new_row += '<td valign="middle"><input type="hidden" name="mc_id[]" id="mc_id[]" maxlength="11" value="'+menu_id+'"><span>'+menu_title+'</span></td>';
 	new_row += '<td valign="top"><input type="hidden" name="mc_prt_id[]" id="mc_prt_id[]" maxlength="11" value="0"><span>Все разделы</span></td>';
+	new_row += '<td valign="top"><select id="it_status[]" name="it_status[]" class="input_nw"><option value="off" selected>Отключён</option><option value="wait">Черновик</option><option value="on">Активен</option></select></td>';
 	new_row += '</tr>';
 	
 	$("#link_table").append(new_row);
@@ -138,6 +139,7 @@ function append_menu_item_table_for_selected_prt()
 		new_row += '<td style="width:40px; height:16px;" align="center" valign="top"><input id="remove_row" type="image" onclick="delete_row_from_link_table(this); return false;" src="tpl/img/minus.gif" name="remove_row"/></td>';
 		new_row += '<td valign="middle"><input type="hidden" name="mc_id[]" id="mc_id[]" maxlength="11" value="'+menu_id+'"><span>'+menu_title+'</span></td>';
 		new_row += '<td valign="top"><input type="hidden" name="mc_prt_id[]" id="mc_prt_id[]" maxlength="11" value="' + partition_id + '"><span>'+ partition_title +'</span></td>';
+		new_row += '<td valign="top"><select id="it_status[]" name="it_status[]" class="input_nw"><option value="off" selected>Отключён</option><option value="wait">Черновик</option><option value="on">Активен</option></select></td>';
 		new_row += '</tr>';
 		
 		$("#link_table").append(new_row);

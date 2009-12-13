@@ -228,7 +228,12 @@ for($i=0; $i<$n; $i++)
 
 print_r($files1);
 
-
+// **********проверяем необходимость отображения системного сообщения********
+$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+if($msg != "") $DOCUMENT['MSG'] = $msg;
+		
+$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 
 //********** создание основного объекта системы Night Stalker *************
 if(!class_exists('nista'))
