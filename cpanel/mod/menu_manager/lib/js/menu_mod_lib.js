@@ -209,7 +209,44 @@ function get_menu_list_for_partition(inp)
 	}
 }
 
+function get_partitions_for_item(id , obj)
+{
+	
+	if(id)
+	{		
+		var param = "p=menu&sp=get_item_prt&it_id="+id;
+		
+		add_ajax_task();
+		var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+		$('#div_prt_list').html(otvet);
+		mark_row(obj);
+	}
+}
 
+function mark_row(obj)
+{
+	var row = obj.parentNode.parentNode;
+	var row_num = -1;
+    $('#item_table_tr tr').each(function() 
+		{
+			row_num++; 
+			var find_num = 'tr:eq('+row_num+')'
+			if(row_num > 0)
+			{
+				var tr = $('#item_table_tr').find(find_num);
+				
+				$(tr).removeClass("tr_selected");
+				$(tr).addClass("tr");
+				
+			}
+			
+		}
+	);
+
+	$(row).removeClass("tr");
+	$(row).addClass("tr_selected");
+}
 /*
 function get_xml_city_range(inp)
 {

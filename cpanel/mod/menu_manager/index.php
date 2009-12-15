@@ -449,6 +449,24 @@ switch ($sp)
 			//не задан ни id контейнера меню ни пункта меню, для поиска контейнера
 		}
 		break;
+	case "get_item_prt":// возвращает html таблицу со списком разделов, к которым привязан пункт меню
+		$item_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
+		
+		$partitions = $menu_manager_obj->get_partitions_for_menu_item($item_id, $partition_manager_obj);
+		if($partitions)
+		{
+			$n = count($partitions);
+			for($i=0; $i<$n; $i++)
+			{
+				if($partitions[$i]['prt_id'])
+					$partitions[$i]['partition'] = $partition_manager_obj->get_partition($partitions[$i]['prt_id']);
+			}
+		}
+		
+		$DOCUMENT['mod']['data']['partitions'] = $partitions;
+		$menu_manager_obj->debug($partitions);
+		$layout_template = $THIS_MODULE_DIR_NAME."html_item_prt_list.tpl";
+		break;
 }
 
 
