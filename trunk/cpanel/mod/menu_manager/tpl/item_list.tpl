@@ -7,26 +7,27 @@
 	<tr>
 		<td width="50%" valign="top">
 			<h2>Список пунктов меню</h2>
-			<table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body">
-				<tr class="tr">
+			<table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body" id="item_table_tr">
+				<tr>
 					<td class="table_head" style="width:32px;" colspan="2">Сост</td>
 					<td class="table_head">Заглавие пункта меню</td>
 				</tr>
 				{section name=item_num loop=$DOCUMENT.mod.data.menu_item_list}
-				<tr>
+				<tr class="tr">
 					<td class="td_body"  style="width:16px;"><input type="checkbox" value="{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}" name="it_id[]" id="it_id[]"></td>
 						<td class="td_body"  style="width:16px;">
 							{if $DOCUMENT.mod.data.menu_item_list[item_num].status == "off"}<img src="{$DOCUMENT.ACP_IMG_WAY}unpublish.gif" width="16" height="16" alt="Отключено" title="Отключено"> {/if}
 							{if $DOCUMENT.mod.data.menu_item_list[item_num].status == "wait"}<img src="{$DOCUMENT.ACP_IMG_WAY}draft.gif" width="16" height="16" alt="В черновиках" title="В черновиках"> {/if}
 							{if $DOCUMENT.mod.data.menu_item_list[item_num].status == "on"}<img src="{$DOCUMENT.ACP_IMG_WAY}publish.gif" width="16" height="16" alt="Опубликован" title="Опубликован"> {/if}
 						</td>
-					<td class="td_body">{$DOCUMENT.mod.data.menu_item_list[item_num].title}</td>
+					<td class="td_body"><a index="#" onclick="get_partitions_for_item('{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}', this); return false;">{$DOCUMENT.mod.data.menu_item_list[item_num].title}</a></td>
 				</tr>
 				{/section}
 			</table>
 		</td>
 		<td width="50%" valign="top">
 			<h2>Список разделов, к которым привязан пункт меню</h2>
+			<div id="div_prt_list" name="div_prt_list"></div>
 		</td>
 	</tr>
 </table>

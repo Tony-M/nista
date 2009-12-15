@@ -739,7 +739,8 @@ class menu_manager extends base_validation
 	public function set_relation_partition_id($id = array())
 	{
 		if(!is_array($id))return false;
-		if(!count($id))return false;
+		$n = count($id);
+		if(!$n)return false;
 		
 		for($i=0; $i<$n; $i++)
 			if((int)$id[$i] != $id[$i]) return false;
@@ -818,7 +819,7 @@ class menu_manager extends base_validation
 						set
 							parent_id='".$this->DATA['rel_parent_id'][$i]."', 
 							item_id='".$item_id."',  
-							prt_id='".$this->DATA['rel_prt_id']."',  
+							prt_id='".$this->DATA['rel_prt_id'][$i]."',  
 							status ='".$this->DATA['rel_status'][$i]."'";
 			if(!mysql_query($query))
 				return false;
@@ -895,6 +896,24 @@ class menu_manager extends base_validation
 		return false;
 	}
 	
+	
+	public function get_partitions_for_menu_item($item_id = 0)
+	{
+		$item_id = (int)$item_id;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$item_id."' order by rid asc";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = array();
+			while ($tmp = mysql_fetch_array($result_id,MYSQL_ASSOC)) 
+			{
+				$result[] = $tmp;	
+			}
+			mysql_free_result($result_id);
+			return $result;
+		}
+		return false;		
+	}
 	
 	
 }
