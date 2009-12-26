@@ -866,17 +866,17 @@ class menu_manager extends base_validation
 	}
 	
 	/**
-	 * Метод возвращает список пунктов меню по id контейнера меню
+	 * Метод возвращает список уникальных пунктов меню по id контейнера меню
 	 *
 	 * @param integer $menu_id
 	 * @return Array or False
 	 */
-	public function get_item_list_for_menu_container($menu_id = 0)
+	public function get_distinct_item_list_for_menu_container($menu_id = 0)
 	{
 		$menu_id=(int)$menu_id;
 		if(!$menu_id)return false;
 		
-		$query = "select tb1.* from ".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_RELATION." as tb2
+		$query = "select distinct tb1.menu_id, tb1.* from ".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_RELATION." as tb2
 					where 
 						tb2.parent_id='".$menu_id."' and 
 						tb1.menu_id = tb2.item_id and

@@ -434,7 +434,7 @@ switch ($sp)
 		if($menu_id) // список пунктов меню по id меню
 		{
 			$DOCUMENT['mod']['data']['menu_data'] = $menu_manager_obj->get_menu_container_by_id($menu_id);
-			$DOCUMENT['mod']['data']['menu_item_list'] = $menu_manager_obj->get_item_list_for_menu_container($menu_id);
+			$DOCUMENT['mod']['data']['menu_item_list'] = $menu_manager_obj->get_distinct_item_list_for_menu_container($menu_id);
 		}
 		
 		if(!$menu_id && $item_id) // Список пунктов мею по id одного из этих пунктов
@@ -464,7 +464,7 @@ switch ($sp)
 		}
 		
 		$DOCUMENT['mod']['data']['partitions'] = $partitions;
-		$menu_manager_obj->debug($partitions);
+		//$menu_manager_obj->debug($partitions);
 		$layout_template = $THIS_MODULE_DIR_NAME."html_item_prt_list.tpl";
 		break;
 }
