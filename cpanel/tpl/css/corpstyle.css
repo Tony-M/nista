@@ -219,8 +219,8 @@ td.body1{
 tr.tr:hover{background-color:#F4FAFF;}
 tr.tr_selected
 {
-	background-color:#ffa200;
-	background-image:url(/cpanel/tpl/img/nista_v2_2_menu_bg.gif);
+	background-color:#76a6ff;
+	background-image:url(/cpanel/tpl/img/row_selected_right.gif);
 	background-repeat: no-repeat;
 	background-position:right center;	
 	}
@@ -235,7 +235,7 @@ tr.tr_selected
 .td_body{
         border-color:#F2F3F4;
         border-style:solid;
-        border-width:1px;
+        border-width:0px;
         font-family:Tahoma;
         font-size:8pt;
         font-weight:normal;

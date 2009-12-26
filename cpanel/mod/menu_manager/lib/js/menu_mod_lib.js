@@ -211,7 +211,7 @@ function get_menu_list_for_partition(inp)
 
 function get_partitions_for_item(id , obj)
 {
-	
+	$('#div_prt_list').html("");
 	if(id)
 	{		
 		var param = "p=menu&sp=get_item_prt&it_id="+id;
@@ -246,6 +246,17 @@ function mark_row(obj)
 
 	$(row).removeClass("tr");
 	$(row).addClass("tr_selected");
+}
+
+//функция обновляет статус выбранного relation меню по его id и изменяет картинку статуса
+function update_rid_status(status , rid, obj)
+{
+	var param = "p=menu&sp="
+	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+	
+	
+	
+	
 }
 /*
 function get_xml_city_range(inp)
