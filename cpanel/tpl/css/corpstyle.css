@@ -78,6 +78,15 @@ input.input_nw, textarea.input_nw, select.input_nw{
 border: 1px solid rgb( 145, 155, 156 );
 }
 
+select.input_list_transp{
+ilter:alpha(opacity=50);
+-moz-opacity:0.5;
+-khtml-opacity: 0.5;
+opacity: 0.5;
+border:1px none #ffffff;
+
+}
+
 .btn_login{
 
         

@@ -896,7 +896,12 @@ class menu_manager extends base_validation
 		return false;
 	}
 	
-	
+	/**
+	 * Метод возвращает список разделов сайта для выбранного пункта меню по id меню
+	 *
+	 * @param integer $item_id
+	 * @return Array or false
+	 */
 	public function get_partitions_for_menu_item($item_id = 0)
 	{
 		$item_id = (int)$item_id;
@@ -915,5 +920,42 @@ class menu_manager extends base_validation
 		return false;		
 	}
 	
+	/**
+	 * Метод обновляет статус relation пункта меню по id
+	 *
+	 * @param integer $relation_id
+	 * @param string $status
+	 * @return boolean
+	 */
+	public function update_rid_status($relation_id = 0, $status = "wait")
+	{
+		$relation_id = (int)$relation_id;
+		if($relation_id == 0)return false;
+		
+		if(!in_array($status, $this->p_STATUS_LIST)) return false;
+		$query = "update ".$this->TBL_NISTA_MENU_RELATION." set status='".$status."' where rid='".$relation_id."'";
+		//echo $query."<br>";
+		return mysql_query($query);
+		
+	}
+	
+	/**
+	 * Метод обновляет статус пункта меню
+	 *
+	 * @param integer $item_id
+	 * @param string $status
+	 * @return boolean
+	 */
+	public function update_menu_item_status($item_id = 0, $status = "wait")
+	{
+		$item_id = (int)$item_id;
+		if($item_id == 0)return false;
+		
+		if(!in_array($status, $this->p_STATUS_LIST)) return false;
+		$query = "update ".$this->TBL_NISTA_MENU." set status='".$status."' where menu_id='".$item_id."' and type='item'";
+		//echo $query."<br>";
+		return mysql_query($query);
+		
+	}
 	
 }

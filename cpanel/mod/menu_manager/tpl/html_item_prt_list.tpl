@@ -12,13 +12,13 @@
 				{if $DOCUMENT.mod.data.partitions[item_prt_num].status == "on"}<img src="{$DOCUMENT.ACP_IMG_WAY}publish.gif" width="16" height="16" alt="Опубликован" title="Опубликован"> {/if}
 			</td>
 		<td class="td_body"><a index="#" >{if $DOCUMENT.mod.data.partitions[item_prt_num].prt_id != 0}{$DOCUMENT.mod.data.partitions[item_prt_num].partition.title}{else}Все разделы{/if}</a></td>
-		<td  class="td_body" style="width:50px;">
+		<td  class="td_body" style="width:60px;">
 			<input value="{$DOCUMENT.mod.data.partitions[item_prt_num].rid}" name="rid[]" id="rid[]" type="hidden" maxlength="11">
-			<select id="rid_status[]" class="input_list" name="rid_status[]" size="1" onchange="update_rid_status(this.options[this.selectedIndex].value , '{$DOCUMENT.mod.data.partitions[item_prt_num].rid}', this);">
+			<select id="rid_status[]" class="input_list_transp" name="rid_status[]" size="1" onchange="update_rid_status(this.options[this.selectedIndex].value , '{$DOCUMENT.mod.data.partitions[item_prt_num].rid}', this);" >
 			<option value="none"> </option>
-			<option value="on"> enable</option>
-			<option value="wait"> draft</option>
-			<option value="off"> disable</option>
+			<option value="on" {if $DOCUMENT.mod.data.partitions[item_prt_num].status == 'on'}selected{/if}> enable</option>
+			<option value="wait" {if $DOCUMENT.mod.data.partitions[item_prt_num].status == 'wait'}selected{/if}> draft</option>
+			<option value="off" {if $DOCUMENT.mod.data.partitions[item_prt_num].status == 'off'}selected{/if}> disable</option>
 			</select>
 		</td>
 	</tr>
