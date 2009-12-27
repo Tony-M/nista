@@ -251,12 +251,38 @@ function mark_row(obj)
 //функция обновляет статус выбранного relation меню по его id и изменяет картинку статуса
 function update_rid_status(status , rid, obj)
 {
-	var param = "p=menu&sp="
+	add_ajax_task();
+	var param = "p=menu&sp=update_rel_status&rid=" + rid + "&status=" + status;
 	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
 	
+	if(otvet != "err")
+			{
+				var row = obj.parentNode.parentNode;
+				var img = $(row).find('td:eq(1)').find('img')
+				img.fadeOut("slow", function () 
+					{
+						img.attr("src", otvet);
+					});
+				img.fadeIn("slow");
+			}
+}
+
+function update_menu_item_status(status , it_id, obj)
+{
+	add_ajax_task();
+	var param = "p=menu&sp=update_item_status&it_id=" + it_id + "&status=" + status;
+	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
 	
-	
-	
+	if(otvet != "err")
+			{
+				var row = obj.parentNode.parentNode;
+				var img = $(row).find('td:eq(2)').find('img')
+				img.fadeOut("slow", function () 
+					{
+						img.attr("src", otvet);
+					});
+				img.fadeIn("slow");
+			}
 }
 /*
 function get_xml_city_range(inp)

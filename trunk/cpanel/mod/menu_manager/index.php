@@ -467,6 +467,52 @@ switch ($sp)
 		//$menu_manager_obj->debug($partitions);
 		$layout_template = $THIS_MODULE_DIR_NAME."html_item_prt_list.tpl";
 		break;
+	case "update_rel_status": // обновляем статус связи relation ajax запросом
+		$rid = ( isset($HTTP_POST_VARS['rid']) ) ? $HTTP_POST_VARS['rid'] : $HTTP_GET_VARS['rid'];
+		$status = ( isset($HTTP_POST_VARS['status']) ) ? $HTTP_POST_VARS['status'] : $HTTP_GET_VARS['status'];
+		
+		if($menu_manager_obj->update_rid_status($rid, $status))
+		{
+			switch ($status)
+			{
+				case "on":
+					echo $DOCUMENT['ACP_IMG_WAY']."publish.gif";
+					break;
+				case "off":
+					echo $DOCUMENT['ACP_IMG_WAY']."unpublish.gif";
+					break;
+				case "wait":
+					echo $DOCUMENT['ACP_IMG_WAY']."draft.gif";
+					break;
+			}
+		}
+		else 
+			echo "err";
+		exit;
+		break;
+	case "update_item_status":
+		$it_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
+		$status = ( isset($HTTP_POST_VARS['status']) ) ? $HTTP_POST_VARS['status'] : $HTTP_GET_VARS['status'];
+		
+		if($menu_manager_obj->update_menu_item_status($it_id, $status))
+		{
+			switch ($status)
+			{
+				case "on":
+					echo $DOCUMENT['ACP_IMG_WAY']."publish.gif";
+					break;
+				case "off":
+					echo $DOCUMENT['ACP_IMG_WAY']."unpublish.gif";
+					break;
+				case "wait":
+					echo $DOCUMENT['ACP_IMG_WAY']."draft.gif";
+					break;
+			}
+		}
+		else 
+			echo "err";
+		exit;
+		break;
 }
 
 
