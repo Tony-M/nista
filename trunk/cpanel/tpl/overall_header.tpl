@@ -26,6 +26,8 @@
 	
 	<link rel="SHORTCUT ICON" href="../templates/nista2/img/favicon.ico" TYPE="image/ico">
 	{$MENU_HEADER}
+	
+	
 </head>
 <body>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-color:#ff0000;border-width:1pt;border-style:solid;height:100%">

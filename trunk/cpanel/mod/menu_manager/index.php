@@ -490,7 +490,7 @@ switch ($sp)
 			echo "err";
 		exit;
 		break;
-	case "update_item_status":
+	case "update_item_status": // ajax обновление статуса пункта меню
 		$it_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
 		$status = ( isset($HTTP_POST_VARS['status']) ) ? $HTTP_POST_VARS['status'] : $HTTP_GET_VARS['status'];
 		
@@ -511,6 +511,16 @@ switch ($sp)
 		}
 		else 
 			echo "err";
+		exit;
+		break;
+	case "rm_mitem_relation":// удаление привязки пункта меню к разделу
+		$rid = ( isset($HTTP_POST_VARS['rid']) ) ? $HTTP_POST_VARS['rid'] : $HTTP_GET_VARS['rid'];
+		
+		if($menu_manager_obj->remove_relation_by_id($rid))
+			echo "ok";
+		else 
+			echo "err";
+		
 		exit;
 		break;
 }
