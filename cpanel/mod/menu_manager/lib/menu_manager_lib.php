@@ -958,4 +958,20 @@ class menu_manager extends base_validation
 		
 	}
 	
+	
+	/**
+	 * Метод удаляе связь пункта меню и раздела сайта
+	 *
+	 * @param integer $rid
+	 * @return boolean
+	 */
+	public function remove_relation_by_id($rid = 0)
+	{
+		$rid = (int)$rid;
+		if(!$rid)return false;
+		
+		$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where rid='".$rid."'";
+		return mysql_query($query);
+	}
+	
 }

@@ -284,6 +284,43 @@ function update_menu_item_status(status , it_id, obj)
 				img.fadeIn("slow");
 			}
 }
+
+function remove_mitem_relation(a_obj, rid_val, prt_id_val)
+{
+	var row = a_obj.parentNode.parentNode;
+	var rid = parseInt(rid_val);
+	var prt_id = parseInt(prt_id_val);
+	
+	if(!rid)return false;
+	
+	if(confirm("Уверены, что хотите удалить привязку пункта меню к данному разделу?"))
+	{
+		if(!prt_id)
+		{
+			if(!confirm("Удаление данного привязки пункта меню может затронуть и другие меню. Вы действительно хотите удалить связь?"))
+				return false;
+		}
+		add_ajax_task();
+		var param = "p=menu&sp=rm_mitem_relation&rid=" + rid;
+		var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+		if(otvet == "err")
+		{
+			alert("Во время удаления привязки пункта меню к разделу(ам) возникли шибки");
+			return false;
+		}
+		
+		if(otvet == "ok")
+		{
+			$(row).remove();
+			return true;
+		} 
+		
+		return false;		
+	}
+	
+	
+}
 /*
 function get_xml_city_range(inp)
 {
