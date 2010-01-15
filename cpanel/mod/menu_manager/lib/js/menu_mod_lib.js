@@ -285,7 +285,7 @@ function update_menu_item_status(status , it_id, obj)
 			}
 }
 
-function remove_mitem_relation(a_obj, rid_val, prt_id_val)
+function remove_mitem_relation(a_obj, rid_val, prt_id_val) // удаляем relation пункта меню
 {
 	var row = a_obj.parentNode.parentNode;
 	var rid = parseInt(rid_val);
@@ -314,12 +314,43 @@ function remove_mitem_relation(a_obj, rid_val, prt_id_val)
 		{
 			$(row).remove();
 			return true;
-		} 
+		}
+		
+		if(otvet == "reload") 
+		{
+			location.reload(); 
+		}
 		
 		return false;		
+	}	
+}
+
+function remove_mitem(a_obj, menu_id_val)
+{
+	var row = a_obj.parentNode.parentNode;
+	var menu_id = parseInt(menu_id_val);
+		
+	if(!menu_id)return false;
+	
+	if(confirm("Удалить пункт меню ?"))
+	{
+		add_ajax_task();
+		var param = "p=menu&sp=rm_mitem&menu_id=" + menu_id;
+		var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+		if(otvet == "err")
+		{
+			alert("Во время удаления привязки пункта меню к разделу(ам) возникли шибки");
+			return false;
+		}
+		
+		if(otvet == "ok")
+		{
+			$(row).remove();
+			$('#div_prt_list').html("");
+			return true;
+		}
 	}
-	
-	
 }
 /*
 function get_xml_city_range(inp)

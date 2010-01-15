@@ -369,7 +369,7 @@ switch ($sp)
 			}
 		}
 		break;
-	case "create_item":// создание нового пункиа меню
+	case "create_item":// создание нового пункиа меню в одном или более контейнерах меню
 		
 		$DOCUMENT['mod']['data']['http_referer'] = $_POST['page_referer']; // ссылка на страницу источник для возврата
 		
@@ -382,26 +382,24 @@ switch ($sp)
 		$menu_manager_obj->set_obj($_POST['obj']);
 		if($uploaded_ico_name = $menu_manager_obj->upload_ico("ico_img"))
 			$menu_manager_obj->set_ico($uploaded_ico_name);
-		$result_item_id = $menu_manager_obj->create_menu_item();
-		if($result_item_id)
+			
+		$menu_manager_obj->set_relation_container_id($_POST['mc_id']);
+		$menu_manager_obj->set_relation_status($_POST['it_status']);
+		$menu_manager_obj->set_relation_partition_id($_POST['mc_prt_id']);
+		
+		if($menu_manager_obj->create_mass_menu_items())
 		{
-			$menu_manager_obj->set_relation_container_id($_POST['mc_id']);
-			$menu_manager_obj->set_relation_status($_POST['it_status']);
-			$menu_manager_obj->set_relation_partition_id($_POST['mc_prt_id']);
-				if($menu_manager_obj->create_relation($result_item_id))
-				{
-					//Связи успешно созданы
-					$MOD_MESSAGE = "Пункт меню '".$_POST['title']."' успешно создан ";
-					header("Location: index.php?p=menu&sp=item_creation_result&msg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
-					exit;
-				}
-				else 
-				{
-					//при создании были косяки
-					$MOD_MESSAGE = "В процессе создания пункта меню '".$_POST['title']."' возникли ошибки ";
-					header("Location: index.php?p=menu&sp=item_creation_result&errmsg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
-					exit;
-				}
+			//Связи успешно созданы
+			$MOD_MESSAGE = "Пункт меню '".$_POST['title']."' успешно создан ";
+			header("Location: index.php?p=menu&sp=item_creation_result&msg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
+			exit;
+		}
+		else 
+		{
+			//при создании были косяки
+			$MOD_MESSAGE = "В процессе создания пункта меню '".$_POST['title']."' возникли ошибки ";
+			header("Location: index.php?p=menu&sp=item_creation_result&errmsg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
+			exit;
 		}
 		
 		header("Location: index.php?p=menu&sp=item_creation_result");
@@ -516,12 +514,29 @@ switch ($sp)
 	case "rm_mitem_relation":// удаление привязки пункта меню к разделу
 		$rid = ( isset($HTTP_POST_VARS['rid']) ) ? $HTTP_POST_VARS['rid'] : $HTTP_GET_VARS['rid'];
 		
-		if($menu_manager_obj->remove_relation_by_id($rid))
+		$result = $menu_manager_obj->remove_relation_by_id($rid);
+		
+		switch ($result)
+		{
+			case false:
+				echo "err";
+				break;
+			case "ok+menu": // была удалена не только relation но и сам пункт меню
+				echo "reload";
+				break;
+			case "ok":
+				echo "ok"; // была удалена relation
+				break;				
+		}		
+		exit;
+		break;
+	case "rm_mitem": //удаление пункта меню
+		$menu_id = ( isset($HTTP_POST_VARS['menu_id']) ) ? $HTTP_POST_VARS['menu_id'] : $HTTP_GET_VARS['menu_id'];
+		if($menu_manager_obj->remove_menu_item($menu_id))
 			echo "ok";
 		else 
 			echo "err";
-		
-		exit;
+		exit;		
 		break;
 }
 

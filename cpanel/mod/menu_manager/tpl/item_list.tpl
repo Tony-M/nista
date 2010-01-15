@@ -18,7 +18,7 @@
 				</tr>
 				{section name=item_num loop=$DOCUMENT.mod.data.menu_item_list}
 				<tr class="tr">
-					<td class="td_body"  style="width:16px;"><input type="checkbox" value="{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}" name="it_id[]" id="it_id[]"></td>
+						<td class="td_body"  style="width:16px;"><a href="" onclick="remove_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить пункт меню" title="Удалить пункт меню"></a></td>
 						<td class="td_body"  style="width:50px;" valign="middle">
 							<select id="status_action" class="input_list_transp" name="status_action" size="1" onchange="update_menu_item_status(this.options[this.selectedIndex].value , '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}', this);">
 								<option value="none"> </option>

@@ -829,6 +829,65 @@ class menu_manager extends base_validation
 			
 	}
 	
+	public  function create_mass_menu_items()
+	{
+		if(!is_array($this->DATA['rel_parent_id']))return false;
+		$rel_parent_num = count($this->DATA['rel_parent_id']);
+		if(!$rel_parent_num)return false;
+		
+		$rel_status_num = count($this->DATA['rel_status']);
+		if(!$rel_status_num)return false;
+		
+		$rel_prt_id_num = count($this->DATA['rel_prt_id']);
+		if(!$rel_prt_id_num)return false;	
+		
+		if(($rel_parent_num!=$rel_prt_id_num) || ($rel_prt_id_num!=$rel_status_num) || ($rel_parent_num!=$rel_status_num))	
+			return false;
+			
+		$unique_menu_ids = array(); // массив с уникальными контейнерами меню, к которым создавать пункты
+		$unique_menu_ids = array_values(array_unique($this->DATA['rel_parent_id']));
+		
+		$unique_num = count($unique_menu_ids);
+		
+		if($unique_num)
+		{
+			for($j=0; $j<$unique_num; $j++) //цикл по уникальным меню
+			{
+				$item_id=$this->create_menu_item();
+				if($item_id) // создали пункт для уникального меню и получили id пункта
+				{
+					for($i=0; $i<$rel_parent_num; $i++)
+					{
+						if($this->DATA['rel_parent_id'][$i] == $unique_menu_ids[$j])
+						{
+							$query = "insert into ".$this->TBL_NISTA_MENU_RELATION."
+										set
+											parent_id='".$this->DATA['rel_parent_id'][$i]."', 
+											item_id='".$item_id."',  
+											prt_id='".$this->DATA['rel_prt_id'][$i]."',  
+											status ='".$this->DATA['rel_status'][$i]."'";
+							//echo $query."<br>";
+							if(!mysql_query($query))
+							{
+								$query = "delete from ".$this->TBL_NISTA_MENU." where menu_id='".$item_id."' limit 1";
+								//echo $query."<br>";
+								mysql_query($query);
+								return false;
+							}							
+						}
+					}					
+				}
+				else 
+					return false;
+			}
+			return true;
+		}
+		
+		return false;
+				
+	}
+	
+	
 	public function get_menu_for_partition($partition_id = 0)
 	{
 		$partition_id = (int)$partition_id;
@@ -969,9 +1028,53 @@ class menu_manager extends base_validation
 	{
 		$rid = (int)$rid;
 		if(!$rid)return false;
+		// необходимо узнать являетсяли данная relation единственной для данного пункта меню
+		$query = "SELECT * FROM ".$this->TBL_NISTA_MENU_RELATION." WHERE parent_id in (select parent_id from ".$this->TBL_NISTA_MENU_RELATION." where rid='".$rid."')";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$rid_num = mysql_num_rows($result_id);
+			if($rid_num==1)
+			{
+				// relatio - была единственная, а это значит что если её просто удалить, то потеряется привязка пункта меню к меню
+				// а следовательно нужно удалить и пункт меню чтоб не засорять БД
+				$row = mysql_fetch_array($result_id, MYSQL_ASSOC);
+				$query = "delete from ".$this->TBL_NISTA_MENU." where menu_id='".$row['item_id']."' and type='item' limit 1";
+				if(!mysql_query($query))
+					return false;
+				$flag = 1; 
+			}
+			mysql_free_result($result_id);
+			
+			$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where rid='".$rid."'";
+			if(mysql_query($query))
+			{
+				if(!$flag)
+					return "ok"; // была просто удалена relation
+				else 
+					return "ok+menu"; // была удалена relation + пункт меню
+			}
+		}
 		
-		$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where rid='".$rid."'";
-		return mysql_query($query);
 	}
 	
+	/**
+	 * Метод удаляет пункт меню по его id (вместе со всеми relations)
+	 *
+	 * @param integer $id
+	 * @return bolean
+	 */
+	public function remove_menu_item($id = 0)
+	{
+		$id = (int)$id;
+		if(!$id)return false;
+		
+		$query = "delete from ".$this->TBL_NISTA_MENU." where menu_id='".$id."' and type='item' limit 1";
+		if(mysql_query($query))
+		{
+			$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$id."'";
+			return mysql_query($query);
+		}
+		else 
+			return false;
+	}
 }
