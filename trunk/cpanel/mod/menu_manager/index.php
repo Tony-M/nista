@@ -82,7 +82,7 @@ switch ($sp)
 		if((int)$prt_id==0)$prt_id=0; // Если не задан id раздела то отображать все меню
 		//$DOCUMENT['mod']['data']['item_list'] =$item_manager_obj->get_item_list_for_partition((int)$prt_id);
 		
-		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();
+		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list($prt_id);
 		
 		//*** начинаем генерацию страниц и меню страниц статей
 		$pagination_obj = new pagination_manager();
@@ -107,7 +107,7 @@ switch ($sp)
 		//список статей для выбранного раздела
 		$prt_id = (isset($HTTP_POST_VARS['prt_id'])) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
 		$DOCUMENT['mod']['data']['ptr_id'] = (int)$prt_id;
-		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list();
+		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list($prt_id);
 		
 		//*** начинаем генерацию страниц и меню страниц статей
 		$page_num = (isset($HTTP_POST_VARS['page'])) ? $HTTP_POST_VARS['page'] : $HTTP_GET_VARS['page'];
@@ -376,7 +376,7 @@ switch ($sp)
 		$menu_manager_obj->set_title($_POST['title']);
 		$menu_manager_obj->set_alt($_POST['alt']);
 		$menu_manager_obj->set_text($_POST['text']);
-		$menu_manager_obj->set_show_title('show_title');
+		$menu_manager_obj->set_show_title($_POST['show_title']);
 		$menu_manager_obj->set_url($_POST['link_url']);
 		$menu_manager_obj->set_target($_POST['target']);
 		$menu_manager_obj->set_obj($_POST['obj']);
@@ -538,6 +538,17 @@ switch ($sp)
 			echo "err";
 		exit;		
 		break;
+	case "mv_item":
+		$direction = std_lib::POST_GET("direction");
+		$item_id = std_lib::POST_GET("menu_id");
+		
+		if($menu_manager_obj->change_menu_item_order($item_id, $direction))
+			echo "ok";
+		else 
+			echo "err";
+		exit;
+		break;
+		
 }
 
 

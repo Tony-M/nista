@@ -142,7 +142,6 @@ class menu_manager extends base_validation
 	 */
 	public function set_show_title($show_title="show")
 	{
-
 		$show_title=htmlentities(strip_tags($show_title),ENT_QUOTES, "UTF-8");
 		$show_title=trim($show_title);
 		if($show_title == "")$show_title =  "show";
@@ -364,9 +363,19 @@ class menu_manager extends base_validation
 	 *
 	 * @return Array or False
 	 */
-	public function get_menu_list()
+	public function get_menu_list($prt_id=0)
 	{
-		$query = "select * from ".$this->TBL_NISTA_MENU." where type='container' order by title asc" ;
+		$prt_id=(int)$prt_id;
+		if(!$prt_id)
+			$query = "select * from ".$this->TBL_NISTA_MENU." where type='container' order by title asc" ;
+		else 
+			$query = "select tb1.* from ".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_LINKS." as tb2 
+							where 
+								tb1.type='container' and 
+								tb1.menu_id=tb2.menu_id and
+								tb2.prt_id='".$prt_id."'
+							order by title asc" ;
+		std_lib::log_query($query);
 //		echo $query."<br>";
 		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
@@ -1076,5 +1085,84 @@ class menu_manager extends base_validation
 		}
 		else 
 			return false;
+	}
+	
+	/**
+	 * Метод изменяет порядок следования пунктов меню
+	 *
+	 * @param integer $item_id id пункта меню
+	 * @param string $direction направление перемещения up/down
+	 * @return boolean
+	 */
+	public function change_menu_item_order($item_id = 0, $direction = "")
+	{ 
+		$item_id = (int)$item_id;
+		if(!$item_id)return false;
+		
+		if(($direction!="up") && ($direction!="down"))
+			return false;
+			
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU." where menu_id='".$item_id."' and type='item'";
+		//std_lib::log_query($query);
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+		{
+			$current_item = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			
+			$query = "select * from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$item_id."' limit 1";
+			//std_lib::log_query($query);
+			if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+			{
+				$current_item['relation'] = mysql_fetch_array($result_id, MYSQL_ASSOC);
+				mysql_free_result($result_id);
+			}
+			else 
+				return false;
+		
+			$query = "";
+			switch ($direction)
+			{
+				case "up":
+					$query = "select tb1.* from ".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_RELATION." as tb2
+									where
+										tb1.menu_id=tb2.item_id and
+										tb1.sequence<'".$current_item['sequence']."' and
+										tb2.parent_id='".$current_item['relation']['parent_id']."' 
+									order by sequence desc
+									limit 1";
+					break;
+				case "down";
+					$query = "select tb1.* from ".$this->TBL_NISTA_MENU." as tb1, ".$this->TBL_NISTA_MENU_RELATION." as tb2
+									where
+										tb1.menu_id=tb2.item_id and
+										tb1.sequence>'".$current_item['sequence']."' and
+										tb2.parent_id='".$current_item['relation']['parent_id']."' 
+									order by sequence asc
+									limit 1";
+					break;
+			}
+			//std_lib::log_query($query);
+			if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+			{
+				$neighbour_item = mysql_fetch_array($result_id, MYSQL_ASSOC);
+				mysql_free_result($result_id);
+				
+				$query = "update ".$this->TBL_NISTA_MENU." set sequence='".$neighbour_item['sequence']."' where menu_id='".$current_item['menu_id']."' and type='item'";
+				//std_lib::log_query($query);
+				if(!mysql_query($query))
+					return false;
+					
+				$query = "update ".$this->TBL_NISTA_MENU." set sequence='".$current_item['sequence']."' where menu_id='".$neighbour_item['menu_id']."' and type='item'";
+				//std_lib::log_query($query);
+				if(!mysql_query($query))
+					return false;					
+			}
+			return true;
+			
+		}
+		else 
+			return false;
+
 	}
 }

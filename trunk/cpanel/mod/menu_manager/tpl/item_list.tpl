@@ -12,13 +12,19 @@
 		<td width="50%" valign="top">
 			<h2>Список пунктов меню</h2>
 			<table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body" id="item_table_tr">
+				<thead>
 				<tr>
-					<td class="table_head" style="width:82px;" colspan="3">Сост</td>
+					<td class="table_head" style="width:150px;" colspan="6">Действия</td>
 					<td class="table_head">Заглавие пункта меню</td>
 				</tr>
+				</thead>
+				<tbody>
 				{section name=item_num loop=$DOCUMENT.mod.data.menu_item_list}
 				<tr class="tr">
-						<td class="td_body"  style="width:16px;"><a href="" onclick="remove_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить пункт меню" title="Удалить пункт меню"></a></td>
+						<td class="td_body"  style="width:16px;"><a href="#up" href="" onclick="move_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}','up'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}up.gif" width="16" height="16" border="0" alt="Переместить вверх" title="Переместить вверх"></a></td>
+						<td class="td_body"  style="width:16px;"><a href="#down" href="" onclick="move_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}','down'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}down.gif" width="16" height="16" border="0" alt="Переместить вниз" title="Переместить вниз"></a></td>
+						<td class="td_body"  style="width:16px;"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" border="0" alt="Редактировать" title="Редактировать"></td>
+						
 						<td class="td_body"  style="width:50px;" valign="middle">
 							<select id="status_action" class="input_list_transp" name="status_action" size="1" onchange="update_menu_item_status(this.options[this.selectedIndex].value , '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}', this);">
 								<option value="none"> </option>
@@ -33,9 +39,11 @@
 							{if $DOCUMENT.mod.data.menu_item_list[item_num].status == "wait"}<img src="{$DOCUMENT.ACP_IMG_WAY}draft.gif" width="16" height="16" alt="В черновиках" title="В черновиках"> {/if}
 							{if $DOCUMENT.mod.data.menu_item_list[item_num].status == "on"}<img src="{$DOCUMENT.ACP_IMG_WAY}publish.gif" width="16" height="16" alt="Опубликован" title="Опубликован"> {/if}
 						</td>
+						<td class="td_body"  style="width:36px;" align="center"><a href="" onclick="remove_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить пункт меню" title="Удалить пункт меню"></a></td>
 					<td class="td_body"><a index="#" onclick="get_partitions_for_item('{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}', this); return false;">{$DOCUMENT.mod.data.menu_item_list[item_num].title}</a></td>
 				</tr>
 				{/section}
+				</tbody>
 			</table>		
 		</td>
 		<td width="50%" valign="top">
