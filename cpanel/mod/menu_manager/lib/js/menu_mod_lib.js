@@ -1,4 +1,15 @@
-
+// функция выдаёт список меню для основной страницы модуля на основе выбранного раздела
+function get_menu_list(prt_id)
+{
+	if(prt_id=="")return false;
+	else
+	{
+		add_ajax_task();
+		var param = "p=menu&sp=get_ls_menu&prt_id="+prt_id;
+		document.getElementById( 'main_div' ).innerHTML = jQuery.ajax({ type: "POST", url: "index.php", data: param, async: false , complete: function(){remove_ajax_task()}}).responseText;
+			//alert("p=item&sp=get_ls_item&prt_id="+inp+"page="+page);
+	}	
+}
 
 // функция листаетс страници контейнера меню в пагинаторе
 function get_menu_list_by_page(page)
@@ -9,9 +20,9 @@ function get_menu_list_by_page(page)
 	else
 	{
 		if(page != "")
-		{		
-			document.getElementById( 'main_div' ).innerHTML = jQuery.ajax({ type: "POST", url: "index.php", data: "p=menu&sp=get_ls_menu&prt_id="+prt_id+"&page="+page, async: false }).responseText;
-			//alert("p=item&sp=get_ls_item&prt_id="+prt_id+"page="+page);
+		{	
+			add_ajax_task();	
+			document.getElementById( 'main_div' ).innerHTML = jQuery.ajax({ type: "POST", url: "index.php", data: "p=menu&sp=get_ls_menu&prt_id="+prt_id+"&page="+page, async: false , complete: function(){remove_ajax_task()} }).responseText;
 		}
 		else
 			return false;
@@ -276,7 +287,7 @@ function update_menu_item_status(status , it_id, obj)
 	if(otvet != "err")
 			{
 				var row = obj.parentNode.parentNode;
-				var img = $(row).find('td:eq(2)').find('img')
+				var img = $(row).find('td:eq(4)').find('img')
 				img.fadeOut("slow", function () 
 					{
 						img.attr("src", otvet);
@@ -318,11 +329,16 @@ function remove_mitem_relation(a_obj, rid_val, prt_id_val) // удаляем rel
 		
 		if(otvet == "reload") 
 		{
-			location.reload(); 
+			reload_page();
 		}
 		
 		return false;		
 	}	
+}
+
+function reload_page()
+{
+	window.location.reload();
 }
 
 function remove_mitem(a_obj, menu_id_val)
@@ -352,6 +368,36 @@ function remove_mitem(a_obj, menu_id_val)
 		}
 	}
 }
+
+// функция изменяет порядок следования пунктов меню
+function move_mitem(obj, menu_id_val , direction)
+{
+	var menu_id = parseInt(menu_id_val);
+	if(!menu_id)
+		return false;
+		
+	if((direction!="up") && (direction!="down"))
+		return false;
+			
+	add_ajax_task();
+	var param = "p=menu&sp=mv_item&menu_id=" + menu_id + "&direction=" + direction;
+	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+	if(otvet == "err")
+	{
+		alert("Во время выполнения операции произошли ошибки.");
+		return false;
+	}
+	
+	if(otvet == "ok")
+	{
+		reload_page();	
+	}
+	
+}
+    
+    
+   
 /*
 function get_xml_city_range(inp)
 {

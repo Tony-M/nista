@@ -28,7 +28,9 @@
 						<span>Всплывающая подсказка: </span> 
 						<input type="text" name="alt" id="alt" value="{$DOCUMENT.mod.data.menu_item}" class="input_nw" maxlength="255">
 						<span>Show title:</span>
-						<input type="checkbox" value="show" checked name="show_title" id="show_title">
+						<input type="radio" value="show" checked name="show_title" id="show_title">
+						<span>Hide title:</span>
+						<input type="radio" value="hide" name="show_title" id="show_title">
 					</td>
 				</tr>
 				<tr>
