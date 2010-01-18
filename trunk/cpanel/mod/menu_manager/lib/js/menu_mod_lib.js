@@ -396,6 +396,34 @@ function move_mitem(obj, menu_id_val , direction)
 	
 }
     
+
+//функция добавляет привязку пункта к разделу из выпадающего списка
+function add_rel()
+{
+	var item_id = $('#selected_item_id').val();
+	
+	var prt_id = $('#partition_id option:selected').val();
+	if(prt_id == '--')
+		return false;
+	
+	add_ajax_task();
+	var param = "p=menu&sp=add_rel&prt_id=" + prt_id + "&item_id=" + item_id;
+	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+		if(otvet == "err")
+		{
+			alert("Во время выполнения операции возникли шибки");
+			return false;
+		}
+		
+		if(otvet != "err")
+		{
+			$('#div_prt_list').html("");
+			$('#div_prt_list').html(otvet);
+			return true;
+		}
+		
+}
     
    
 /*
