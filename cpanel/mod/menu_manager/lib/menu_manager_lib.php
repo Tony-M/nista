@@ -359,6 +359,40 @@ class menu_manager extends base_validation
 	}
 	
 	/**
+	 * Метод проверяет, является и запись пунктом меню или нет
+	 *
+	 * @param integer $id
+	 * @return Array or False
+	 */
+	public function is_menu_item($id = 0)
+	{
+		$id = (int)$id;
+		if(!$id)return false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='item' and menu_id='".$id."'";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+		{
+			$result = mysql_fetch_array($result_id,MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			
+			$query = "select * from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$id."' limit 1";
+			if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+			{
+				$tmp = mysql_fetch_array($result_id,MYSQL_ASSOC);
+				$result['menu_container_id'] = $tmp['parent_id'];
+				mysql_free_result($result_id);
+				
+				return $result;
+			}
+			
+			return false;
+		}
+		return false;
+		
+		
+	}
+	
+	/**
 	 * Метод возвращяет полный смисок контейнеров меню
 	 *
 	 * @return Array or False

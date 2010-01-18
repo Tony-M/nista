@@ -447,22 +447,70 @@ switch ($sp)
 			//не задан ни id контейнера меню ни пункта меню, для поиска контейнера
 		}
 		break;
+	case "add_rel":
+		$item_id = std_lib::POST_GET("item_id");
+		$prt_id = std_lib::POST_GET("prt_id");
+		
+		
+		break;
 	case "get_item_prt":// возвращает html таблицу со списком разделов, к которым привязан пункт меню
 		$item_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
-		
-		$partitions = $menu_manager_obj->get_partitions_for_menu_item($item_id, $partition_manager_obj);
-		if($partitions)
-		{
-			$n = count($partitions);
-			for($i=0; $i<$n; $i++)
+		$item = $menu_manager_obj->is_menu_item($item_id);
+		if($item)
+		{	
+			$DOCUMENT['mod']['data']['item_id'] = $item_id;
+			$partitions = $menu_manager_obj->get_partitions_for_menu_item($item_id, $partition_manager_obj);
+			if($partitions)
 			{
-				if($partitions[$i]['prt_id'])
-					$partitions[$i]['partition'] = $partition_manager_obj->get_partition($partitions[$i]['prt_id']);
+				$n = count($partitions);
+				for($i=0; $i<$n; $i++)
+				{
+					if($partitions[$i]['prt_id'])
+						$partitions[$i]['partition'] = $partition_manager_obj->get_partition($partitions[$i]['prt_id']);
+				}
 			}
+			
+			
+			$DOCUMENT['mod']['data']['partitions'] = $partitions;
+			$partitions_num = count($partitions);
+			$menu_links = $menu_manager_obj->get_menu_links_2_partition($item['menu_container_id']);
+			$n = count($menu_links);
+			//$partition_manager_obj->debug($partitions);
+			
+			$partition_tree = $partition_manager_obj->get_all_partition_trees();
+			$m = count($partition_tree);
+			$k = 0;
+			for($j=0; $j<$m; $j++)
+			{
+				for($i=0; $i<$n; $i++)
+				{
+					$flag = 0;
+					$tmp_partition = $partition_manager_obj->get_partition($menu_links[$i]['prt_id']);
+					if($tmp_partition['id'] == $partition_tree[$j]['id'])
+					{
+						for($l=0; $l<$partitions_num; $l++)
+						{
+							if($partitions[$l]['partition']['id'] == $partition_tree[$j]['id'])
+								$flag = 1;
+						}
+						if(!$flag)
+						{
+							$DOCUMENT['mod']['data']['partitions_for_menu'][$k] =$partition_tree[$j];
+							if($tmp_partition['pid'] != $partition_tree[$j-1]['id'])
+								$DOCUMENT['mod']['data']['partitions_for_menu'][$k]['not_subprt'] = "yes";
+							$k++;
+						}
+					}
+					 
+				}
+			}
+			
+			
+			
+			
 		}
 		
-		$DOCUMENT['mod']['data']['partitions'] = $partitions;
-		//$menu_manager_obj->debug($partitions);
+//		$menu_manager_obj->debug($partitions);
 		$layout_template = $THIS_MODULE_DIR_NAME."html_item_prt_list.tpl";
 		break;
 	case "update_rel_status": // обновляем статус связи relation ajax запросом
@@ -548,6 +596,7 @@ switch ($sp)
 			echo "err";
 		exit;
 		break;
+	
 		
 }
 
