@@ -38,7 +38,7 @@ class std_lib{
 	 */
 	public static function log_text($text)
 	{
-		file_put_contents(ROOT_WAY."/text.log", $query."\n", FILE_APPEND);
+		file_put_contents(ROOT_WAY."/text.log", $text."\n", FILE_APPEND);
 	}
 	
 	/**
