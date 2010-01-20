@@ -111,6 +111,8 @@ switch ($sp)
 		
 		//*** начинаем генерацию страниц и меню страниц статей
 		$page_num = (isset($HTTP_POST_VARS['page'])) ? $HTTP_POST_VARS['page'] : $HTTP_GET_VARS['page'];
+		$DOCUMENT['mod']['data']['page_number'] = $page_num;
+		
 		
 		$pagination_obj = new pagination_manager();
 		$pagination_obj->set_total_records(count($DOCUMENT['mod']['data']['menu_containers']));
@@ -595,8 +597,8 @@ switch ($sp)
 		std_lib::get_ok_err_result($menu_manager_obj->change_menu_item_order($item_id, $direction));
 		exit;
 		break;
-	case "rm_menu": // удаление контейнера меню
-		echo std_lib::get_ok_err_result($menu_manager_obj->remove_menu_container(std_lib::POST_GET($menu_id)));
+	case "rm_menu": // удаление контейнера меню		
+		echo std_lib::get_ok_err_result($menu_manager_obj->remove_menu_container(std_lib::POST_GET('menu_id')));
 		exit;
 		break;
 	

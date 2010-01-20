@@ -1,4 +1,5 @@
 <input type="hidden" maxlength="11" value="{$DOCUMENT.mod.data.item_id}" name="selected_item_id" id="selected_item_id">
+
 <table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body">
 	<tr>
 		<td class="table_head" style="width:52px;" colspan="2">Сост</td>

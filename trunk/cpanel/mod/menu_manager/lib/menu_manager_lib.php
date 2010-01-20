@@ -261,6 +261,7 @@ class menu_manager extends base_validation
 					type='container', ";
 		$query .= " title='".$this->DATA['title']."' ";
 		$query .= " , comment='".$this->DATA['comment']."' ";
+		$query .= " , sequence='".$this->get_new_sequence()."' ";
 
 		if(($this->DATA['show_title']!=1) && ($this->DATA['show_title']!=0))$this->DATA['show_title']=1;
 
@@ -1369,6 +1370,7 @@ class menu_manager extends base_validation
 	 */
 	public function remove_menu_container($menu_id=0)
 	{
+		
 		$menu_id = (int)$menu_id;
 		if(!$menu_id)return false;
 		
@@ -1396,7 +1398,7 @@ class menu_manager extends base_validation
 			
 			if($flag_no_err)
 			{
-				$query = "delete from ".$this->TBL_NISTA_MENU." where  type='comtainer' and menu_id='".$menu_id."'";
+				$query = "delete from ".$this->TBL_NISTA_MENU." where  type='container' and menu_id='".$menu_id."'";
 				return mysql_query($query);
 			}			
 		}

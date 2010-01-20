@@ -445,6 +445,44 @@ function add_rel()
 		}
 		
 }
+
+function rm_menu_container(menu_id_val)
+{
+	if(confirm("Вы действительно хотите удалить меню ?"))
+	{
+		var page = $('#current_page_num').val();
+		if(page == "")
+			page=1;
+		else
+			page = parseInt(page);
+		
+		if(!page)return false;
+		
+		var menu_id = parseInt(menu_id_val);	
+		if(!menu_id) return false;
+		
+		prt_id = $('#prt_id').val();
+		if(prt_id=="")return false;
+		
+		add_ajax_task();
+		var param = "p=menu&sp=rm_menu&prt_id=" + prt_id + "&page=" + page + "&menu_id=" + menu_id; 
+		
+		var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+		if(otvet == "err")
+		{
+			alert("Во время выполнения операции возникли шибки");
+			return false;
+		}
+			
+		if(otvet == "ok")
+		{
+			get_menu_list_by_page(page);
+			return true;
+		}
+		return false;
+	}
+}
     
    
 /*

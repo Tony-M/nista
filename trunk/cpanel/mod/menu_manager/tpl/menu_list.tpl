@@ -1,4 +1,5 @@
 <input type="hidden" name="prt_id" id="prt_id" value="{$DOCUMENT.mod.data.ptr_id}">
+<input type="hidden" maxlength="11" value="{$DOCUMENT.mod.data.page_number}" name="current_page_num" id="current_page_num">
 {capture name=menu_item_page_nums}
 	<div style="margin-left:10pt; background-color:#ffffff; "><center>
 	{include file=$DOCUMENT.mod.data.sub_tpl_pagination_menu_list}
@@ -24,7 +25,7 @@
 			<td class="td_body" style="padding-left:{$DOCUMENT.mod.data.menu_containers[mc_num].tab}5px;"><a href="index.php?p=menu&sp=item_list&mid={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}" title="Состав меню">{$DOCUMENT.mod.data.menu_containers[mc_num].title}</a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=link_menu&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}link.gif" width="16" height="16" alt="привязка меню к разделу" title="привязка меню к разделу" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=edit_menu&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
-			<td class="td_body" style="width: 45px;" align="right"><a href="" onclick="delete_menu({$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
+			<td class="td_body" style="width: 45px;" align="right"><a href="" onclick="rm_menu_container({$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
 		</tr>
 		{/section}
 </table>
