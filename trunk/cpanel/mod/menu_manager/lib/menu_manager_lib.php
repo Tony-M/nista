@@ -370,12 +370,14 @@ class menu_manager extends base_validation
 		if(!$id)return false;
 		
 		$query = "select * from ".$this->TBL_NISTA_MENU." where type='item' and menu_id='".$id."'";
+		//std_lib::log_query($query);
 		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
 		{
 			$result = mysql_fetch_array($result_id,MYSQL_ASSOC);
 			mysql_free_result($result_id);
 			
 			$query = "select * from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$id."' limit 1";
+			//std_lib::log_query($query);
 			if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
 			{
 				$tmp = mysql_fetch_array($result_id,MYSQL_ASSOC);
@@ -387,10 +389,33 @@ class menu_manager extends base_validation
 			
 			return false;
 		}
-		return false;
-		
-		
+		return false;		
 	}
+	
+	/**
+	 * Метод проверяет является ли запись контейнером меню по id
+	 *
+	 * @param integer $menu_id id записи
+	 * @return Array or False
+	 */
+	public function is_menu_container($menu_id)
+	{
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return  false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU." where type='container' and menu_id='".$menu_id."'";
+		//std_lib::log_query($query);
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==1))
+		{
+			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			
+			return $result;
+		}
+		
+		return false;
+	}
+	
 	
 	/**
 	 * Метод возвращяет полный смисок контейнеров меню
@@ -424,6 +449,29 @@ class menu_manager extends base_validation
 		return false;
 	}
 
+	/**
+	 * метод возвращает список ликов данного контейнера меню к разделам сайта по id меню
+	 *
+	 * @param integer $menu_id id контейнера меню
+	 * @return Array or False
+	 */
+	public function get_menu_links($menu_id = 0)
+	{
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU_LINKS." where menu_id='".$menu_id."'";
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = array();
+			while ($tmp = mysql_fetch_array($result_id, MYSQL_ASSOC))
+				$result[] = $tmp;
+			
+			mysql_free_result($result_id);
+			return $result;
+		}
+		return false;
+	}
 	/**
 	 * Метод возвращаеттекущую дату и время для datecreated
 	 *
@@ -834,7 +882,7 @@ class menu_manager extends base_validation
 	/**
 	 * Метод создаёт связь пункта меню с контейнером для требуемых разделов
 	 *
-	 * @param штеупук $item_id
+	 * @param integer $item_id
 	 * @return boolean
 	 */
 	public function create_relation($item_id=0)
@@ -870,6 +918,168 @@ class menu_manager extends base_validation
 		
 		return true;
 			
+	}
+	
+	/**
+	 * Метод проверяет существования привязки пункта меню к разделу и меню по их id.
+	 *
+	 * @param integer $item_id id пункта меню
+	 * @param integer $prt_id id раздела
+	 * @param integer $menu_id id контейнера меню
+	 * @return Array or false
+	 */
+	public function is_relation_exist($item_id=0, $prt_id=0, $menu_id=0)
+	{
+		$item_id = (int)$item_id;
+		if(!$item_id)return false;
+		
+		if($prt_id != (int)$prt_id) return false;
+
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU_RELATION." 
+						where 
+							parent_id='".$menu_id."' and
+							item_id='".$item_id."' and
+							prt_id='".$prt_id."'";
+		std_lib::log_query($query);
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)==0))
+		{
+			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
+			mysql_free_result($result_id);
+			
+			return $result;
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Метод добавляет relation между пунктом меню, контейнером меню и разделом по их id
+	 *
+	 * @param integer $item_id id пункта меню
+	 * @param integer $prt_id id раздела
+	 * @param integer $menu_id id контейнера меню
+	 * @return integer or false
+	 */
+	public function add_relation($item_id=0, $prt_id=0, $menu_id=0)
+	{
+		$item_id = (int)$item_id;
+		if(!$item_id)return false;
+		
+		if($prt_id != (int)$prt_id) return false;
+
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		$flag_ok = 0;
+		if($this->is_menu_container($menu_id))
+		{
+			if($this->is_menu_item($item_id))
+			{
+				if($prt_id)
+				{
+					if($this->is_link_exist($menu_id, $prt_id))
+						$flag_ok = 1;
+				}
+				else 
+					$flag_ok = 1;
+					
+				if($flag_ok)
+				{
+					$relations = $this->get_partitions_for_menu_item($item_id);
+					$flag_insert = 1; // 1 - нужно делать insert    
+					
+					if($relations)
+					{
+						$flag_all = 0; // 1 если в списке relations указана привязка ко всем разделам
+						
+						$n = count($relations);
+						
+						for($i=0; $i<$n; $i++)
+						{
+							if($relations[$i]['prt_id'] == 0)
+								$flag_all =1;
+								
+							if($relations[$i]['prt_id'] == $prt_id)
+								$flag_insert=0;
+						}
+					}
+					
+					if($flag_insert)
+					{
+						if($flag_all) // в бд установлена привязка ко всем разделам
+						{
+							if($prt_id==0) // новая привязка тоже ко всем разделам
+								return true;
+							else // новая привязка к отдельному разделу => надо удалить привязку ко всем разделам
+							{
+								$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$item_id."'";
+								//std_lib::log_query($query);
+								if(!mysql_query($query))
+									return false;
+							}
+						}
+						else 
+						{
+							if($prt_id==0) // новая привязка ко всем разделам => привязки к отдельным разделам надо удалить
+							{
+								$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$item_id."'";
+								//std_lib::log_query($query);
+								if(!mysql_query($query))
+									return false;
+							}											
+						}
+						
+						$query = "insert into ".$this->TBL_NISTA_MENU_RELATION." 
+										set 
+											parent_id='".$menu_id."', 
+											item_id='".$item_id."', 
+											prt_id='".$prt_id."', 
+											status='off'";
+						//std_lib::log_query($query);
+						if(mysql_query($query))
+							return mysql_insert_id();
+						else 
+							return false;
+						
+					}
+					return false;				
+									
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Метод проверяет существование связи между меню и разделом по их id
+	 *
+	 * @param integer $menu_id id меню
+	 * @param integer $prt_id id раздела
+	 * @return Array or False
+	 */
+	public function is_link_exist($menu_id=0, $prt_id=0)
+	{
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$prt_id = (int)$prt_id;
+		if(!$prt_id) return  false;
+		
+		
+		$query = "select * from ".$this->TBL_NISTA_MENU_LINKS." where menu_id='".$menu_id."' and prt_id='".$prt_id."'";
+		//std_lib::log_query($query);
+		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)>0))
+		{
+			$result = array();
+			while($tmp = mysql_fetch_array($result_id, MYSQL_ASSOC))
+				$result[] = $tmp;
+				
+			mysql_free_result($result_id);
+			return $result;
+		}
+		return false;
 	}
 	
 	public  function create_mass_menu_items()
@@ -1101,6 +1311,36 @@ class menu_manager extends base_validation
 	}
 	
 	/**
+	 * Метод удаляет все relation данного пункта меню
+	 *
+	 * @param integer $item_id id пункта меню
+	 * @return boolean
+	 */
+	public function remove_all_relations_of_menu_item($item_id= 0)
+	{
+		$item_id = (int)$item_id;
+		if(!$item_id)return false;
+		
+		$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$item_id."'";
+		return mysql_query($query);
+	}
+	
+	/**
+	 * Метод удаляет все линки данного контейнера меню к разделам сайта
+	 *
+	 * @param integer $menu_id id контейнера меню
+	 * @return boolean
+	 */
+	public function remove_all_menu_links($menu_id = 0)
+	{
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$query = "delete from ".$this->TBL_NISTA_MENU_LINKS." where menu_id='".$menu_id."'";
+		return mysql_query($query);
+	}
+	
+	/**
 	 * Метод удаляет пункт меню по его id (вместе со всеми relations)
 	 *
 	 * @param integer $id
@@ -1114,11 +1354,53 @@ class menu_manager extends base_validation
 		$query = "delete from ".$this->TBL_NISTA_MENU." where menu_id='".$id."' and type='item' limit 1";
 		if(mysql_query($query))
 		{
-			$query = "delete from ".$this->TBL_NISTA_MENU_RELATION." where item_id='".$id."'";
-			return mysql_query($query);
+			return $this->remove_all_relations_of_menu_item($id);
 		}
 		else 
 			return false;
+	}
+	
+	
+	/**
+	 * Метод удаляет контейнер меню по его id
+	 *
+	 * @param integer $menu_id id контейнера меню
+	 * @return boolean
+	 */
+	public function remove_menu_container($menu_id=0)
+	{
+		$menu_id = (int)$menu_id;
+		if(!$menu_id)return false;
+		
+		$flag_no_err = 1; 
+		
+		if($this->is_menu_container($menu_id))
+		{
+			$items = $this->get_distinct_item_list_for_menu_container($menu_id);
+			
+			if($items)
+			{
+				$n = count($items);
+				for($i=0; $i<$n; $i++)
+				{
+					if(!$this->remove_menu_item($items[$i]['menu_id']))
+						$flag_no_err = 0;
+				}
+			}			
+			
+			if($flag_no_err)
+			{
+				if(!$this->remove_all_menu_links($menu_id))
+					$flag_no_err = 0;
+			}
+			
+			if($flag_no_err)
+			{
+				$query = "delete from ".$this->TBL_NISTA_MENU." where  type='comtainer' and menu_id='".$menu_id."'";
+				return mysql_query($query);
+			}			
+		}
+		return false;
 	}
 	
 	/**

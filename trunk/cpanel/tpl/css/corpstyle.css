@@ -226,13 +226,20 @@ td.body1{
         color:#444A51;
 }
 tr.tr:hover{background-color:#F4FAFF;}
-tr.tr_selected
+tr.tr_selected_right
+{
+	background-color:#76a6ff;
+	/*background-image:url(/cpanel/tpl/img/row_selected_right.gif);
+	background-repeat: no-repeat;
+	background-position:right center;	*/
+}
+td.tr_selected_right
 {
 	background-color:#76a6ff;
 	background-image:url(/cpanel/tpl/img/row_selected_right.gif);
 	background-repeat: no-repeat;
 	background-position:right center;	
-	}
+}
 .table_head{
        background-image:url(/cpanel/tpl/img/table_head_bg.jpg);
        text-align: center;
