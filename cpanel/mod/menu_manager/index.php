@@ -447,11 +447,16 @@ switch ($sp)
 			//не задан ни id контейнера меню ни пункта меню, для поиска контейнера
 		}
 		break;
-	case "add_rel":
+	case "add_rel": // добавляем ajax запросом relation пункта меню к меню и разделу из списка пунктов меню
 		$item_id = std_lib::POST_GET("item_id");
 		$prt_id = std_lib::POST_GET("prt_id");
+		$menu_id = std_lib::POST_GET("menu_id");
 		
-		
+		if($menu_manager_obj->add_relation($item_id, $prt_id, $menu_id))
+			echo "ok";
+		else 
+			echo "err";
+		exit;
 		break;
 	case "get_item_prt":// возвращает html таблицу со списком разделов, к которым привязан пункт меню
 		$item_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
@@ -580,20 +585,18 @@ switch ($sp)
 		break;
 	case "rm_mitem": //удаление пункта меню
 		$menu_id = ( isset($HTTP_POST_VARS['menu_id']) ) ? $HTTP_POST_VARS['menu_id'] : $HTTP_GET_VARS['menu_id'];
-		if($menu_manager_obj->remove_menu_item($menu_id))
-			echo "ok";
-		else 
-			echo "err";
+		echo std_lib::get_ok_err_result($menu_manager_obj->remove_menu_item($menu_id));
 		exit;		
 		break;
-	case "mv_item":
+	case "mv_item": // изменение порядка пунктов меню в меню
 		$direction = std_lib::POST_GET("direction");
 		$item_id = std_lib::POST_GET("menu_id");
 		
-		if($menu_manager_obj->change_menu_item_order($item_id, $direction))
-			echo "ok";
-		else 
-			echo "err";
+		std_lib::get_ok_err_result($menu_manager_obj->change_menu_item_order($item_id, $direction));
+		exit;
+		break;
+	case "rm_menu": // удаление контейнера меню
+		echo std_lib::get_ok_err_result($menu_manager_obj->remove_menu_container(std_lib::POST_GET($menu_id)));
 		exit;
 		break;
 	

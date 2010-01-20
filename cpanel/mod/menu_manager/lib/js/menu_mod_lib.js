@@ -247,16 +247,18 @@ function mark_row(obj)
 			{
 				var tr = $('#item_table_tr').find(find_num);
 				
-				$(tr).removeClass("tr_selected");
-				$(tr).addClass("tr");
-				
+				$(tr).removeClass("tr_selected_right");
+				$(tr).find('td:last').removeClass("tr_selected_right");
+				$(tr).addClass("tr");				
+				$(tr).find('td:last').addClass("td_body");
 			}
 			
 		}
 	);
 
 	$(row).removeClass("tr");
-	$(row).addClass("tr_selected");
+	$(row).addClass("tr_selected_right");
+	$(row).find('td:last').addClass("tr_selected_right");
 }
 
 //функция обновляет статус выбранного relation меню по его id и изменяет картинку статуса
@@ -295,7 +297,17 @@ function update_menu_item_status(status , it_id, obj)
 				img.fadeIn("slow");
 			}
 }
-
+function refresh_prtlist_for_item()
+{
+	var item_id = $('#selected_item_id').val();
+	var param = "p=menu&sp=get_item_prt&it_id="+item_id;
+		
+	add_ajax_task();
+	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+	$('#div_prt_list').html(otvet);
+}
+	
 function remove_mitem_relation(a_obj, rid_val, prt_id_val) // удаляем relation пункта меню
 {
 	var row = a_obj.parentNode.parentNode;
@@ -323,7 +335,9 @@ function remove_mitem_relation(a_obj, rid_val, prt_id_val) // удаляем rel
 		
 		if(otvet == "ok")
 		{
-			$(row).remove();
+			//$(row).remove();
+			refresh_prtlist_for_item();
+			
 			return true;
 		}
 		
@@ -335,6 +349,7 @@ function remove_mitem_relation(a_obj, rid_val, prt_id_val) // удаляем rel
 		return false;		
 	}	
 }
+		
 
 function reload_page()
 {
@@ -401,25 +416,31 @@ function move_mitem(obj, menu_id_val , direction)
 function add_rel()
 {
 	var item_id = $('#selected_item_id').val();
+	var menu_id = $('#current_menu_id').val();
 	
 	var prt_id = $('#partition_id option:selected').val();
 	if(prt_id == '--')
 		return false;
 	
 	add_ajax_task();
-	var param = "p=menu&sp=add_rel&prt_id=" + prt_id + "&item_id=" + item_id;
+	var param = "p=menu&sp=add_rel&prt_id=" + prt_id + "&item_id=" + item_id + "&menu_id=" + menu_id;
+	
 	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
-		
+		//$('#div_prt_list').html(otvet);return false;
 		if(otvet == "err")
 		{
 			alert("Во время выполнения операции возникли шибки");
 			return false;
 		}
 		
-		if(otvet != "err")
+		if(otvet == "ok")
 		{
-			$('#div_prt_list').html("");
-			$('#div_prt_list').html(otvet);
+			
+			refresh_prtlist_for_item();
+			
+			
+//			$('#div_prt_list').html("");
+//			$('#div_prt_list').html(otvet);
 			return true;
 		}
 		

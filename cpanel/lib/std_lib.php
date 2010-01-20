@@ -29,6 +29,41 @@ class std_lib{
 	{
 		file_put_contents(ROOT_WAY."/query.log", $query."\n", FILE_APPEND);
 	}
+	
+	
+	/**
+	 * Метод записывает в лог требуемый текст
+	 *
+	 * @param string $text
+	 */
+	public static function log_text($text)
+	{
+		file_put_contents(ROOT_WAY."/text.log", $query."\n", FILE_APPEND);
+	}
+	
+	/**
+	 * Метод возвращает текущую дату
+	 *
+	 * @return string
+	 */
+	public static function get_date()
+	{
+		return date("Y-m-d H:i:s");
+	}
+	
+	/**
+	 * Метод возвращает текстовое соотбщение ok|err на основании результата выполнения операции
+	 *
+	 * @param boolean $result результат выполнения операции
+	 * @return string ok|err
+	 */
+	public function get_ok_err_result($result)
+	{
+		if($result)
+			return "ok";
+		else 
+			return "err";
+	}
 }
 
 ?>

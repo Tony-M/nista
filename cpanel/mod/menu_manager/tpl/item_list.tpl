@@ -11,6 +11,7 @@
 	<tr>
 		<td width="50%" valign="top">
 			<h2>Список пунктов меню</h2>
+			<input type="hidden" name="current_menu_id" id="current_menu_id" value="{$DOCUMENT.mod.data.menu_data.menu_id}" maxlength="11">
 			<table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body" id="item_table_tr">
 				<thead>
 				<tr>

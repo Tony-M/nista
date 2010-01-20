@@ -10,7 +10,7 @@
 		<tr>
 			<td class="table_head" style="width:48px;" colspan="3">Сост</td>
 			<td class="table_head">Заглавие</td>
-			<td class="table_head" style="width:57px;" colspan="3">&nbsp;</td>
+			<td class="table_head" style="width:77px;" colspan="3">Действия</td>
 		</tr>
 		{section name=mc_num loop=$DOCUMENT.mod.data.menu_containers}
 		<tr onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
@@ -24,7 +24,7 @@
 			<td class="td_body" style="padding-left:{$DOCUMENT.mod.data.menu_containers[mc_num].tab}5px;"><a href="index.php?p=menu&sp=item_list&mid={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}" title="Состав меню">{$DOCUMENT.mod.data.menu_containers[mc_num].title}</a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=link_menu&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}link.gif" width="16" height="16" alt="привязка меню к разделу" title="привязка меню к разделу" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=edit_menu&id={$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
-			<td class="td_body" style="width: 25px;" align="right"><a href="" onclick="delete_menu({$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
+			<td class="td_body" style="width: 45px;" align="right"><a href="" onclick="delete_menu({$DOCUMENT.mod.data.menu_containers[mc_num].menu_id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
 		</tr>
 		{/section}
 </table>

@@ -1,12 +1,12 @@
 <input type="hidden" maxlength="11" value="{$DOCUMENT.mod.data.item_id}" name="selected_item_id" id="selected_item_id">
 <table border="0" cellspacing="1" cellpadding="0" width="100%" class="table_body">
 	<tr>
-		<td class="table_head" style="width:32px;" colspan="2">Сост</td>
+		<td class="table_head" style="width:52px;" colspan="2">Сост</td>
 		<td class="table_head" colspan="2">Заглавие раздела</td>
 	</tr>
 	{section name=item_prt_num loop=$DOCUMENT.mod.data.partitions}
 	<tr class="tr">
-		<td class="td_body"  style="width:16px;"><a href="" onclick="remove_mitem_relation(this, '{$DOCUMENT.mod.data.partitions[item_prt_num].rid}', '{$DOCUMENT.mod.data.partitions[item_prt_num].prt_id}');return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить привязку" title="Удалить привязку"></a></td>
+		<td class="td_body"  style="width:36px;" align="left"><a href="" onclick="remove_mitem_relation(this, '{$DOCUMENT.mod.data.partitions[item_prt_num].rid}', '{$DOCUMENT.mod.data.partitions[item_prt_num].prt_id}');return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить привязку" title="Удалить привязку"></a></td>
 		<td class="td_body" style="width:16px;">
 				{if $DOCUMENT.mod.data.partitions[item_prt_num].status == "off"}<img src="{$DOCUMENT.ACP_IMG_WAY}unpublish.gif" width="16" height="16" alt="Отключено" title="Отключено"> {/if}
 				{if $DOCUMENT.mod.data.partitions[item_prt_num].status == "wait"}<img src="{$DOCUMENT.ACP_IMG_WAY}draft.gif" width="16" height="16" alt="В черновиках" title="В черновиках"> {/if}
