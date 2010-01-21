@@ -24,7 +24,7 @@
 				<tr class="tr">
 						<td class="td_body"  style="width:16px;"><a href="#up" href="" onclick="move_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}','up'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}up.gif" width="16" height="16" border="0" alt="Переместить вверх" title="Переместить вверх"></a></td>
 						<td class="td_body"  style="width:16px;"><a href="#down" href="" onclick="move_mitem(this, '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}','down'); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}down.gif" width="16" height="16" border="0" alt="Переместить вниз" title="Переместить вниз"></a></td>
-						<td class="td_body"  style="width:16px;"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" border="0" alt="Редактировать" title="Редактировать"></td>
+						<td class="td_body"  style="width:16px;"><a href="index.php?p=menu&sp=edit_mitem&menu_id={$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" border="0" alt="Редактировать" title="Редактировать"></a></td>
 						
 						<td class="td_body"  style="width:50px;" valign="middle">
 							<select id="status_action" class="input_list_transp" name="status_action" size="1" onchange="update_menu_item_status(this.options[this.selectedIndex].value , '{$DOCUMENT.mod.data.menu_item_list[item_num].menu_id}', this);">

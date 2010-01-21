@@ -601,6 +601,14 @@ switch ($sp)
 		echo std_lib::get_ok_err_result($menu_manager_obj->remove_menu_container(std_lib::POST_GET('menu_id')));
 		exit;
 		break;
+	case "edit_mitem": // форма редактирования пункта меню
+		$MOD_TEMPALE =  "menu_item_not_mass_form.tpl";
+		$item = $menu_manager_obj->is_menu_item(std_lib::POST_GET('menu_id'));
+		if($item)
+		{
+			$DOCUMENT['mod']['data']['menu_item'] = $item;
+		}
+		break;
 	
 		
 }
