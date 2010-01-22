@@ -1,4 +1,4 @@
-<h1>{if $MOD_ACTION=="create_item"}Создание{else}редактирование{/if} пункта меню</h1>
+<h1>{if $MOD_ACTION=="create_item"}Создание{else}Редактирование{/if} пункта меню</h1>
 <p>Для объекта:
 <ul>
 <li><b>Тип: </b> "{$DOCUMENT.mod.data.object.object_type}" </li>
@@ -6,7 +6,15 @@
 </ul>
 </p>
 <hr>
-<form action="index.php?p=menu&sp=create_item" method="POST" enctype="multipart/form-data" id="menu_form" name="menu_form">
+<form action="index.php?p=menu&sp={$MOD_ACTION}" method="POST" enctype="multipart/form-data" id="menu_form" name="menu_form">
+<input type="hidden" id="menu_id" name="menu_id" value="{$DOCUMENT.mod.data.menu_item.menu_id}" maxlength="11">
+<input type="hidden" id="ico_src" name="ico_src" value="{$DOCUMENT.mod.data.menu_item.ico}" maxlength="255">
+
+{if $MOD_ACTION=="create_item"}
+<input type="hidden" id="mc_id[]" name="mc_id[]" maxlength="11" value="{$DOCUMENT.mod.data.menu_item.menu_id}">
+<input type="hidden" id="it_status[]" name="it_status[]" maxlength="11" value="off">
+<input type="hidden" id="mc_prt_id[]" name="mc_prt_id[]" maxlength="11" value="0">
+{/if}
 
 {section name=obj_link_num loop=$DOCUMENT.mod.data.object_link}
 	<input name="obj[]" id="obj[]" type="hidden" value="{$DOCUMENT.mod.data.object_link[obj_link_num]}">
@@ -70,21 +78,32 @@
 				</script>
 			{/literal}
 			
-			<div id="accordion">
+			<div id="accordion" >
 				<h3><a href="#">Иконка</a></h3>
+				<div style="height:200px;">
+					<span>Текущая иконка:</span><br>
+					
+					
+					<div id="div_current_ico" name="div_current_ico" align="center">{include file=$DOCUMENT.mod.data.sub_tpl_ico}</div>
+					<br><span>Выбрать другую иконку:</span>
+					<select id="ico_list" name="ico_list" style="width:280px;" class="input_nw" onchange="change_ico(this.options[this.selectedIndex].value); return false;">
+						<option value=""></option>
+						<option value="none">нет иконки</option>
+						{section name=ico_num loop=$DOCUMENT.data.ico_list}
+							<option value="{$DOCUMENT.data.ico_list[ico_num]}">{$DOCUMENT.data.ico_list[ico_num]}</option>
+						{/section}
+					</select>
+				</div>
+				<h3><a href="#">Загрузить новое изображение</a></h3>
 				<div>
-				<a>Загрузить новое изображение :</a>
-				<br/>
-				<br/>
-				<input type="hidden" value="300000" name="MAX_FILE_SIZE"/>
-				<span>File:</span>
-				<input type="file" name="ico_img" class="input">
-			</div>
-			<h3><a href="#"></a></h3>
-			<div>
-				 
-			</div>
-			
+					<a>Загрузить новое изображение :</a>
+					<br/>
+					<br/>
+					<input type="hidden" value="300000" name="MAX_FILE_SIZE"/>
+					<span>File:</span>
+					<input type="file" name="ico_img" class="input">
+				</div>
+				
 			
 			</div>
 			

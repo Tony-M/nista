@@ -175,11 +175,36 @@ class menu_manager extends base_validation
 	 */
 	public function set_ico($ico="")
 	{
+		
 		$ico=htmlentities(strip_tags($ico),ENT_QUOTES, "UTF-8");
 		$ico=trim($ico);
-		$this->DATA['ico']=$ico;
+		
+		if($ico == "") 
+		{
+			$this->DATA['ico'] ="";
+		}
+		else 
+		{
+			if(!$this->is_ico_exists($ico)) return false;
+		
+			$this->DATA['ico']=$ico;
+		}
 		return true;
 	}
+	
+	/**
+	 * Метод проверяет существует и файл иконки с заданным именем
+	 *
+	 * @param string $ico_file_name filename
+	 * @return boolean
+	 */
+	public function is_ico_exists($ico_file_name="")
+	{
+		$ico_file_name = trim($ico_file_name);
+		if(!file_exists(ROOT_WAY.$ico_file_name)) return false;
+		else return true;
+	}
+	
 	
 	/**
 	 * Методу устанавливает url ссылки
@@ -738,8 +763,7 @@ class menu_manager extends base_validation
 		
 		if(!is_dir(ROOT_WAY.$this->DATA['config']['ico_dir']))return false;
 		
-		$new_file_name = $_FILES[$file_field_name]["name"];
-		
+		$new_file_name = "ico_".mktime().md5($_FILES[$file_field_name]["name"]).substr($_FILES[$file_field_name]["name"], -strlen($_FILES[$file_field_name]["name"])+strrpos($_FILES[$file_field_name]["name"], "."));	
 		$flag=0;		
 		while(!$flag)
 		{
@@ -794,11 +818,62 @@ class menu_manager extends base_validation
 		
 		if($this->DATA['obj']!="") $query .= ", obj='".$this->DATA['obj']."' ";
 		
-		//echo $query."<br>";
+		
 		if(mysql_query($query))
 			return mysql_insert_id();
 		else 
 			return false;
+	}
+	
+	/**
+	 * Метод производит обновление записи пункта меню
+	 *
+	 * @return boolean
+	 */
+	public function update_menu_item()
+	{
+		$query = "";
+		
+		$query .= "update ".$this->TBL_NISTA_MENU." set ";
+		
+		if($this->DATA['title']!="") $query .= " title='".$this->DATA['title']."' ";
+		else return false;
+		
+		if($this->DATA['url']!="") $query .= ", url='".$this->DATA['url']."' ";
+		else return false;
+		
+		$query .= ", status='wait' ";
+		
+		if($this->DATA['alt']!="") $query .= ", alt='".$this->DATA['alt']."' ";
+		
+		if($this->DATA['text']!="") $query .= ", text='".$this->DATA['text']."' ";
+	
+		if(($this->DATA['show_title']!=0)&&($this->DATA['show_title']!=1)) $this->DATA['show_title']=1;
+			 $query .= ", show_title='".$this->DATA['show_title']."' ";
+		
+		if($this->DATA['target']!="") $query .= ", target='".$this->DATA['target']."' ";
+		
+		if($this->DATA['ico']=="") $query .= ", ico='".$this->DATA['ico']."' ";
+		else 
+		{
+			if($this->is_ico_exists($this->DATA['ico'])) $query .= ", ico='".$this->DATA['ico']."' ";
+		}
+		
+		if($this->DATA['obj']!="") $query .= ", obj='".$this->DATA['obj']."' ";
+		
+		
+		if($this->DATA['menu_id'])
+			$query.= " where menu_id='".$this->DATA['menu_id']."' and type='item'";
+		else 
+			return false;
+		//echo $query."<br>";
+		echo $query."<br>";exit;
+		return mysql_query($query);
+		//echo $query."<br>";
+		//if(mysql_query($query))
+			//return mysql_insert_id();
+		//else 
+			//return false;
 	}
 	
 	/**
@@ -1481,6 +1556,7 @@ class menu_manager extends base_validation
 		}
 		else 
 			return false;
-
 	}
+	
+	
 }

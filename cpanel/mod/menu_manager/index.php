@@ -382,6 +382,9 @@ switch ($sp)
 		$menu_manager_obj->set_url($_POST['link_url']);
 		$menu_manager_obj->set_target($_POST['target']);
 		$menu_manager_obj->set_obj($_POST['obj']);
+		
+		$menu_manager_obj->set_ico(std_lib::POST_GET('ico_src'));
+		
 		if($uploaded_ico_name = $menu_manager_obj->upload_ico("ico_img"))
 			$menu_manager_obj->set_ico($uploaded_ico_name);
 			
@@ -433,6 +436,7 @@ switch ($sp)
 				
 		if($menu_id) // список пунктов меню по id меню
 		{
+			$DOCUMENT['mod']['data']['menu_container_id'] = $menu_id;
 			$DOCUMENT['mod']['data']['menu_data'] = $menu_manager_obj->get_menu_container_by_id($menu_id);
 			$DOCUMENT['mod']['data']['menu_item_list'] = $menu_manager_obj->get_distinct_item_list_for_menu_container($menu_id);
 		}
@@ -603,13 +607,84 @@ switch ($sp)
 		break;
 	case "edit_mitem": // форма редактирования пункта меню
 		$MOD_TEMPALE =  "menu_item_not_mass_form.tpl";
+		$DOCUMENT['mod']['data']['sub_tpl_ico']=$THIS_MODULE_DIR_NAME."el_ico_html_code.tpl";
+		$MOD_ACTION = "update_mitem";
+		
+		$DOCUMENT['mod']['data']['http_referer'] = rawurlencode($_SERVER['HTTP_REFERER']);
+		
+		$DOCUMENT['data']['ico_list'] =$nista->get_ico_list('png');
+		
 		$item = $menu_manager_obj->is_menu_item(std_lib::POST_GET('menu_id'));
 		if($item)
 		{
 			$DOCUMENT['mod']['data']['menu_item'] = $item;
+			if($item['ico']!="")$DOCUMENT['mod']['data']['menu_item']["ico_way"] = $DOCUMENT['SERVER_URL']."/".$item['ico'];
+		}
+		else 
+		{
+			header('Location: '.$_SERVER['HTTP_REFERER']);
+			exit;
 		}
 		break;
-	
+	case "new_mitem":
+		$MOD_TEMPALE =  "menu_item_not_mass_form.tpl";
+		$DOCUMENT['mod']['data']['sub_tpl_ico']=$THIS_MODULE_DIR_NAME."el_ico_html_code.tpl";
+		$MOD_ACTION = "create_item";
+		$DOCUMENT['mod']['data']['http_referer'] = rawurlencode($_SERVER['HTTP_REFERER']);
+		
+		$DOCUMENT['data']['ico_list'] =$nista->get_ico_list('png');
+		$menu_container = $menu_manager_obj->is_menu_container(std_lib::POST_GET('menu_id'));
+		if($menu_container)
+		{
+			$DOCUMENT['mod']['data']['menu_item']['menu_id'] = $menu_container['menu_id'];
+			$DOCUMENT['mod']['data']['object_link'] = array("url");
+			
+		}
+		else 
+		{
+			header('Location : '.$_SERVER['HTTP_REFERER']);
+			exit;
+		}
+		
+		break;	
+	case "update_mitem":// обновление записи в БД для пункта меню после редактирования его формы
+		
+		//$menu_manager_obj->debug($_POST);
+		
+		$menu_manager_obj->set_menu_id(std_lib::POST_GET('menu_id'));
+		
+		$menu_manager_obj->set_title(std_lib::POST_GET('title'));
+		$menu_manager_obj->set_alt(std_lib::POST_GET('alt'));
+		$menu_manager_obj->set_text(std_lib::POST_GET('text'));
+		$menu_manager_obj->set_show_title(std_lib::POST_GET('show_title'));			
+		$menu_manager_obj->set_url(std_lib::POST_GET('link_url'));
+		$menu_manager_obj->set_target(std_lib::POST_GET('target'));
+		$menu_manager_obj->set_obj(std_lib::POST_GET('obj'));
+		
+		$menu_manager_obj->set_ico(std_lib::POST_GET('ico_src'));
+		
+		if($uploaded_ico_name = $menu_manager_obj->upload_ico("ico_img"))
+			$menu_manager_obj->set_ico($uploaded_ico_name);
+		
+		$menu_manager_obj->update_menu_item();
+		//$menu_manager_obj->debug();
+		
+		header("Location: ".trim(rawurldecode(std_lib::POST_GET('page_referer'))));
+		exit;
+		break;
+	case "get_ico": // аякс запрос html код рисунка по его имени (для иконок)
+		$layout_template = $THIS_MODULE_DIR_NAME."el_ico_html_code.tpl";
+		
+		if(!file_exists(ROOT_WAY."img/ico/".std_lib::POST_GET('ico')))
+		{
+			echo std_lib::get_ok_err_result(false);
+			exit;
+		}
+		
+		$DOCUMENT['mod']['data']['menu_item']['ico']="img/ico/".std_lib::POST_GET('ico');
+		$DOCUMENT['mod']['data']['menu_item']['ico_way'] = $DOCUMENT['SERVER_URL']."/img/ico/".std_lib::POST_GET('ico');
+		
+		break;
 		
 }
 

@@ -1,0 +1,1 @@
+{if $DOCUMENT.mod.data.menu_item.ico!=""}{html_image file=$DOCUMENT.mod.data.menu_item.ico_way}{/if}
