@@ -483,7 +483,37 @@ function rm_menu_container(menu_id_val)
 		return false;
 	}
 }
-    
+
+function change_ico(ico_file)
+{
+	
+	if(ico_file=="")
+		return false;
+	if(ico_file=='none')
+	{
+		$('#ico_src').val("");
+		$('#div_current_ico').hide('2', function(){$('#div_current_ico').html('');});
+		
+		return true;
+	}
+	add_ajax_task();
+	var param = "p=menu&sp=get_ico&ico=" + ico_file; 
+	
+	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
+		
+	if(otvet == "err")
+	{
+		alert("Во время выполнения операции возникли шибки");
+		return false;
+	}
+	else
+	{
+		$('#ico_src').val("img/ico/"+ico_file);
+		$('#div_current_ico').hide('2', function(){$('#div_current_ico').html(otvet);});		
+		$('#div_current_ico').show('2');
+		return true;
+	}
+}
    
 /*
 function get_xml_city_range(inp)

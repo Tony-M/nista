@@ -19,7 +19,7 @@ class nista{
 	"sudo" => 6,
 	"root" => 7);
 
-
+	private $p_IMG_TYPES = array("jpg", "jpeg", "png", "gif"); // список расширений рисунков
 
 	private $SYS_STRUC = array(); // system structure
 
@@ -555,8 +555,58 @@ class nista{
 			$this->SYS_STRUC['forbidden_public_dirs'][count($this->SYS_STRUC['forbidden_public_dirs'])]=$dir_way;
 		}
 	}
-
-
+	
+	/**
+	 * Метод возвращает список доступных расширений рисунков
+	 *
+	 * @return Array or false
+	 */
+	public function get_image_types()
+	{
+		if(count($this->p_IMG_TYPES)>0)
+			return $this->p_IMG_TYPES;
+		else 
+			return false;
+	}
+	
+	/**
+	 * Метод выдаёт список фронтенд иконок (с возможной фильтрацией по типу файла)
+	 *
+	 * @param string $type типа файла без точки
+	 * @return Array or False
+	 */
+	public function get_ico_list($type = "")
+	{
+		$dir = ROOT_WAY."img/ico";
+		$types = $this->get_image_types();
+		if(!$types) return false;
+		
+		if($type!="")
+			if(!in_array($type, $types)) return false;
+		$result = array();
+		$dir = opendir($dir);
+		while (false !==($file = readdir($dir)))
+		{
+		    $file;
+		
+		    if(eregi("^(ico_)", $file))
+		    {
+		    	if($type !="")
+		    	{
+		    		if(strtolower(substr($file, -strlen($file) + strrpos($file, ".")+1))==$type)
+		    			$result[] = $file;		    
+		    	}
+		    	else 
+		    		$result[] = $file;
+		    	
+		    }
+		}
+		closedir($dir);
+		if(!count($result))
+			return false;
+		else 
+			return $result;
+	}
 
 
 

@@ -3,6 +3,7 @@
 <table>
 	<tr>
 		<td><a class="menu_action" href="index.php?p=menu">К списку меню</a></td>
+		<td><a class="menu_action" href="index.php?p=menu&sp=new_mitem&menu_id={$DOCUMENT.mod.data.menu_container_id}">Создать пункт меню (URL)</a></td>
 	</tr>
 </table><br>
 {if $DOCUMENT.MSG <> ""}<div class="sys_msg">{$DOCUMENT.MSG}</div>{/if}
