@@ -384,34 +384,6 @@ function remove_mitem(a_obj, menu_id_val)
 	}
 }
 
-// функция изменяет порядок следования пунктов меню
-function move_mitem(obj, menu_id_val , direction)
-{
-	var menu_id = parseInt(menu_id_val);
-	if(!menu_id)
-		return false;
-		
-	if((direction!="up") && (direction!="down"))
-		return false;
-			
-	add_ajax_task();
-	var param = "p=menu&sp=mv_item&menu_id=" + menu_id + "&direction=" + direction;
-	var otvet = jQuery.ajax({ type: "POST", url: "index.php", data: param,  async: false , complete: function(){remove_ajax_task()}}).responseText;
-		
-	if(otvet == "err")
-	{
-		alert("Во время выполнения операции произошли ошибки.");
-		return false;
-	}
-	
-	if(otvet == "ok")
-	{
-		reload_page();	
-	}
-	
-}
-    
-
 //функция добавляет привязку пункта к разделу из выпадающего списка
 function add_rel()
 {

@@ -10,7 +10,7 @@
 		<tr>
 			<td class="table_head" style="width:48px;" colspan="3">Сост</td>
 			<td class="table_head">Заглавие</td>
-			<td class="table_head" style="width:57px;" colspan="3">&nbsp;</td>
+			<td class="table_head" style="width:77px;" colspan="3">&nbsp;</td>
 		</tr>
 		{section name=item_num loop=$DOCUMENT.mod.data.item_list}
 		<tr onMouseOver="this.style.background='#F4FAFF'" onMouseOut="this.style.background='none'">
@@ -22,9 +22,9 @@
 			</td>
 			<td class="td_body" style="width: 16px; background-image: url({$DOCUMENT.ACP_IMG_WAY}{if $DOCUMENT.mod.data.item_list[item_num].has_child=='yes'}plus1.gif{else}line.gif{/if}); background-repeat: repeat-y;">&nbsp;</td>
 			<td class="td_body" style="padding-left:{$DOCUMENT.mod.data.item_list[item_num].tab}5px;">{$DOCUMENT.mod.data.item_list[item_num].title}</td>
-			<td class="td_body" style="width: 16px;"><a href="index.php?p=item&sp=ls_category&id={$DOCUMENT.mod.data.item_list[item_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}shape_group.gif" width="16" height="16" alt="Категории раздела" title="Категории раздела" border="0"></a></td>
+			<td class="td_body" style="width: 16px;"><a href="index.php?p=menu&sp=ln&{$DOCUMENT.mod.data.item_list[item_num].object_link}"><img src="{$DOCUMENT.ACP_IMG_WAY}menu_ln.gif" width="16" height="16" alt="Создать пункт меню" title="Создать пункт меню" border="0"></a></td>
 			<td class="td_body" style="width: 16px;"><a href="index.php?p=item&sp=edit_item&id={$DOCUMENT.mod.data.item_list[item_num].id}"><img src="{$DOCUMENT.ACP_IMG_WAY}edit_16.png" width="16" height="16" alt="Редактировать" title="Редактировать" border="0"></a></td>
-			<td class="td_body" style="width: 25px;" align="right"><a href="" onclick="delete_item({$DOCUMENT.mod.data.item_list[item_num].id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
+			<td class="td_body" style="width: 45px;" align="right"><a href="" onclick="delete_item({$DOCUMENT.mod.data.item_list[item_num].id}); return false;"><img src="{$DOCUMENT.ACP_IMG_WAY}trash_(delete)_16x16.gif" width="16" height="16" border="0" alt="Удалить" title="Удалить"></a></td>
 		</tr>
 		{/section}
 </table>

@@ -1564,4 +1564,15 @@ class partition_manager
 		
 		return $result;
 	}
+	
+	public function api_get_partition_url_link($partition_id=0)
+	{
+		$partition_id=(int)$partition_id;
+		if(!$partition_id)return false;
+		
+		$result = $this->get_partition($partition_id);
+		if(!$result)return false;
+		
+		return $result['link'];
+	}
 }
