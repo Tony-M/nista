@@ -598,8 +598,10 @@ switch ($sp)
 		$direction = std_lib::POST_GET("direction");
 		$item_id = std_lib::POST_GET("menu_id");
 		
-		std_lib::get_ok_err_result($menu_manager_obj->change_menu_item_order($item_id, $direction));
+		$menu_manager_obj->change_menu_item_order($item_id, $direction);
+		header('Location: '.$_SERVER['HTTP_REFERER']);
 		exit;
+		
 		break;
 	case "rm_menu": // удаление контейнера меню		
 		echo std_lib::get_ok_err_result($menu_manager_obj->remove_menu_container(std_lib::POST_GET('menu_id')));

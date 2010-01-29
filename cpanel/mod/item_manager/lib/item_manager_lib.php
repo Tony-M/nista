@@ -14,6 +14,8 @@ class item_manager
 	private $TBL_NISTA_DATA_STRUCTURE = "data_structure";
 	private $TBL_NISTA_DATA_STRUCTURE_CATEGORY = "data_structure_category";
 	public $PREFIX = "tbl_nista_";
+	
+	private $MENU_OBJECTS = array("item"); // типы объектов для создания меню item - раздел сайта
 
 	/**
 	 * Метод отображает структурноедерево данных передаваемого аргумента в целях отладки
@@ -364,6 +366,7 @@ class item_manager
 
 			while ($tmp = mysql_fetch_array($result_id,MYSQL_ASSOC))
 			{
+				$tmp['object_link'] = $this->get_object_link_for_item($tmp['id']);
 				$result[] = $tmp;
 			}
 
@@ -373,6 +376,22 @@ class item_manager
 		return false;
 	}
 
+	/**
+	 * Метод возвращает ссылку на статью для менеджера меню
+	 *
+	 * @param integer $id
+	 * @return String or false
+	 */
+	private function get_object_link_for_item($id=0)
+	{
+		$id = (int)$id;
+		if(!$id)return false;
+		
+		//следующая строка формирует ссылку на объект для менеджера меню
+		$result="obj[0]=".$this->DATA['MOD_DATA']['modid']."&obj[1]=item&obj[2]=".$id;
+		return $result;
+			
+	}
 
 	/**
 	 * Метод возвращает инфорамцию о статье сайта по её id
@@ -472,5 +491,90 @@ class item_manager
 						modid='".$this->DATA['MOD_DATA']['modid']."'" ;
 		return mysql_query($query);
 	}
+	
+	/**
+	 * Метод возвращает менеджеру меню ссылку и информацию о объекте для вормирования пунктов меню сайта
+	 *
+	 * @param array $obj
+	 * @return array or False
+	 */
+	public function get_task_object($obj = array())
+	{
+		if(!is_array($obj))return false;
+		
+		if(!in_array($obj[1], $this->MENU_OBJECTS))
+			return false;
+			
+		switch ($obj[1])
+		{
+			case "item":
+				if(!(int)$obj[2])return false; // ссылка на статью неверная
+				
+				$result = $this->get_item($obj[2]);
+				if($result)
+				{
+					$result['object_title'] = $result['title'];
+					$result['object_type'] = "Раздел сайта";
+					$result['object_url'] = ""; // ссылки нет, т к у статьи нет ссылки поумолчанию
+					
+					global $partition_manager_obj;
+					$prt_link = $partition_manager_obj->api_get_partition_url_link($result['pid']);
+					
+					if($prt_link)
+					{
+						$pos = false;
+						// вначале ищем есть ли в ссылке на раздел указание раздела по id передаваемое через data
+						$pos = strripos($prt_link, "data=") ;
+						if($pos!== false)
+						{
+							$result['object_url'] = eregi_replace("data=[0-9]+", "data=".$result['id'],$prt_link);
+						}
+						
+						// если ссылка не была сформирована то смотрим есть ли в ссылке на раздел ключевое слово index.php (с доп проверкой на символ ?)
+						if($result['object_url']=="")
+						{
+							$pos = false;
+							$pos = strripos($prt_link, "index.php");
+							if($pos !== false)
+							{
+								$pos = strripos($prt_link, "index.php?");
+								if($pos !== false)
+								{
+									$result['object_url'] = $prt_link."&data=".$result['id'];
+								}
+								else 
+								{
+									$result['object_url'] = $prt_link."?data=".$result['id'];
+								}
+							}
+						}
+						
+						// если не было слова data и index.php  то раздел привязан на каталог а значит надо создать продолжение в виде параметров
+						if($result['object_url']=="")
+						{
+							if(substr($prt_link,-1)=="/")
+							{
+								$result['object_url'] = $prt_link."index.php?data=".$result['id'];
+							}
+							else 
+							{
+								$result['object_url'] = $prt_link."/index.php?data=".$result['id'];
+							}
+						}
+						
+						if($result['object_url']=="")
+							return false;
+					}
+					
+				}
+				break;
+			default: // тип объекта не обрабатывается
+				return false;
+				break;
+		}
+		
+		return $result;
+	}
 
 }
+?>
