@@ -1076,7 +1076,8 @@ class partition_manager
 		{
 			
 			if(mkdir($this->DATA['catalog_owner']."/".$name , 0755))
-				return copy($this->DATA['SYS']['PUB_CATALOG']['includes']."index.php", $this->DATA['catalog_owner']."/".$name."/index.php");
+				return copy(ROOT_WAY."includes/index.php", $this->DATA['catalog_owner']."/".$name."/index.php");
+				//return copy($this->DATA['SYS']['PUB_CATALOG']['includes']."index.php", $this->DATA['catalog_owner']."/".$name."/index.php");
 			
 			return false;
 		}
@@ -1166,7 +1167,8 @@ class partition_manager
 			{
 				if($result[0]['title']=="index.php")
 				{
-					$base_index_size = filesize($this->DATA['SYS']['PUB_CATALOG']['includes']."index.php"); // измеряем размер базового index.php
+					$base_index_size = filesize(ROOT_WAY."includes/index.php"); // измеряем размер базового index.php
+//					$base_index_size = filesize($this->DATA['SYS']['PUB_CATALOG']['includes']."index.php"); // измеряем размер базового index.php
 					$index_size = filesize(ROOT_WAY.$result[0]['path']); // измеряем размер текущего index.php
 					if($base_index_size == $index_size) // если не равны, то значит раздел нестандартный и грохать его нельзя
 					{

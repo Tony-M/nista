@@ -63,12 +63,6 @@ if(file_exists(LIB_DIR."filter_base_validation_lib.php"))
 	$SYS['php_lib'][count($SYS['php_lib'])] = LIB_DIR."filter_base_validation_lib.php";
 	
 }
-if(file_exists(LIB_DIR."hierarchy_lib.php"))
-{
-	require_once(LIB_DIR."hierarchy_lib.php"); // загрузка базового класса системы
-	$SYS['php_lib'][count($SYS['php_lib'])] = LIB_DIR."hierarchy_lib.php";
-	
-}
 
 if(file_exists($SYS['ROOT_WAY']."includes/lib/spyc.php"))
 {
