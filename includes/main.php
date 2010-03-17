@@ -14,6 +14,8 @@ define('ROOT_WAY', $ROOT_WAY);
 //echo $ROOT_WAY;
 //определяем адрес, который запрашивает клиент
 $SYS['HTTP_HOST'] = "http://".$_SERVER['HTTP_HOST'];
+$SYS['PHP_SELF'] = $_SERVER['PHP_SELF'];
+$SYS['DIR_NAME'] = dirname($_SERVER['PHP_SELF']);
 
 $DOCUMENT['REFERER'] = $_SERVER['HTTP_REFERER'];
 if(trim($DOCUMENT['REFERER'])=="")$DOCUMENT['REFERER'] = "index.php";
@@ -106,7 +108,9 @@ unset($SYS['php_mod_lib']);
 //-------------------------------------------------------------------------
 
 
-
+$partition = new partition_manager();
+$PARTITION = $partition->detect_partition();
+$nista->debug($PARTITION);
 $nista->debug($SYS);
 //************** определение раздела сайта *********************
 
