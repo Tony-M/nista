@@ -13,9 +13,9 @@ class std_lib{
 		$var_name = trim($var_name);
 		if($var_name=="")return false;
 		
-		global $HTTP_POST_VARS, $HTTP_GET_VARS;
+		global $_POST, $_GET;
 		
-		$result = ( isset($HTTP_POST_VARS[$var_name]) ) ? $HTTP_POST_VARS[$var_name] : $HTTP_GET_VARS[$var_name];
+		$result = ( isset($_POST[$var_name]) ) ? $_POST[$var_name] : $_GET[$var_name];
 				
 		return $result;
 	}
@@ -63,6 +63,23 @@ class std_lib{
 			return "ok";
 		else 
 			return "err";
+	}
+	
+	
+	public function LOCATION($location = "")
+	{
+		$location = trim($location);
+		if($location == "")
+			return false;
+		if(!filter_var($location, FILTER_VALIDATE_URL))
+			return false;
+		header("Location ".$location);
+		exit;
+	}
+	
+	public function Page404()
+	{ // not found
+		die("<b>Page 404</b>");
 	}
 }
 

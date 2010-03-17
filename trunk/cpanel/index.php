@@ -280,11 +280,8 @@ require_once ('lib/phplayersmenu-3.2.0/lib/PHPLIB.php');
 require_once  ('lib/phplayersmenu-3.2.0/lib/layersmenu-common.inc.php');
 require_once ('lib/phplayersmenu-3.2.0/lib/layersmenu.inc.php');
 
-//$mid = new LayersMenu(6, 7, 2, 5, 140);
-//$mid = new LayersMenu(6, 7, 2, 1);	// Gtk2-like
-$mid = new LayersMenu(3, 8, 1, 1);	// Keramik-like
-//$mid = new LayersMenu(3, 9, 2, 1);	// Galaxy-like
-//$mid = new LayersMenu(-12, 10, 6, 5);	// "Traditional" PHPLM look
+$mid = new LayersMenu(0, 2, 1, 1);	// Keramik-like
+
 
 //$mid->setLibjsdir('lib/phplayersmenu-3.2.0/libjs/');
 
