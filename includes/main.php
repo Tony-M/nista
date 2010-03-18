@@ -1,4 +1,3 @@
-cool!! it works
 <?php
 define('IN_SITE', true);
 
@@ -106,13 +105,16 @@ for($i=0;$i<$n; $i++)
 $SYS['mod_lib'] = $SYS['php_mod_lib'];
 unset($SYS['php_mod_lib']);
 //-------------------------------------------------------------------------
-
-
+//******************** определение раздела сайта **************************
 $partition = new partition_manager();
-$PARTITION = $partition->detect_partition();
-$nista->debug($PARTITION);
+$DOCUMENT['partition'] = $partition->detect_partition();
+//-------------------------------------------------------------------------
+
+
+
+$nista->debug($DOCUMENT);
 $nista->debug($SYS);
-//************** определение раздела сайта *********************
+
 
 
 ?>

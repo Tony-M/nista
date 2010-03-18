@@ -10,6 +10,7 @@ class partition_manager{
 	
 	private $DATA = array(); // Массив данных
 	
+	private $DETECT_REPORT = array(); // Массив содержащий отчёт о результатах работы метода $this->detect_partition();
 	public function __construct()
 	{
 		$this->TBL_DATA_STRUCTURE = $this->PREFIX.$this->TBL_DATA_STRUCTURE;
@@ -49,6 +50,12 @@ class partition_manager{
 		return true;
 	}
 	
+	/**
+	 * Метод устанавливает значение id
+	 *
+	 * @param integer $id
+	 * @return boolean
+	 */
 	public function set_id($id = 0)
 	{
 		$id = intval($id);
@@ -60,6 +67,13 @@ class partition_manager{
 		return true;
 	}
 	
+	
+	
+	/**
+	 * Метод определяет текущий раздел сайта
+	 *
+	 * @return Array or false
+	 */
 	public function detect_partition()
 	{
 		$partition = array(); // result partition info 
@@ -68,148 +82,158 @@ class partition_manager{
 		$data = (int)std_lib::POST_GET('data');
 		
 		if($data!=0)
-		{	
+		{	// пробуем найти цель по заданному id (data)
 			
-			$link = $_SERVER['PHP_SELF']."?data=".$data;
+			$link = $_SERVER['PHP_SELF']."?data=".$data; // собираем текущий путь для поиска по БД
 			
 			if($partition = $this->get_partition_by_link($link))
-				return $partition;
-			else
 			{
-				//$link = dirname($_SERVER['PHP_SELF']);
-				//if($partition = $this->get_partition_by_link($link))
-				//	return $partition;
-				//else 
-				//{
-					//std_lib::Page404();
-					$flag = 0;
-					echo $data_pid = $data;
+				// найдено соответствие пути с разделом в бд - найден нужный раздел
+				$this->DETECT_REPORT['partition'] = $partition; // данные раздела
+				$this->DETECT_REPORT['initial_is_partition'] = true; // была ссылка на раздел а не на чтото стороннее в нём
+				
+				return $partition; 
+			}
+			else
+			{	
+				// раздел не был найден, значит попробуем найти целевой обект и его родительский раздел
+		
+				$this->DETECT_REPORT['initial_is_partition'] = false; // ссылка была не на раздел а на его содержимое
+			
+				$flag = 0; // флаг для выхода из цикла поиска родительского раздела
+				$data_pid = $data; // id - родительского элемента
+				
+				if($data ==1) 
+					$root_flag =1; //если pid =1 то это корневой раздел и там бескоечная рекурсия.
+				
+				$flag_first_iteration = 0; // флаг первой итерации
+				while(!$flag)
+				{					
+					$flag_first_iteration ++;
 					
-					if($data ==1)
-						$root_flag =1;
-					//$i=0;	
-					while(!$flag)
+					if($this->set_id($data_pid))
 					{
-						//echo $i++;
-						//if($i==10)exit;
-						if($this->set_id($data_pid))
+						if($partition=$this->get_record())
 						{
-							if($partition=$this->get_record())
-							{
-								if($partition['type']=='prt')
+							if($partition['type']=='prt')
+							{	
+								// родительский элемент - раздел. проверяем сходная ли ссылка у раздела с нашей искомой
+								$link = dirname($_SERVER['PHP_SELF']);
+								$pos = strpos($partition['link'], $link);
+								if($pos===false) 
 								{
-									$link = dirname($_SERVER['PHP_SELF']);
-									$pos = strpos($partition['link'], $link);
-									if($pos===false)
-										std_lib::Page404();
-									else 
-									{
-										$pos = strpos($partition['link'], "index.php");
-										if($pos === false)
-										{
-											if(substr($partition['link'], -1)=="/")
-												$adres=$partition['link']."index.php?data=".$data;
-											else 
-												$adres=$partition['link']."/index.php?data=".$data;												
-										}
-										else 
-										{
-											$pos=strpos($partition['link'], "?");
-											if($pos === false)
-												$partition['link'] .= "?";
-																					
-											$pos=strpos($partition['link'], "data");
-											
-											if($pos === false)
-												$adres = $partition['link']."&data=".$data;
-											else 
-											{
-												
-												$params =  parse_url($partition['link'], PHP_URL_QUERY);
-												$par_array = explode("&", $params);
-												$this->debug($par_array);
-												$n = count($par_array);
-												for($i=0;$i<$n;$i++)
-												{
-													$pos = strpos($par_array[$i],"data=");
-													if($pos !== false)
-													{
-														$par_array[$i] = "data=".$data;
-													}
-												}
-												$adres = substr($partition['link'],0,strpos($partition['link'], "?")+1).implode("&", $par_array);
-											}
-												
-										}
-										die($adres);
-									}
+									$flag =1;
+									std_lib::Page404(); // ссылки не совпали, значит раздел не найден.
 								}
 								else 
 								{
-									if($root_flag)
-										std_lib::Page404(); // т к id==1 и это не root partition
-										
-									if($partition['pid']==$partition['id'])
+									// поскольку раздел найден, то теперь надо редиректнуть на него.
+									$pos = strpos($partition['link'], "index.php");
+									if($pos === false)
 									{
-										std_lib::Page404();
-										//std_lib::LOCATION()
+										if(substr($partition['link'], -1)=="/")
+											$adres=$partition['link']."index.php?data=".$data;
+										else 
+											$adres=$partition['link']."/index.php?data=".$data;												
 									}
-										//std_lib::Page404();
+									else 
+									{
+										$pos=strpos($partition['link'], "?");
+										if($pos === false)
+											$partition['link'] .= "?";
+																				
+										$pos=strpos($partition['link'], "data");
 										
-									$data_pid = $partition['pid'];
+										if($pos === false)
+											$adres = $partition['link']."&data=".$data;
+										else 
+										{
+											
+											$params =  parse_url($partition['link'], PHP_URL_QUERY);
+											$par_array = explode("&", $params);
+											//$this->debug($par_array);
+											$n = count($par_array);
+											for($i=0;$i<$n;$i++)
+											{
+												$pos = strpos($par_array[$i],"data=");
+												if($pos !== false)
+												{
+													$par_array[$i] = "data=".$data;
+												}
+											}
+											
+											$adres = substr($partition['link'],0,strpos($partition['link'], "?")+1).implode("&", $par_array);
+											
+											/*
+											$arg = $_SERVER['QUERY_STRING'];
+											$arg_arr = explode("&", $arg);
+											$n=count($arg_arr);
+											$additional_arg = "";
+											for($i=0;$i<$n;$i++)
+											{
+												if(strpos($arg_arr[$i],"data=")!==0)
+												{
+													$additional_arg .= "&".$arg_arr[$i];
+												}
+											}
+											$adres .= $additional_arg;
+											*/
+										}
+											
+									}
+									//die($adres);
+									$link = $_SERVER['PHP_SELF']."?data=".$data;
+									if($adres == $link)
+									{
+										$this->DETECT_REPORT['partition'] = $partition;
+										return $partition;
+									}
+									else 
+										std_lib::Page404();
 								}
 							}
 							else 
 							{
-								$flag=1;
+								if($flag_first_iteration==1)
+								{
+									// результат который мы получили - некое содержимое раздела
+									$this->DETECT_REPORT['content'] = $partition;
+									$this->DETECT_REPORT['content_exists'] = true;
+								}
 								
-								
+								if($root_flag)
+									std_lib::Page404(); // т к id==1 и это не root partition
+									
+								if($partition['pid']==$partition['id'])
+								{
+									std_lib::Page404();
+									//std_lib::LOCATION()
+								}
+									//std_lib::Page404();
+									
+								$data_pid = $partition['pid'];
 							}
 						}
 						else 
-							return false; // в data не число
+						{
+							$flag=1;
+							
+							
+						}
 					}
-					///////					
-					
-				//}
-			}
-				
-			
-//			$flag = 0;
-//			$data_pid = $data;
-//			
-//			if($data ==1)
-//				$root_flag =1;
-//				
-//			while(!$flag)
-//			{
-//				if($this->set_id($data_pid))
-//				{
-//					if($partition=$this->get_record())
-//					{
-//						if($partition['type']=='prt')
-//							return $partition;
-//						else 
-//						{
-//							if($root_flag)
-//								return false; // т к id==1 и это не root partition
-//								
-//							if($partition['pid']==$partition['id'])
-//								return false;
-//								
-//							$data_pid = $partition['pid'];
-//						}
-//					}
-//				}
-//				else 
-//					return false; // в data не число
-//			}
+					else 
+						return false; // в data не число
+				}
+			}				
 		}
 		else 
 		{
 			$link = dirname($_SERVER['PHP_SELF']);
 			if($partition = $this->get_partition_by_link($link))
+			{
+				$this->DETECT_REPORT['partition'] = $partition;
 				return $partition;
+			}
 			else 
 				std_lib::Page404();
 		}
@@ -247,7 +271,7 @@ class partition_manager{
 		if($link=="")return false;
 		
 		$query = "select * from `".$this->TBL_DATA_STRUCTURE."` where status='on' and type='prt' and link='".$link."' limit 1";
-		echo $query."<br>";
+		//echo $query."<br>";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)==1))
 		{
 			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
@@ -270,7 +294,7 @@ class partition_manager{
 			return false;
 		
 		$query = "select * from `".$this->TBL_DATA_STRUCTURE."` where status='on' and id='".$this->DATA['id']."' limit 1";
-		echo $query."<br>";
+		//echo $query."<br>";
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)==1))
 		{
 			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
