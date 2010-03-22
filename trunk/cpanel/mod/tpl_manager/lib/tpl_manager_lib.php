@@ -42,7 +42,7 @@ class tpl_manager
 	 */
 	public function load_config()
 	{
-		$this->DATA['config'] = Spyc::YAMLLoad($this->DATA['SYS']['CONFIG_DIR'].'tpl.yaml');
+		$this->DATA['config'] = Spyc::YAMLLoad($this->DATA['SYS']['PUBLIC_CONFIG_DIR'].'tpl.yaml');
 				
 		return $this->DATA['config'];
 	}
@@ -364,7 +364,7 @@ class tpl_manager
 	public function save_config()
 	{
 		$template_data_yaml = Spyc::YAMLDump($this->DATA['config']);
-		file_put_contents($this->DATA['SYS']['CONFIG_DIR'].'tpl.yaml',$template_data_yaml);
+		file_put_contents($this->DATA['SYS']['PUBLIC_CONFIG_DIR'].'tpl.yaml',$template_data_yaml);
 		//$this->debug($this->DATA['config']);exit;
 	}
 	

@@ -6,6 +6,9 @@ if ( !defined('IN_NISTA') )  die("Hacking attempt");
 $SYS['CONFIG_DIR'] = 'etc/';
 define('CONFIG_DIR', $SYS['CONFIG_DIR']);
 
+$SYS['PUBLIC_CONFIG_DIR'] = "../includes/etc/";
+define("PUBLIC_CONFIG_DIR", $SYS['PUBLIC_CONFIG_DIR']);
+
 $SYS['LIB_DIR'] = 'lib/';
 define('LIB_DIR', $SYS['LIB_DIR']);
 

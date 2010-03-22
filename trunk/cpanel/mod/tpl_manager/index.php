@@ -85,7 +85,7 @@ switch ($sp)
 			$template_data['layout'][$n]['file']="layout_".$_FILES["tpl_file"]["name"];
 			
 			$template_data_yaml = Spyc::YAMLDump($template_data);
-			file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+			file_put_contents(PUBLIC_CONFIG_DIR.'tpl.yaml', $template_data_yaml);
 			
 			header("Location: index.php?p=tpl&msg=".rawurlencode($MOD_MESSAGE));
 			exit;
@@ -379,7 +379,7 @@ switch ($sp)
 			$template_data['menu'][$n]['file']="menu_".$_FILES["tpl_file"]["name"];
 			
 			$template_data_yaml = Spyc::YAMLDump($template_data);
-			file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+			file_put_contents(PUBLIC_CONFIG_DIR.'tpl.yaml', $template_data_yaml);
 			
 			header("Location: index.php?p=tpl&msg=".rawurlencode($MOD_MESSAGE));
 			exit;
@@ -465,7 +465,7 @@ switch ($sp)
 					}
 				}
 				$template_data_yaml = Spyc::YAMLDump($template_data);
-				file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+				file_put_contents(PUBLIC_CONFIG_DIR.'tpl.yaml', $template_data_yaml);
 				
 				header("Location: index.php?p=tpl&sp=ls_menu&msg=".rawurlencode($MOD_MESSAGE));
 				exit;
@@ -489,7 +489,7 @@ switch ($sp)
 					}
 				}
 				$template_data_yaml = Spyc::YAMLDump($template_data);
-				file_put_contents(CONFIG_DIR.'tpl.yaml', $template_data_yaml);
+				file_put_contents(PUBLIC_CONFIG_DIR.'tpl.yaml', $template_data_yaml);
 				
 				$MOD_MESSAGE = "Данные меню успешно обновлены";
 				header("Location: index.php?p=tpl&sp=ls_menu&msg=".rawurlencode($MOD_MESSAGE));

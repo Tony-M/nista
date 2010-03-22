@@ -83,6 +83,7 @@ class item_manager{
 								type='item' and 
 								id='".$this->DATA['id']."' 
 								limit 1";
+		
 		if(($result_id=mysql_query($query)) && (mysql_num_rows($result_id)))
 		{
 			$result = mysql_fetch_array($result_id, MYSQL_ASSOC);
@@ -90,6 +91,21 @@ class item_manager{
 			return $result;
 		}
 		return false;
+	}
+	
+	
+	public function api_get_object($inp_array='')
+	{
+		if(!is_array($inp_array))
+			return false;
+		
+		// Если есть data то объект - статья
+		if(array_key_exists("data", $inp_array))
+		{
+			if($this->set_id($inp_array['data']))
+				return $this->get_item();
+			return false;
+		}
 	}
 	
 }

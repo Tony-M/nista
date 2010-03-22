@@ -109,6 +109,29 @@ unset($SYS['php_mod_lib']);
 $partition = new partition_manager();
 $DOCUMENT['partition'] = $partition->detect_partition();
 //-------------------------------------------------------------------------
+//***************** загрузка конфигурации шаблонов ************************
+if(!class_exists("template_manager"))
+	die("no template configuration manager.");
+	
+$template_obj = new template_manager();
+if($template_obj->set_layout($DOCUMENT['partition']['template']))
+{
+	$DOCUMENT['zone'] = $template_obj->get_layout_zonez();
+}
+else 
+	die("no template");
+//-------------------------------------------------------------------------
+//******************** построени структуры меню ***************************	
+if(!class_exists("menu_manager"))
+	die("no menu manager");
+	
+$menu_manager_obj = new menu_manager(&$template_obj);
+if($menu_manager_obj->set_partition_id($DOCUMENT['partition']['id']))
+{
+	$menu_manager_obj->get_zones_content();
+}
+//-------------------------------------------------------------------------
+//***************** поиск целевого объекта ********************************
 
 if(!$partition->is_detected_target_partition())
 {
@@ -116,7 +139,12 @@ if(!$partition->is_detected_target_partition())
 	{
 		if($tmp_mod = $nista->get_module_by_id($tmp['modid']))
 		{
-			$nista->debug($tmp_mod);
+			if(class_exists($tmp_mod['mod_name']))
+			{
+				$class_name = $tmp_mod['mod_name'];
+				$obj = new $class_name();
+				$DOCUMENT['content'] = $obj->api_get_object(array("data"=>std_lib::POST_GET('data')));
+			}
 		}
 	}
 }
