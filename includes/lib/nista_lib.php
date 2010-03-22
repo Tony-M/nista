@@ -154,6 +154,30 @@ class nista_manager{
 		}
 		return $result;
 	}
+	
+	/**
+	 * Метод ищет модуль по его id
+	 *
+	 * @param integer $id
+	 * @return array or false;
+	 */
+	public function get_module_by_id($id=0)
+	{
+		$id = (int)$id;
+		if(!$id)
+			return false;
+		$result = false;
+		$n = count($this->SYS_STRUC);
+		for($i=0;$i<$n;$i++)
+		{
+			if($this->SYS_STRUC[$i]['modid']==$id)
+				$result = $this->SYS_STRUC[$i];
+		}
+		if(!$result)return false;
+		
+		$result['lib_way'] = substr($result['way'], 0, strpos($result['way'], "index.php"))."lib/";
+		return $result;		
+	}
 }
 
 ?>

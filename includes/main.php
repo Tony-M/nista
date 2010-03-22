@@ -110,7 +110,16 @@ $partition = new partition_manager();
 $DOCUMENT['partition'] = $partition->detect_partition();
 //-------------------------------------------------------------------------
 
-
+if(!$partition->is_detected_target_partition())
+{
+	if($tmp = $partition->get_target_object())
+	{
+		if($tmp_mod = $nista->get_module_by_id($tmp['modid']))
+		{
+			$nista->debug($tmp_mod);
+		}
+	}
+}
 
 $nista->debug($DOCUMENT);
 $nista->debug($SYS);
