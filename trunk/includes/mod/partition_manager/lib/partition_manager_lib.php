@@ -14,6 +14,9 @@ class partition_manager{
 	public function __construct()
 	{
 		$this->TBL_DATA_STRUCTURE = $this->PREFIX.$this->TBL_DATA_STRUCTURE;
+		
+		$this->DETECT_REPORT['initial_is_partition'] = false;
+		$this->DETECT_REPORT['content_exists'] = false;
 	}
 	
 	
@@ -232,6 +235,7 @@ class partition_manager{
 			if($partition = $this->get_partition_by_link($link))
 			{
 				$this->DETECT_REPORT['partition'] = $partition;
+				$this->DETECT_REPORT['initial_is_partition'] = true; // была ссылка на раздел а не на чтото стороннее в нём
 				return $partition;
 			}
 			else 
@@ -304,6 +308,39 @@ class partition_manager{
 		}
 	}
 	
+	/**
+	 * Метод указвыает, является ли детектированный раздел целевым (т е ссылка была на него) если он цеевой, то true
+	 * если он не целевой, то false - значит что ссыка была на контент раздела
+	 *
+	 * @return boolean
+	 */
+	public function is_detected_target_partition()
+	{
+		if($this->DETECT_REPORT['initial_is_partition']==true)
+			return true;
+		else 
+			return false;
+	}
 	
+	/**
+	 * Метод возвращает информацию о целевом объекте, если он был найден по data
+	 *
+	 * @return array or false
+	 */
+	public function get_target_object()
+	{
+		if($this->DETECT_REPORT['initial_is_partition'] == true)
+			return false; // т к целевой объект - это нечто неопределённое, а раздел - это не целевой
+		
+			if($this->DETECT_REPORT['content_exists'] == false)
+				return false; // нет целевого объекта
+			
+			if(!is_array($this->DETECT_REPORT['content']))
+				return false;
+				
+			return $this->DETECT_REPORT['content'];
+									
+		
+	}
 }
 ?>
