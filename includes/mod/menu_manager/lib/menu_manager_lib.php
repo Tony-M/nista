@@ -85,30 +85,34 @@ class menu_manager{
 
 		$m = count($container_list);
 		
-		$this->debug($container_list);
+		//$this->debug($container_list);
 		
 		$result = array();
 		for($i=0; $i<$n; $i++)
 		{
-			$result[$zones[$i]] = array();
+			$result[$i] = array();
+			$result[$i]['title'] = $zones[$i];
+			$result[$i]['value'] = array();
 			$k =0;
 			for($j=0; $j<$m; $j++)
 			{
 				if($zones[$i]==$container_list[$j]['zone_name'])
 				{
-					$result[$zones[$i]]['menu_container'][$k] = $container_list[$j];
+					$result[$i]['value']['menu_container'][$k] = $container_list[$j];
 					if($this->set_menu_container_id($container_list[$j]['menu_id']))
 					{
-						$result[$zones[$i]]['menu_container'][$k]['items'] = $this->get_menu_container_content();
+						$result[$i]['value']['menu_container'][$k]['items'] = $this->get_menu_container_content();
 					}
+					else 
+						return false;
 				}
 			}
 			
 			
 		}
 			
-		
-		$this->debug($result	);exit;
+		return $result;
+		//$this->debug($result	);exit;
 	}
 	
 	public function set_partition_id($id =0)
@@ -179,7 +183,7 @@ class menu_manager{
 							m.type='item' and 
 							r.prt_id in ( '".$this->DATA['partition_id']."', '0' )
 							order by m.sequence asc";
-		echo $query;
+		//echo $query;
 		if(($result_id = mysql_query($query)) && (mysql_num_rows($result_id)>0))
 		{
 			$result = array();

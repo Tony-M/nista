@@ -65,7 +65,12 @@ class std_lib{
 			return "err";
 	}
 	
-	
+	/**
+	 * Метод перенаправляет страницу по заданному адресу
+	 *
+	 * @param string $location
+	 * @return boolean
+	 */
 	public function LOCATION($location = "")
 	{
 		$location = trim($location);
@@ -77,10 +82,75 @@ class std_lib{
 		exit;
 	}
 	
+	/**
+	 * метод генерирует событие 404 страницы
+	 *
+	 */
 	public function Page404()
 	{ // not found
 		die("<b>Page 404</b>");
 	}
+	
+	/**
+	 * метод генерирует список основных css стилей сайта
+	 *
+	 * @return array
+	 */
+	public function get_site_css()
+	{
+		global $SYS;
+		$css_dir = ROOT_WAY."includes/css/";
+		$dir = opendir($css_dir);
+		$result = array()   ;
+		while (false !==($file = readdir($dir)))
+		{
+		    $file;
+		
+		    if(preg_match("/[a-zA-Z0-9_@\.\-]+\.(css)/", $file))
+		    {
+		    	if(file_exists($css_dir.$file))
+		    	{
+		    		$f = $SYS['HTTP_HOST']."/".preg_replace("/\.\.\//","",$css_dir.$file);
+		    		
+		    		$result[count($result)] = $f;
+		    	}
+		    }
+		    $result = array_unique($result);
+		}
+		closedir($dir);
+		return $result;
+	}
+	
+	/**
+	 * Метод генерирует список основных javascript файлов сайта
+	 *
+	 * @return array
+	 */
+	public function get_site_js()
+	{
+		global $SYS;
+		$css_dir = ROOT_WAY."includes/js/";
+		$dir = opendir($css_dir);
+		$result = array()   ;
+		while (false !==($file = readdir($dir)))
+		{
+		    $file;
+		
+		    if(preg_match("/[a-zA-Z0-9_@\.\-]+\.(js)/", $file))
+		    {
+		    	if(file_exists($css_dir.$file))
+		    	{
+		    		$f = $SYS['HTTP_HOST']."/".preg_replace("/\.\.\//","",$css_dir.$file);
+		    		
+		    		$result[count($result)] = $f;
+		    	}
+		    }
+		    $result = array_unique($result);
+		}
+		closedir($dir);
+		return $result;
+	}
+	
 }
 
 ?>
