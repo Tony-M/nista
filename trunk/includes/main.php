@@ -16,6 +16,10 @@ $SYS['HTTP_HOST'] = "http://".$_SERVER['HTTP_HOST'];
 $SYS['PHP_SELF'] = $_SERVER['PHP_SELF'];
 $SYS['DIR_NAME'] = dirname($_SERVER['PHP_SELF']);
 
+
+$SYS['TPL_DIR'] = ROOT_WAY.'includes/tpl/';
+define('TPL_DIR', $SYS['TPL_DIR']);
+
 $DOCUMENT['REFERER'] = $_SERVER['HTTP_REFERER'];
 if(trim($DOCUMENT['REFERER'])=="")$DOCUMENT['REFERER'] = "index.php";
 //-------------------------------------------------------------------------
@@ -108,6 +112,14 @@ unset($SYS['php_mod_lib']);
 //******************** определение раздела сайта **************************
 $partition = new partition_manager();
 $DOCUMENT['partition'] = $partition->detect_partition();
+if($DOCUMENT['partition']['template']!="")
+{
+	$LAYOUT_TEMPLATE = $DOCUMENT['partition']['template'];
+}
+$DOCUMENT['title'] = $DOCUMENT['partition']['title'];
+$DOCUMENT['meta']['keywords'] = $DOCUMENT['partition']['meta_keyword'];
+$DOCUMENT['meta']['description'] = $DOCUMENT['partition']['meta_description'];
+
 //-------------------------------------------------------------------------
 //***************** загрузка конфигурации шаблонов ************************
 if(!class_exists("template_manager"))
@@ -116,7 +128,7 @@ if(!class_exists("template_manager"))
 $template_obj = new template_manager();
 if($template_obj->set_layout($DOCUMENT['partition']['template']))
 {
-	$DOCUMENT['zone'] = $template_obj->get_layout_zonez();
+	$DOCUMENT['zone_list'] = $template_obj->get_layout_zonez();
 }
 else 
 	die("no template");
@@ -128,7 +140,7 @@ if(!class_exists("menu_manager"))
 $menu_manager_obj = new menu_manager(&$template_obj);
 if($menu_manager_obj->set_partition_id($DOCUMENT['partition']['id']))
 {
-	$menu_manager_obj->get_zones_content();
+	$DOCUMENT['zone_content']=$menu_manager_obj->get_zones_content();
 }
 //-------------------------------------------------------------------------
 //***************** поиск целевого объекта ********************************
@@ -144,14 +156,46 @@ if(!$partition->is_detected_target_partition())
 				$class_name = $tmp_mod['mod_name'];
 				$obj = new $class_name();
 				$DOCUMENT['content'] = $obj->api_get_object(array("data"=>std_lib::POST_GET('data')));
+				if($DOCUMENT['content'])
+				{
+					$DOCUMENT['title'] = $DOCUMENT['content']['title'];
+					$DOCUMENT['meta']['keywords'] = $DOCUMENT['content']['meta_keyword'];
+					$DOCUMENT['meta']['description'] = $DOCUMENT['content']['meta_description'];
+				}
 			}
 		}
 	}
 }
 
+//******************* Подключение CSS файлов стилей ***********************
+$DOCUMENT['css'] = std_lib::get_site_css();
+//-------------------------------------------------------------------------
+//**************** Подключение JavaScript файлов стилей *******************
+$DOCUMENT['js'] = std_lib::get_site_js();
+//-------------------------------------------------------------------------
 $nista->debug($DOCUMENT);
-$nista->debug($SYS);
+//$nista->debug($SYS);
+
+// указываем путь к директории Smarty
+define('SMARTY_DIR', ROOT_WAY.'includes/lib/smarty/');
+require_once(SMARTY_DIR.'Smarty.class.php');
 
 
+$tpl = new Smarty();
+$tpl->template_dir= TPL_DIR;
+$tpl->compile_dir= TPL_DIR.'tpl_c/';
+$tpl->config_dir= TPL_DIR.'configs/';
+$tpl->cache_dir= TPL_DIR.'cache/';
+$tpl->plugins_dir[] = ROOT_WAY.'includes/lib/nista_smarty_plugins'; 
+
+
+$tpl->assign('DOCUMENT', $DOCUMENT);
+
+if(!isset($LAYOUT_TEMPLATE ) || ($LAYOUT_TEMPLATE == ""))$LAYOUT_TEMPLATE ="index.tpl";
+
+
+$LAYOUT = "sys_layout.tpl"; // глобальный неизменный шаблон. всё остальное - только body
+$tpl->assign('LAYOUT_TEMPLATE', $LAYOUT_TEMPLATE);
+$tpl->display($LAYOUT);
 
 ?>

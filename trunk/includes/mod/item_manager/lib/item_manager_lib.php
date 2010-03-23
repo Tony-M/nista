@@ -106,6 +106,7 @@ class item_manager{
 				return $this->get_item();
 			return false;
 		}
+		return false;
 	}
 	
 }
