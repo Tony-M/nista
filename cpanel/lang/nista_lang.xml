@@ -39,6 +39,16 @@
         	<target lang="EN">Copyright 2005 - </target>
         </trans_unit>
       </group>
+      <group type="action">
+      	<trans_unit>
+      		<source lang="RU">Закончить сеанс </source>
+        	<target lang="EN">Logout </target>
+        </trans_unit>
+        <trans_unit>
+      		<source lang="RU">Обновить </source>
+        	<target lang="EN">Refresh </target>
+        </trans_unit>
+      </group>
       
     </body>
   </file>
