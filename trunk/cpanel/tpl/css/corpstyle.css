@@ -198,9 +198,11 @@ p.comment, span.comment {
 }
 a.menu_action{
 	border:1px solid #656565;
+	border-color:  #CCCCCC #A2A2A2  #A2A2A2 #CCCCCC ;
 	padding:3 3 3 3;
 	background-color:#f4f9ff;
 	text-decoration:none;
+	
 }
 a.menu_action:hover{
 	border:1px solid #656565;

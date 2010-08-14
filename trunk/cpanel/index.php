@@ -315,6 +315,7 @@ $tpl->assign("MENU_FOOTER", $footer);
 
 
 $tpl->assign('DOCUMENT', $DOCUMENT);
+$tpl->assign('I_AM', $MY_USER_DATA);
 
 if(!isset($layout_template) || ($layout_template == ""))$layout_template="index.tpl";
 $tpl->display($layout_template);
