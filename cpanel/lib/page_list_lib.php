@@ -107,8 +107,9 @@ class pagination_manager{
 	 */
 	public function set_records_on_page_limit($num=0)
 	{
-		if(!eregi("[0-9]+", $num))return false;
-		if($num <= 0)return false;
+		if((int)$num <= 0 )return false;	
+		//if(!eregi("[0-9]+", $num))return false;
+		//if($num <= 0)return false;
 		
 		$this->MOD_DATA['records_on_page_limit'] = $num;
 		return true;

@@ -2,4 +2,6 @@ all:
   languages:
     default: RU
     priority: [EN]
+  pagination:
+    row_on_page: 20
     

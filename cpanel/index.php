@@ -86,7 +86,9 @@ while (false !==($file = readdir($dir)))
     $SYS['php_lib'] = array_unique($SYS['php_lib']);
 }
 closedir($dir);
-
+//********************* главные настройки системы *****************************
+if(file_exists("etc/settings.yaml"))$SYS['settings'] =  Spyc::YAMLLoad("etc/settings.yaml");
+//-----------------------------------------------------------------------------
 
 // Подключаем все JavaScript библиотеки требуемые для обеспечения работы модулей
 $dir = opendir(JS_DIR);
@@ -243,7 +245,7 @@ if(!class_exists('nista'))
 }
 $nista = new nista($SYS);
 
-
+//$nista->debug($SYS);
 // создаём все подписи на всех языках			
 $I18N = $nista->generate_i18n_data();
 $DOCUMENT['i18n'] = $I18N;

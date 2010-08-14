@@ -7,7 +7,7 @@ $MOD_TEMPALE = "mod_index.tpl"; // Шаблон модуля поумолчан�
 
 $ThisModuleInfo = $nista->get_module_info_by_par($p); // информация о данном модуле
 
-$SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page'] = 5; // количество строк отображаемых на 1 страницу
+$SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page'] = $SYS['settings']['all']['pagination']['row_on_page']; // количество строк отображаемых на 1 страницу
 $DOCUMENT['mod']['data'] = array(); // очищаем данные модуля для вывода
 
 //****************** Подключаем JS библиотеки модуля ********************
@@ -89,8 +89,8 @@ switch ($sp)
 		$pagination_obj->set_total_records(count($DOCUMENT['mod']['data']['menu_containers']));
 		$pagination_obj->set_records_on_page_limit($SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page']); // количество строк на страницу
 		$pagination_obj->set_current_page(trim($_GET['page'])); // устанавливаем номер текущей страницы
-		$pagination_obj->set_left_page_num_limit(5);
-		$pagination_obj->set_right_page_num_limit(5);
+//		$pagination_obj->set_left_page_num_limit(5);
+//		$pagination_obj->set_right_page_num_limit(5);
 		$DOCUMENT['mod']['data']['menu_page_list'] = $pagination_obj->get_result();
 		$pagination_obj->set_full_data($DOCUMENT['mod']['data']['menu_containers']);
 		$DOCUMENT['mod']['data']['menu_containers'] = $pagination_obj->get_generated_content();

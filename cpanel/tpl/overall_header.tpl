@@ -30,10 +30,10 @@
 	
 </head>
 <body>
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-color:#ff0000;border-width:1pt;border-style:solid;height:100%">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-color:#ff0000;border-width:0pt;border-style:solid;height:100%">
 
    <tr>
-    <td align="left" valign="top" style="height:20px; background-color:#f5f5f5; padding-left:10pt;">
+    <td align="left" valign="top" style="height:20px; background-color:#dddddd; padding-left:10pt;">
 
     <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%" style="height:20px;">
        <TR>
@@ -51,7 +51,7 @@
           	</div>
           	
           </td>
-          <TD class="td_top_menu" width="10%" align="right" valign="middle" style="padding-right:15pt; "><DIV  id=m3 ><A  onclick="javascript:do_menu('m3x')" onmouseover="do_check('m3x')" href="logout.php" class="a_top_menu" {popup text="click if u wanna logout"}><img src="{$DOCUMENT.ACP_IMG_WAY}off_16.png" width="15" height="15" border=0  hspace="5"  align="top">{__i18n type="action"}Закончить сеанс{/__i18n}{$I_AM.login}</A> </DIV></TD>
+          <TD class="td_top_menu" width="10%" align="right" valign="middle" style="padding-right:15pt; " nowrap="nowrap"><DIV  id=m3 ><A  onclick="javascript:do_menu('m3x')" onmouseover="do_check('m3x')" href="logout.php" class="a_top_menu" {popup text="click if u wanna logout"}><img src="{$DOCUMENT.ACP_IMG_WAY}off_16.png" width="15" height="15" border=0  hspace="5"  align="top">{__i18n type="action"}Закончить сеанс{/__i18n}{$I_AM.login}</A> </DIV></TD>
        </TR>
       </table>
         <!-- tytt -->
