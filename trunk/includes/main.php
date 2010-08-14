@@ -63,6 +63,7 @@ while (false !==($file = readdir($dir)))
     }
     $SYS['php_conf'] = array_unique($SYS['php_conf']);
 }
+
 closedir($dir);
 
 //-------------------------------------------------------------------------
@@ -112,9 +113,15 @@ unset($SYS['php_mod_lib']);
 //******************** определение раздела сайта **************************
 $partition = new partition_manager();
 $DOCUMENT['partition'] = $partition->detect_partition();
+$partition->debug($partition->detect_partition());
 if($DOCUMENT['partition']['template']!="")
 {
 	$LAYOUT_TEMPLATE = $DOCUMENT['partition']['template'];
+}
+
+if($partition->is_detected_target_partition())
+{
+	$DOCUMENT['content'] =  $DOCUMENT['partition'];
 }
 $DOCUMENT['title'] = $DOCUMENT['partition']['title'];
 $DOCUMENT['meta']['keywords'] = $DOCUMENT['partition']['meta_keyword'];
