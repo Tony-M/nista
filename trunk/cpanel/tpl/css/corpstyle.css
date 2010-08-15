@@ -74,6 +74,16 @@ input.input, textarea.input, select.input{
 border: 1px solid rgb( 145, 155, 156 );
 width:100%;
 }
+
+input.input[type="submit"], input[type="submit"]{
+border: 1px solid rgb( 145, 155, 156 );
+border-color:  #CCCCCC #A2A2A2  #A2A2A2 #CCCCCC ;
+color: #494949;
+font-family: Tahoma;
+font-size: 8pt;
+background-color:#f4f9ff;
+text-decoration:none;
+}
 input.input_nw, textarea.input_nw, select.input_nw{
 border: 1px solid rgb( 145, 155, 156 );
 }
