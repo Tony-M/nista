@@ -113,7 +113,7 @@ unset($SYS['php_mod_lib']);
 //******************** определение раздела сайта **************************
 $partition = new partition_manager();
 $DOCUMENT['partition'] = $partition->detect_partition();
-$partition->debug($partition->detect_partition());
+
 if($DOCUMENT['partition']['template']!="")
 {
 	$LAYOUT_TEMPLATE = $DOCUMENT['partition']['template'];
