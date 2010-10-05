@@ -13,10 +13,19 @@ class std_lib{
 		$var_name = trim($var_name);
 		if($var_name=="")return false;
 		
-		global $HTTP_POST_VARS, $HTTP_GET_VARS;
+		$phpversion =  self::get_phpversion ();
 		
-		$result = ( isset($HTTP_POST_VARS[$var_name]) ) ? $HTTP_POST_VARS[$var_name] : $HTTP_GET_VARS[$var_name];
-				
+		if ($phpversion<=40100)
+		{
+			global $HTTP_POST_VARS, $HTTP_GET_VARS;
+			$result = ( isset($HTTP_POST_VARS[$var_name]) ) ? $HTTP_POST_VARS[$var_name] : $HTTP_GET_VARS[$var_name];
+		}
+		else
+		{
+			global $_POST, $_GET;
+			$result = ( isset($_POST[$var_name]) ) ? $_POST[$var_name] : $_GET[$var_name];
+		}
+			
 		return $result;
 	}
 	
@@ -64,6 +73,22 @@ class std_lib{
 		else 
 			return "err";
 	}
+	
+	/**
+	 * Метод возвращает текущую версию php например 50200 40100
+	 * @return integer
+	 */
+	public static function get_phpversion () 
+	{
+		$a = phpversion ();
+		$a = explode ('-', $a);
+		$a = $a[0];
+		$version = explode('.',$a);
+    	$PHP_VERSION_ID = $version[0] * 10000 + $version[1] * 100 + $version[2];
+		return $PHP_VERSION_ID;
+	}
+	
+	
 }
 
 ?>

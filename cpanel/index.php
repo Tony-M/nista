@@ -1,6 +1,12 @@
 <?php
 header ("Content-Type: text/html; charset=utf-8\n\n");
 if(!session_id())session_start();
+//echo "<pre>";
+
+
+//ini_set('display_errors',1);
+//error_reporting(E_ALL ^E_NOTICE);
+//error_reporting(E_ALL ^E_NOTICE);
 
 define('IN_NISTA', true);
 
@@ -10,7 +16,6 @@ $DOCUMENT = array(); 	// данные всей страницы, для рабо
 $ROOT_WAY = "";			// путь к корню сайта
 $ADMIN_WAY = "";		// путь к административной части
 //--------------------------------------------------------------
-
 
 
 //определяем адрес, который запрашивает клиент
@@ -30,19 +35,21 @@ $SYS['ADMIN_WAY'] = ADMIN_WAY;
 $DOCUMENT['SERVER_URL'] = 'http://'.$_SERVER['HTTP_HOST'];
 $DOCUMENT['NISTA_URL'] = $DOCUMENT['SERVER_URL'].ADMIN_WAY;
 
-$DOCUMENT['REFERER'] = $_SERVER['HTTP_REFERER'];
+$DOCUMENT['REFERER'] = @$_SERVER['HTTP_REFERER'];
 if(trim($DOCUMENT['REFERER'])=="")$DOCUMENT['REFERER'] = "index.php";
 
 //****** подцепляем базовый набор конфигурационных файлов ******
 if(file_exists('etc/config.php'))
 {
 	require_once('etc/config.php');
-	$SYS['php_conf'][count($SYS['php_conf'])] = "etc/config.php";
+	if (isset ($SYS['php_conf']))$SYS['php_conf'][count($SYS['php_conf'])] = "etc/config.php";
+	else $SYS['php_conf'][0]="etc/config.php";
 }
 if(file_exists('etc/db_connection.php'))
 {
 	require_once('etc/db_connection.php');
-	$SYS['php_conf'][count($SYS['php_conf'])] = "etc/db_connection.php";
+	if (isset ($SYS['php_conf']))$SYS['php_conf'][count($SYS['php_conf'])] = "etc/db_connection.php";
+	else $SYS['php_conf'][0] = "etc/db_connection.php";
 }
 
 if(file_exists('etc/forbidden_dir.php'))
@@ -60,7 +67,8 @@ $dir = opendir(LIB_DIR);
 if(file_exists(LIB_DIR."filter_base_validation_lib.php"))
 {
 	require_once(LIB_DIR."filter_base_validation_lib.php"); // загрузка базового класса системы
-	$SYS['php_lib'][count($SYS['php_lib'])] = LIB_DIR."filter_base_validation_lib.php";
+	if (isset ($SYS['php_lib']))$SYS['php_lib'][count($SYS['php_lib'])] = LIB_DIR."filter_base_validation_lib.php";
+	else $SYS['php_lib'][0] = LIB_DIR."filter_base_validation_lib.php";
 	
 }
 
@@ -70,7 +78,7 @@ if(file_exists($SYS['ROOT_WAY']."includes/lib/spyc.php"))
 	$SYS['php_lib'][count($SYS['php_lib'])] =$SYS['ROOT_WAY']."includes/lib/spyc.php";
 	
 }
-    
+   
 while (false !==($file = readdir($dir)))
 {
     $file;
@@ -117,18 +125,21 @@ closedir($dir);
 
 unset($dir);
 
-
+//echo std_lib::get_phpversion();
+//$a = std_lib::POST_GET['p'];
 //
 // Set p
 //
-if( isset( $HTTP_POST_VARS['p'] ) || isset( $HTTP_GET_VARS['p'] ) )
-{
-        $p = ( isset($HTTP_POST_VARS['p']) ) ? $HTTP_POST_VARS['p'] : $HTTP_GET_VARS['p'];
-}
-else
-{
-        $p = '';
-}
+//if( isset( $HTTP_POST_VARS['p'] ) || isset( $HTTP_GET_VARS['p'] ) )
+//{
+//        $p = ( isset($HTTP_POST_VARS['p']) ) ? $HTTP_POST_VARS['p'] : $HTTP_GET_VARS['p'];
+//}
+//else
+//{
+//        $p = '';
+//}
+$p = std_lib::POST_GET('p');
+
 // указываем путь к директории Smarty
 define('SMARTY_DIR', ROOT_WAY.'includes/lib/smarty/');
 require_once(SMARTY_DIR.'Smarty.class.php');
@@ -147,7 +158,8 @@ $tpl->plugins_dir[] = '../includes/lib/nista_smarty_plugins';
 if(file_exists(LIB_DIR.'func_lib_mysql.php'))
 {
 	require_once(LIB_DIR.'func_lib_mysql.php');
-	$SYS['db_lib'][count($SYS['db_lib'])] = LIB_DIR.'func_lib_mysql.php';
+	if (isset ($SYS['db_lib']))$SYS['db_lib'][count($SYS['db_lib'])] = LIB_DIR.'func_lib_mysql.php';
+	else $SYS['db_lib'][0] = LIB_DIR.'func_lib_mysql.php';
 }
 
 $SYS['db_connection_id'] = func_lib_mysql::db_connect();
@@ -222,15 +234,20 @@ for($i=0; $i<$n; $i++)
 	}
 }
 
-print_r($files1);
+//print_r($files1);
 
 // **********проверяем необходимость отображения системного сообщения********
-$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
-if($msg != "") $DOCUMENT['MSG'] = $msg;
-		
-$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
-if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+if (isset ($_GET['msg']) && ($_GET['msg']!='')) 
+{
+	$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+	if($msg != "") $DOCUMENT['MSG'] = $msg;
+}
 
+if (isset ($_GET['errmsg']) && ($_GET['errmsg']!=''))
+{	
+	$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+	if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
+}
 //********** создание основного объекта системы Night Stalker *************
 if(!class_exists('nista'))
 {
