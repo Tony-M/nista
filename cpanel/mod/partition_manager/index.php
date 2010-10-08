@@ -35,14 +35,16 @@ if(is_dir($Mod_LIB_JS_DIR))
 //
 // Set sp
 //
-if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
-{
-        $sp = ( isset($HTTP_POST_VARS['sp']) ) ? $HTTP_POST_VARS['sp'] : $HTTP_GET_VARS['sp'];
-}
-else
-{
-        $sp = 'ind';
-}
+//if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
+//{
+//        $sp = ( isset($HTTP_POST_VARS['sp']) ) ? $HTTP_POST_VARS['sp'] : $HTTP_GET_VARS['sp'];
+//}
+//else
+//{
+//        $sp = 'ind';
+//}
+$sp = std_lib::POST_GET('sp');
+if($sp=="")$sp = "ind";
 if(!class_exists("partition_manager"))
 {
 	header("Location: index.php");
@@ -59,10 +61,10 @@ switch ($sp)
 	default:
 	case "ind":
 		// проверяем необходимость отображения системного сообщения
-		$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+		$msg =  stripcslashes(trim(rawurldecode(trim(std_lib::GET('msg')))));
 		if($msg != "") $DOCUMENT['MSG'] = $msg;
 		
-		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+		$err_msg = stripcslashes(trim(rawurldecode(trim(std_lib::GET('errmsg')))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
@@ -73,7 +75,7 @@ switch ($sp)
 		//$DOCUMENT['mod']['data']['file_content'] = $template_data;
 		break;
 	case "add_partition": //* форма создания раздела
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		$DOCUMENT['OPTION']['xinha'] = 'enabled';
 		$MOD_TEMPALE = "partition_form.tpl";
@@ -94,19 +96,19 @@ switch ($sp)
 		break;
 	case "create_partition":
 		//$partition_manager_obj->debug($_POST);
-//		echo $_POST['text'];exit;
-		if($partition_manager_obj->set_title($_POST['title']))
+//		echo $_POST('text');exit;
+		if($partition_manager_obj->set_title(std_lib::POST('title')))
 		{
-			$partition_manager_obj->set_text($_POST['text']);
-			$partition_manager_obj->set_meta_keyword($_POST['meta_keyword']);
-			$partition_manager_obj->set_meta_description($_POST['meta_description']);
-			$partition_manager_obj->set_owner_id($_POST['subpart']);
+			$partition_manager_obj->set_text(std_lib::POST('text'));
+			$partition_manager_obj->set_meta_keyword(std_lib::POST('meta_keyword'));
+			$partition_manager_obj->set_meta_description(std_lib::POST('meta_description'));
+			$partition_manager_obj->set_owner_id(std_lib::POST('subpart'));
 			
-			$inherit_tpl = trim($_POST['inherit_tpl']);
+			$inherit_tpl = trim(std_lib::POST('inherit_tpl'));
 			if($inherit_tpl == "yes")
 			{
 				$partition_manager_parent_obj = new partition_manager($SYS, $ThisModuleInfo, $MY_USER_DATA);
-				$parent_partition_info = $partition_manager_parent_obj->get_partition($_POST['subpart']);
+				$parent_partition_info = $partition_manager_parent_obj->get_partition(std_lib::POST('subpart'));
 				if(is_array($parent_partition_info))
 				{
 					$partition_manager_obj->set_template($parent_partition_info['template']);
@@ -119,21 +121,21 @@ switch ($sp)
 				}
 			}
 			else 
-				$partition_manager_obj->set_template($_POST['template']);
+				$partition_manager_obj->set_template(std_lib::POST('template'));
 						
-			$partition_manager_obj->set_status($_POST['publish']);
-			$partition_manager_obj->set_penname($_POST['penname']);
-			$partition_manager_obj->set_access_level($_POST['access_level']);
+			$partition_manager_obj->set_status(std_lib::POST('publish'));
+			$partition_manager_obj->set_penname(std_lib::POST('penname'));
+			$partition_manager_obj->set_access_level(std_lib::POST('access_level'));
 			
 			if($partition_manager_obj->save_partition())
 			{
-				$MOD_MESSAGE = "Раздел сайта с заглавием '".$_POST['title']."' успешно создан ";
+				$MOD_MESSAGE = "Раздел сайта с заглавием '".std_lib::POST('title')."' успешно создан ";
 				header("Location: index.php?p=site&msg=".rawurlencode($MOD_MESSAGE));
 				exit;
 			}
 			else 
 			{
-				$MOD_MESSAGE = "Во время создания раздела сайта с заглавием '".$_POST['title']."' произошли ошибки";
+				$MOD_MESSAGE = "Во время создания раздела сайта с заглавием '".std_lib::POST('title')."' произошли ошибки";
 				header("Location: index.php?p=site&errmsg=".rawurlencode($MOD_MESSAGE));
 				exit;
 			}
@@ -143,7 +145,7 @@ switch ($sp)
 		
 		break;
 	case "edit_partition": //* форма редактирования раздела
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		$DOCUMENT['OPTION']['xinha'] = 'enabled';
 		$MOD_TEMPALE = "partition_form.tpl";
@@ -158,7 +160,7 @@ switch ($sp)
 		}
 		
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
-		$DOCUMENT['mod']['data']['partition_info'] = $partition_manager_obj->get_partition($_GET['id']);
+		$DOCUMENT['mod']['data']['partition_info'] = $partition_manager_obj->get_partition(std_lib::GET('id'));
 		
 		if($DOCUMENT['mod']['data']['partition_info'] == false)
 		{
@@ -171,19 +173,19 @@ switch ($sp)
 		break;
 	case "update_partition":
 		//$partition_manager_obj->debug($_POST);
-//		echo $_POST['text'];exit;
-		if(($partition_manager_obj->set_title($_POST['title'])) && ($partition_manager_obj->set_id($_POST['prt_id'])))
+//		echo std_lib::POST('text');exit;
+		if(($partition_manager_obj->set_title(std_lib::POST('title'))) && ($partition_manager_obj->set_id(std_lib::POST('prt_id'))))
 		{
-			$partition_manager_obj->set_text($_POST['text']);
-			$partition_manager_obj->set_meta_keyword($_POST['meta_keyword']);
-			$partition_manager_obj->set_meta_description($_POST['meta_description']);
-			$partition_manager_obj->set_owner_id($_POST['subpart']);
+			$partition_manager_obj->set_text(std_lib::POST('text'));
+			$partition_manager_obj->set_meta_keyword(std_lib::POST('meta_keyword'));
+			$partition_manager_obj->set_meta_description(std_lib::POST('meta_description'));
+			$partition_manager_obj->set_owner_id(std_lib::POST('subpart'));
 			
-			$inherit_tpl = trim($_POST['inherit_tpl']);
+			$inherit_tpl = trim(std_lib::POST('inherit_tpl'));
 			if($inherit_tpl == "yes")
 			{
 				$partition_manager_parent_obj = new partition_manager($SYS, $ThisModuleInfo, $MY_USER_DATA);
-				$parent_partition_info = $partition_manager_parent_obj->get_partition($_POST['subpart']);
+				$parent_partition_info = $partition_manager_parent_obj->get_partition(std_lib::POST('subpart'));
 				if(is_array($parent_partition_info))
 				{
 					$partition_manager_obj->set_template($parent_partition_info['template']);
@@ -196,15 +198,15 @@ switch ($sp)
 				}
 			}
 			else 
-				$partition_manager_obj->set_template($_POST['template']);
+				$partition_manager_obj->set_template(std_lib::POST('template'));
 						
-			$partition_manager_obj->set_status($_POST['publish']);
-			$partition_manager_obj->set_penname($_POST['penname']);
-			$partition_manager_obj->set_access_level($_POST['access_level']);
+			$partition_manager_obj->set_status(std_lib::POST('publish'));
+			$partition_manager_obj->set_penname(std_lib::POST('penname'));
+			$partition_manager_obj->set_access_level(std_lib::POST('access_level'));
 			
 			if($partition_manager_obj->save_partition())
 			{
-				$MOD_MESSAGE = "Раздел сайта с заглавием '".htmlentities($_POST['title'],ENT_QUOTES, "UTF-8")."' успешно обновлён ";
+				$MOD_MESSAGE = "Раздел сайта с заглавием '".htmlentities(std_lib::POST('title'),ENT_QUOTES, "UTF-8")."' успешно обновлён ";
 				header("Location: index.php?p=site&msg=".rawurlencode($MOD_MESSAGE));
 				exit;
 			}
@@ -220,7 +222,7 @@ switch ($sp)
 		
 		break;
 	case "add_category": //* форма создания категории
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		
 		$MOD_TEMPALE = "category_form.tpl";
@@ -232,10 +234,10 @@ switch ($sp)
 		
 		break;
 	case "edit_category": //* форма редактирования категории
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		
-		$DOCUMENT['mod']['data']['category_info'] = $partition_manager_obj->get_category($_GET['id']);
+		$DOCUMENT['mod']['data']['category_info'] = $partition_manager_obj->get_category(std_lib::GET('id'));
 		$DOCUMENT['mod']['data']['partition_info'] = $partition_manager_obj->get_partition($DOCUMENT['mod']['data']['category_info']['prt_id']);
 		
 		$MOD_TEMPALE = "category_form.tpl";
@@ -248,13 +250,13 @@ switch ($sp)
 		break;
 	case "create_category": //* Создание новой категории
 		$partition_manager_obj->purge_variables();
-		if($partition_manager_obj->set_title($_POST['title']))
+		if($partition_manager_obj->set_title(std_lib::POST('title')))
 		{
-			if($partition_manager_obj->set_category_owner_id($_POST['subpart']))
+			if($partition_manager_obj->set_category_owner_id(std_lib::POST('subpart')))
 			{
 				if($partition_manager_obj->save_category())
 				{
-					$MOD_MESSAGE = "Категория с заглавием '".htmlentities($_POST['title'],ENT_QUOTES, "UTF-8")."' успешно создна ";
+					$MOD_MESSAGE = "Категория с заглавием '".htmlentities(std_lib::POST('title'),ENT_QUOTES, "UTF-8")."' успешно создна ";
 					header("Location: index.php?p=site&msg=".rawurlencode($MOD_MESSAGE));
 					exit;
 				}				
@@ -267,13 +269,13 @@ switch ($sp)
 		break;
 	case "update_category": //* изменение данных категории
 		$partition_manager_obj->purge_variables();
-		if($partition_manager_obj->set_id($_POST['ctgr_id']))
+		if($partition_manager_obj->set_id(std_lib::POST('ctgr_id')))
 		{
-			if($partition_manager_obj->set_title($_POST['title']))
+			if($partition_manager_obj->set_title(std_lib::POST('title')))
 			{		
 				if($partition_manager_obj->save_category())
 				{
-					$MOD_MESSAGE = "Категория с заглавием '".htmlentities($_POST['title'],ENT_QUOTES, "UTF-8")."' успешно обновлена ";
+					$MOD_MESSAGE = "Категория с заглавием '".htmlentities(std_lib::POST('title'),ENT_QUOTES, "UTF-8")."' успешно обновлена ";
 					header("Location: index.php?p=site&msg=".rawurlencode($MOD_MESSAGE));
 					exit;
 				}				
@@ -289,7 +291,7 @@ switch ($sp)
 		
 		$MOD_TEMPALE = "ls_category.tpl";
 		
-		$id  = (int)trim($_GET['id']);
+		$id  = (int)trim(std_lib::GET('id'));
 		$partition_info = $partition_manager_obj->get_partition($id);
 		
 			$DOCUMENT['mod']['data']['partition_info'] = $partition_info;
@@ -324,8 +326,8 @@ switch ($sp)
 		break;
 	case "update_prt":
 		
-		$id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
-		$status = ( isset($HTTP_POST_VARS['status_action']) ) ? $HTTP_POST_VARS['status_action'] : $HTTP_GET_VARS['status_action'];
+		$id = std_lib::POST_GET('prt_id');
+		$status = std_lib::POST_GET('status_action') ;
 		
 		if($status != "none")
 		{
@@ -360,12 +362,12 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['sub_tpl_folder_list']=$THIS_MODULE_DIR_NAME."folder_list.tpl";
 		//$partition_manager_obj->debug($SYS);
 		$DOCUMENT['mod']['data']['catalog_list'] = $partition_manager_obj->ls_dir();
-		$DOCUMENT['mod']['data']['partition_info'] = $partition_manager_obj->get_partition($_GET['prt_id']);
+		$DOCUMENT['mod']['data']['partition_info'] = $partition_manager_obj->get_partition(std_lib::GET('prt_id'));
 		break;
 	case "ls_dir_ajax":
 		$layout_template = $THIS_MODULE_DIR_NAME."folder_list.tpl";
 		//$partition_manager_obj->debug($SYS);
-		$path = ( isset($HTTP_POST_VARS['path']) ) ? $HTTP_POST_VARS['path'] : $HTTP_GET_VARS['path'];
+		$path = std_lib::POST_GET('path');
 		$DOCUMENT['mod']['data']['current_path'] = trim($path);
 		$DOCUMENT['mod']['data']['catalog_list'] = $partition_manager_obj->ls_dir($path);
 		$DOCUMENT['mod']['data']['linked_full_path_to'] = $partition_manager_obj->get_linked_full_path_to($path);
@@ -373,8 +375,8 @@ switch ($sp)
 	case "mkdir":
 		$layout_template = $THIS_MODULE_DIR_NAME."folder_list.tpl";
 		
-		$new_name = ( isset($HTTP_POST_VARS['new_name']) ) ? $HTTP_POST_VARS['new_name'] : $HTTP_GET_VARS['new_name'];
-		$current_path = ( isset($HTTP_POST_VARS['current_path']) ) ? $HTTP_POST_VARS['current_path'] : $HTTP_GET_VARS['current_path'];
+		$new_name = std_lib::POST_GET('new_name');
+		$current_path = std_lib::POST_GET('current_path');
 		
 		
 		if($partition_manager_obj->set_catalog_owner($current_path))
@@ -394,8 +396,8 @@ switch ($sp)
 		break;
 	case "rmdir":
 		
-		$rmdir_name = ( isset($HTTP_POST_VARS['rmdir_name']) ) ? $HTTP_POST_VARS['rmdir_name'] : $HTTP_GET_VARS['rmdir_name'];
-		$current_path = ( isset($HTTP_POST_VARS['current_path']) ) ? $HTTP_POST_VARS['current_path'] : $HTTP_GET_VARS['current_path'];
+		$rmdir_name = std_lib::POST_GET('rmdir_name') ;
+		$current_path = std_lib::POST_GET('current_path') ;
 		
 		if($partition_manager_obj->rm_catalog($rmdir_name))
 			$DOCUMENT['mod']['data']['msg'] = "Каталог '".$rmdir_name."' успешно удалён.";
@@ -413,9 +415,9 @@ switch ($sp)
 		
 		break;
 	case "link_path":
-		$id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
-		$path = ( isset($HTTP_POST_VARS['path']) ) ? $HTTP_POST_VARS['path'] : $HTTP_GET_VARS['path'];
-		$current_path = ( isset($HTTP_POST_VARS['current_path']) ) ? $HTTP_POST_VARS['current_path'] : $HTTP_GET_VARS['current_path'];
+		$id = std_lib::POST_GET('prt_id') ;
+		$path = std_lib::POST_GET('path') ;
+		$current_path = std_lib::POST_GET('current_path') ;
 				
 		$partition_manager_obj->link_catalog_to_partition($path, $id);
 		
@@ -427,8 +429,8 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['linked_full_path_to'] = $partition_manager_obj->get_linked_full_path_to($path);
 		break;
 	case "unlink_path":
-		$id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
-		$current_path = ( isset($HTTP_POST_VARS['current_path']) ) ? $HTTP_POST_VARS['current_path'] : $HTTP_GET_VARS['current_path'];
+		$id = std_lib::POST_GET('prt_id') ;
+		$current_path = std_lib::POST_GET('current_path') ;
 		
 		$partition_manager_obj->unlink_partition($id);
 		

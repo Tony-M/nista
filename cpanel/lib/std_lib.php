@@ -29,6 +29,48 @@ class std_lib{
 		return $result;
 	}
 	
+	public static function POST($var_name = "")
+	{
+		$var_name = trim($var_name);
+		if($var_name=="")return false;
+		
+		$phpversion =  self::get_phpversion ();
+		
+		if ($phpversion<=40100)
+		{
+			global $HTTP_POST_VARS;
+			$result =  $HTTP_POST_VARS[$var_name];
+		}
+		else
+		{
+			global $_POST;
+			$result =$_POST[$var_name];
+		}
+			
+		return $result;
+	}
+	
+	public static function GET($var_name = "")
+	{
+		$var_name = trim($var_name);
+		if($var_name=="")return false;
+		
+		$phpversion =  self::get_phpversion ();
+		
+		if ($phpversion<=40100)
+		{
+			global $HTTP_GET_VARS;
+			$result =  $HTTP_GET_VARS[$var_name];
+		}
+		else
+		{
+			global $_GET;
+			$result =$_GET[$var_name];
+		}
+			
+		return $result;
+	}
+	
 	/**
 	 * метод записывает запрос к БД в файл /query.log
 	 *
