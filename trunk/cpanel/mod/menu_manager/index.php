@@ -36,14 +36,17 @@ if(is_dir($Mod_LIB_JS_DIR))
 //
 // Set sp
 //
-if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
-{
-        $sp = ( isset($HTTP_POST_VARS['sp']) ) ? $HTTP_POST_VARS['sp'] : $HTTP_GET_VARS['sp'];
-}
-else
-{
-        $sp = 'ind';
-}
+//if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
+//{
+//        $sp = ( isset($HTTP_POST_VARS['sp']) ) ? $HTTP_POST_VARS['sp'] : $HTTP_GET_VARS['sp'];
+//}
+//else
+//{
+//        $sp = 'ind';
+//}
+$sp = std_lib::POST_GET('sp');
+if($sp=="")$sp = 'ind';
+
 if(!class_exists("menu_manager"))
 {
 	header("Location: index.php");
@@ -63,10 +66,10 @@ $partition_manager_obj = new partition_manager($SYS, $nista->get_module_info_by_
 $partition_manager_obj->create_root_partition();
 
 // проверяем необходимость отображения системного сообщения
-$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+$msg =  stripcslashes(trim(rawurldecode(trim(std_lib::GET('msg')))));
 if($msg != "") $DOCUMENT['MSG'] = $msg;
 
-$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+$err_msg = stripcslashes(trim(rawurldecode(trim(std_lib::GET('errmsg')))));
 if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 
 switch ($sp)
@@ -78,7 +81,7 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
 		
 		//список статей для выбранного раздела
-		$prt_id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$prt_id = std_lib::POST_GET('prt_id1');
 		if((int)$prt_id==0)$prt_id=0; // Если не задан id раздела то отображать все меню
 		//$DOCUMENT['mod']['data']['item_list'] =$item_manager_obj->get_item_list_for_partition((int)$prt_id);
 		
@@ -88,7 +91,7 @@ switch ($sp)
 		$pagination_obj = new pagination_manager();
 		$pagination_obj->set_total_records(count($DOCUMENT['mod']['data']['menu_containers']));
 		$pagination_obj->set_records_on_page_limit($SYS['mod']['settings'][$ThisModuleInfo['mod_name']]['pagination']['row_on_page']); // количество строк на страницу
-		$pagination_obj->set_current_page(trim($_GET['page'])); // устанавливаем номер текущей страницы
+		$pagination_obj->set_current_page(trim(std_lib::GET('page'))); // устанавливаем номер текущей страницы
 //		$pagination_obj->set_left_page_num_limit(5);
 //		$pagination_obj->set_right_page_num_limit(5);
 		$DOCUMENT['mod']['data']['menu_page_list'] = $pagination_obj->get_result();
@@ -105,12 +108,12 @@ switch ($sp)
 	case "get_ls_menu":
 		$layout_template = $THIS_MODULE_DIR_NAME."menu_list.tpl";
 		//список статей для выбранного раздела
-		$prt_id = (isset($HTTP_POST_VARS['prt_id'])) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$prt_id = std_lib::POST_GET(prt_id) ;
 		$DOCUMENT['mod']['data']['ptr_id'] = (int)$prt_id;
 		$DOCUMENT['mod']['data']['menu_containers'] = $menu_manager_obj->get_menu_list($prt_id);
 		
 		//*** начинаем генерацию страниц и меню страниц статей
-		$page_num = (isset($HTTP_POST_VARS['page'])) ? $HTTP_POST_VARS['page'] : $HTTP_GET_VARS['page'];
+		$page_num = std_lib::POST_GET('page') ;
 		$DOCUMENT['mod']['data']['page_number'] = $page_num;
 		
 		
@@ -131,12 +134,12 @@ switch ($sp)
 		$MOD_TEMPALE = "menu_form.tpl";
 		$MOD_ACTION = 'create_menu';
 		
-		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+		$err_msg = stripcslashes(trim(rawurldecode(trim(std_lib::GET('errmsg')))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
-		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim($_GET['title']))));
-		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim($_GET['show_title']))));
-		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim($_GET['comment']))));
+		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim(std_lib::GET('title')))));
+		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim(std_lib::GET('show_title')))));
+		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim(std_lib::GET('comment')))));
 		
 		$DOCUMENT['mod']['data']['template_content'] = $template_data;
 		break;
@@ -144,12 +147,12 @@ switch ($sp)
 		$MOD_TEMPALE = "menu_form.tpl";
 		$MOD_ACTION = 'update_menu';
 		
-		$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+		$err_msg = stripcslashes(trim(rawurldecode(trim(std_lib::GET('errmsg')))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
-		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim($_GET['title']))));
-		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim($_GET['show_title']))));
-		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim($_GET['comment']))));
+		$DOCUMENT['title'] = stripcslashes(trim(rawurldecode(trim(std_lib::GET('title')))));
+		$DOCUMENT['show_title'] = stripcslashes(trim(rawurldecode(trim(std_lib::GET('show_title')))));
+		$DOCUMENT['comment'] = stripcslashes(trim(rawurldecode(trim(std_lib::GET('comment')))));
 		
 		$id = ( isset($HTTP_POST_VARS['id']) ) ? $HTTP_POST_VARS['id'] : $HTTP_GET_VARS['id'];
 		if((int)$id != 0)
@@ -341,7 +344,7 @@ switch ($sp)
 	case "ln":// принимаем ссылку на объект модуля, для формирования пункта меню и выводим форму создания пункта меню
 		$MOD_TEMPALE = "menu_item_form.php";
 		$MOD_ACTION = 'create_item';
-		$object_link = $_GET['obj'];
+		$object_link = std_lib::GET('obj');
 		$DOCUMENT['mod']['data']['http_referer'] = rawurlencode($_SERVER['HTTP_REFERER']); // ссылка на страницу источник для возврата
 		//$menu_manager_obj->debug($object_link);
 		
@@ -373,36 +376,36 @@ switch ($sp)
 		break;
 	case "create_item":// создание нового пункиа меню в одном или более контейнерах меню
 		
-		$DOCUMENT['mod']['data']['http_referer'] = $_POST['page_referer']; // ссылка на страницу источник для возврата
+		$DOCUMENT['mod']['data']['http_referer'] = std_lib::POST('page_referer'); // ссылка на страницу источник для возврата
 		
-		$menu_manager_obj->set_title($_POST['title']);
-		$menu_manager_obj->set_alt($_POST['alt']);
-		$menu_manager_obj->set_text($_POST['text']);
-		$menu_manager_obj->set_show_title($_POST['show_title']);
-		$menu_manager_obj->set_url($_POST['link_url']);
-		$menu_manager_obj->set_target($_POST['target']);
-		$menu_manager_obj->set_obj($_POST['obj']);
+		$menu_manager_obj->set_title(std_lib::POST('title'));
+		$menu_manager_obj->set_alt(std_lib::POST('alt'));
+		$menu_manager_obj->set_text(std_lib::POST('text'));
+		$menu_manager_obj->set_show_title(std_lib::POST('show_title'));
+		$menu_manager_obj->set_url(std_lib::POST('link_url'));
+		$menu_manager_obj->set_target(std_lib::POST('target'));
+		$menu_manager_obj->set_obj(std_lib::POST('obj'));
 		
 		$menu_manager_obj->set_ico(std_lib::POST_GET('ico_src'));
 		
 		if($uploaded_ico_name = $menu_manager_obj->upload_ico("ico_img"))
 			$menu_manager_obj->set_ico($uploaded_ico_name);
 			
-		$menu_manager_obj->set_relation_container_id($_POST['mc_id']);
-		$menu_manager_obj->set_relation_status($_POST['it_status']);
-		$menu_manager_obj->set_relation_partition_id($_POST['mc_prt_id']);
+		$menu_manager_obj->set_relation_container_id(std_lib::POST('mc_id'));
+		$menu_manager_obj->set_relation_status(std_lib::POST('it_status'));
+		$menu_manager_obj->set_relation_partition_id(std_lib::POST('mc_prt_id'));
 		
 		if($menu_manager_obj->create_mass_menu_items())
 		{
 			//Связи успешно созданы
-			$MOD_MESSAGE = "Пункт меню '".$_POST['title']."' успешно создан ";
+			$MOD_MESSAGE = "Пункт меню '".std_lib::POST('title')."' успешно создан ";
 			header("Location: index.php?p=menu&sp=item_creation_result&msg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
 			exit;
 		}
 		else 
 		{
 			//при создании были косяки
-			$MOD_MESSAGE = "В процессе создания пункта меню '".$_POST['title']."' возникли ошибки ";
+			$MOD_MESSAGE = "В процессе создания пункта меню '".std_lib::POST('title')."' возникли ошибки ";
 			header("Location: index.php?p=menu&sp=item_creation_result&errmsg=".rawurlencode($MOD_MESSAGE)."&pr=".$DOCUMENT['mod']['data']['http_referer']);
 			exit;
 		}
@@ -412,11 +415,11 @@ switch ($sp)
 		break;
 	case "item_creation_result": // диалог после создания пункта меню
 		$MOD_TEMPALE =  "menu_item_after_creation_dialog.tpl";
-		$DOCUMENT['mod']['data']['http_referer'] = trim(rawurldecode($_GET['pr'])); // страница источник
+		$DOCUMENT['mod']['data']['http_referer'] = trim(rawurldecode(std_lib::GET('pr'))); // страница источник
 		
 		break;
 	case "get_prt_menu": // Возвращаем список меню для выбранного раздела в формате xml
-		$xml = $menu_manager_obj->get_menu_for_partition($_GET['id']);
+		$xml = $menu_manager_obj->get_menu_for_partition(std_lib::GET('id'));
 		if($xml)
 		{
 			header ("content-type: text/xml");	
@@ -428,10 +431,10 @@ switch ($sp)
 	case "item_list":// для выбранного меню выводим список его пунктов
 		$MOD_TEMPALE = "item_list.tpl";
 	
-		$menu_id = ( isset($HTTP_POST_VARS['mid']) ) ? $HTTP_POST_VARS['mid'] : $HTTP_GET_VARS['mid'];
+		$menu_id = std_lib::POST_GET('mid');
 		$menu_id = (int)$menu_id;
 		
-		$item_id = ( isset($HTTP_POST_VARS['it_id']) ) ? $HTTP_POST_VARS['it_id'] : $HTTP_GET_VARS['it_id'];
+		$item_id = std_lib::POST_GET('it_id') ;
 		$item_id = (int)$item_id;
 				
 		if($menu_id) // список пунктов меню по id меню
@@ -651,7 +654,7 @@ switch ($sp)
 		break;	
 	case "update_mitem":// обновление записи в БД для пункта меню после редактирования его формы
 		
-		//$menu_manager_obj->debug($_POST);
+		//$menu_manager_obj->debug(std_lib::POST);
 		
 		$menu_manager_obj->set_menu_id(std_lib::POST_GET('menu_id'));
 		

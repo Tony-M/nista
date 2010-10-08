@@ -43,7 +43,7 @@ if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
 else
 {
         $sp = 'ind';
-}
+}z
 if(!class_exists("partition_manager"))
 {
 	header("Location: index.php");
