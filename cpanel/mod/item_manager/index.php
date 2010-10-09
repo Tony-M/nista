@@ -36,14 +36,9 @@ if(is_dir($Mod_LIB_JS_DIR))
 //
 // Set sp
 //
-if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
-{
-        $sp = ( isset($HTTP_POST_VARS['sp']) ) ? $HTTP_POST_VARS['sp'] : $HTTP_GET_VARS['sp'];
-}
-else
-{
-        $sp = 'ind';
-}z
+$sp = std_lib::POST_GET('sp') ;
+if($sp =="") $sp = "ind";
+
 if(!class_exists("partition_manager"))
 {
 	header("Location: index.php");
@@ -77,7 +72,7 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['total_item_num'] = $item_manager_obj->count_all_items();
 		
 		//список статей для выбранного раздела
-		$prt_id = ( isset($HTTP_POST_VARS['prt_id']) ) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$prt_id = std_lib::POST_GET('prt_id');
 		if((int)$prt_id==0)$prt_id=$partition_manager_obj->get_root_partition_id(); // Если не задан id раздела то отображать корневой
 		$DOCUMENT['mod']['data']['item_list'] =$item_manager_obj->get_item_list_for_partition((int)$prt_id);
 		
@@ -104,12 +99,13 @@ switch ($sp)
 	case "get_ls_item":
 		$layout_template = $THIS_MODULE_DIR_NAME."item_list.tpl";
 		//список статей для выбранного раздела
-		$prt_id = (isset($HTTP_POST_VARS['prt_id'])) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		
+		$prt_id = std_lib::POST_GET('prt_id');
 		$DOCUMENT['mod']['data']['ptr_id'] = (int)$prt_id;
 		$DOCUMENT['mod']['data']['item_list'] =$item_manager_obj->get_item_list_for_partition((int)$prt_id);
 		
 		//*** начинаем генерацию страниц и меню страниц статей
-		$page_num = (isset($HTTP_POST_VARS['page'])) ? $HTTP_POST_VARS['page'] : $HTTP_GET_VARS['page'];
+		$page_num = std_lib::POST_GET('page');
 		
 		$pagination_obj = new pagination_manager();
 		$pagination_obj->set_total_records(count($DOCUMENT['mod']['data']['item_list']));
@@ -125,14 +121,14 @@ switch ($sp)
 		//------------------
 		break;
 	case "get_ls_category":
-		$prt_id = (isset($HTTP_POST_VARS['prt_id'])) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$prt_id = std_lib::POST_GET('prt_id')
 		$xml = $partition_manager_obj->get_xml_category_list_for_partition((int)$prt_id);
 		header ("content-type: text/xml");
 		echo $xml;		
 		exit;
 		break;
 	case "add_item": //* форма создания статьи
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		$DOCUMENT['OPTION']['xinha'] = 'enabled'; // включаем ксинху
 		$MOD_TEMPALE = "item_form.tpl";
@@ -144,33 +140,33 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['category_list'] = $partition_manager_obj->get_category_list_4_partition($partition_manager_obj->get_root_partition_id());
 		if((int)$_GET['prt_id']!=0)
 		{
-			$DOCUMENT['mod']['data']['item_info']['pid'] = (int)$_GET['prt_id'];
+			$DOCUMENT['mod']['data']['item_info']['pid'] = (int)std_lib::GET('prt_id');
 			$DOCUMENT['mod']['data']['category_list'] = $partition_manager_obj->get_category_list_4_partition((int)$_GET['prt_id']);
 		}
 		break;
 	case "create_item": //* Создание новой статьи
 		
-		if($item_manager_obj->set_title($_POST['title']))
+		if($item_manager_obj->set_title(std_lib::POST('title')))
 		{
-			$item_manager_obj->set_text($_POST['text']);
-			$item_manager_obj->set_meta_keyword($_POST['meta_keyword']);
-			$item_manager_obj->set_meta_description($_POST['meta_description']);
-			$item_manager_obj->set_owner_id($_POST['owner_partition']);
-			$item_manager_obj->set_category_id($_POST['category_id']);
+			$item_manager_obj->set_text(std_lib::POST('text'));
+			$item_manager_obj->set_meta_keyword(std_lib::POST('meta_keyword'));
+			$item_manager_obj->set_meta_description(std_lib::POST('meta_description'));
+			$item_manager_obj->set_owner_id(std_lib::POST('owner_partition'));
+			$item_manager_obj->set_category_id(std_lib::POST('category_id'));
 				
-			$item_manager_obj->set_status($_POST['publish']);
-			$item_manager_obj->set_penname($_POST['penname']);
-			$item_manager_obj->set_access_level($_POST['access_level']);
+			$item_manager_obj->set_status(std_lib::POST('publish'));
+			$item_manager_obj->set_penname(std_lib::POST('penname'));
+			$item_manager_obj->set_access_level(std_lib::POST('access_level'));
 			
 			if($item_manager_obj->save_item())
 			{
-				$MOD_MESSAGE = "Статья сайта с заглавием '".$_POST['title']."' успешно создана ";
-				header("Location: index.php?p=item&prt_id=".(int)$_POST['owner_partition']."&msg=".rawurlencode($MOD_MESSAGE));
+				$MOD_MESSAGE = "Статья сайта с заглавием '".std_lib::POST('title')."' успешно создана ";
+				header("Location: index.php?p=item&prt_id=".(int)std_lib::POST('owner_partition')."&msg=".rawurlencode($MOD_MESSAGE));
 				exit;
 			}
 			else 
 			{
-				$MOD_MESSAGE = "Статья сайта с заглавием '".$_POST['title']."' не создана ";
+				$MOD_MESSAGE = "Статья сайта с заглавием '".std_lib::POST('title')."' не создана ";
 				header("Location: index.php?p=item&errmsg=".rawurlencode($MOD_MESSAGE));
 				exit;
 			}
@@ -180,7 +176,7 @@ switch ($sp)
 		
 		break;
 	case "edit_item": //* форма редактирования статьи
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		$DOCUMENT['OPTION']['xinha'] = 'enabled';
 		$MOD_TEMPALE = "item_form.tpl";
@@ -193,7 +189,7 @@ switch ($sp)
 		$DOCUMENT['mod']['data']['partition_tree'] = $partition_manager_obj->get_all_partition_trees();
 		
 		
-		$DOCUMENT['mod']['data']['item_info'] = $item_manager_obj->get_item($_GET['id']);
+		$DOCUMENT['mod']['data']['item_info'] = $item_manager_obj->get_item(std_lib::GET('id'));
 		
 		if($DOCUMENT['mod']['data']['item_info'] == false)
 		{
@@ -210,24 +206,24 @@ switch ($sp)
 		//{
 			$item_manager_obj->purge_variables();
 			
-			if(($item_manager_obj->set_title($_POST['title'])) && ($item_manager_obj->set_id((int)$_POST['item_id'])))
+			if(($item_manager_obj->set_title(std_lib::POST('title'))) && ($item_manager_obj->set_id((int)std_lib::POST('item_id'))))
 			{
 				
 				
-				$item_manager_obj->set_text($_POST['text']);
-				$item_manager_obj->set_meta_keyword($_POST['meta_keyword']);
-				$item_manager_obj->set_meta_description($_POST['meta_description']);
-				$item_manager_obj->set_owner_id($_POST['owner_partition']);
-				$item_manager_obj->set_category_id($_POST['category_id']);
+				$item_manager_obj->set_text(std_lib::POST('text')$_POST['']);
+				$item_manager_obj->set_meta_keyword(std_lib::POST('meta_keyword')$_POST['']);
+				$item_manager_obj->set_meta_description(std_lib::POST('meta_description')$_POST['']);
+				$item_manager_obj->set_owner_id(std_lib::POST('owner_partition')$_POST['']);
+				$item_manager_obj->set_category_id(std_lib::POST('category_id')$_POST['']);
 									
-				$item_manager_obj->set_status($_POST['publish']);
-				$item_manager_obj->set_penname($_POST['penname']);
-				$item_manager_obj->set_access_level($_POST['access_level']);
+				$item_manager_obj->set_status(std_lib::POST('publish')$_POST['']);
+				$item_manager_obj->set_penname(std_lib::POST('penname')$_POST['']);
+				$item_manager_obj->set_access_level(std_lib::POST('access_level')$_POST['']);
 				
 				if($item_manager_obj->save_item())
 				{
-					$MOD_MESSAGE = "Статья сайта с заглавием '".htmlentities($_POST['title'],ENT_QUOTES, "UTF-8")."' успешно обновлёна ";
-					header("Location: index.php?p=item&prt_id=".(int)$_POST['owner_partition']."msg=".rawurlencode($MOD_MESSAGE));
+					$MOD_MESSAGE = "Статья сайта с заглавием '".htmlentities(std_lib::POST('title')$_POST[''],ENT_QUOTES, "UTF-8")."' успешно обновлёна ";
+					header("Location: index.php?p=item&prt_id=".(int)std_lib::POST('owner_partition')$_POST['']."msg=".rawurlencode($MOD_MESSAGE));
 					exit;
 				}
 				else 
@@ -250,9 +246,8 @@ switch ($sp)
 		break;	
 	case "update_item_status"://* производится обновление статуса статей по выделенным чекбоксам в индексе модуля
 		
-		$id = ( isset($HTTP_POST_VARS['item_id']) ) ? $HTTP_POST_VARS['item_id'] : $HTTP_GET_VARS['item_id'];
-		$status = ( isset($HTTP_POST_VARS['status_action']) ) ? $HTTP_POST_VARS['status_action'] : $HTTP_GET_VARS['status_action'];
-		
+		$id = std_lib::POST_GET('item_id');
+		$status = std_lib::POST_GET('status_action');
 		if($status != "none")
 		{
 			$item_manager_obj->purge_variables();
@@ -278,12 +273,13 @@ switch ($sp)
 			$MOD_MESSAGE = "Статутсы статей успешно обновлены";
 		else 
 			$MOD_MESSAGE = "Во время обновления статусов статей произошли ошибки";
-		header("Location: index.php?p=item&prt_id=".(int)$_POST['owner_partition']."msg=".rawurlencode($MOD_MESSAGE));
+		header("Location: index.php?p=item&prt_id=".(int)std_lib::POST('owner_partition')."msg=".rawurlencode($MOD_MESSAGE));
 		exit;
 		break;
 	case "rm_item":
-		$item_id = ( isset($HTTP_POST_VARS['item_id']) ) ? $HTTP_POST_VARS['item_id'] : $HTTP_GET_VARS['item_id'];
-		$prt_id = (isset($HTTP_POST_VARS['prt_id'])) ? $HTTP_POST_VARS['prt_id'] : $HTTP_GET_VARS['prt_id'];
+		$item_id = std_lib::POST_GET('item_id');
+		$prt_id = std_lib::POST_GET('prt_id');
+		
 		
 		$item = $item_manager_obj->get_item((int)$item_id);
 		if($item)
