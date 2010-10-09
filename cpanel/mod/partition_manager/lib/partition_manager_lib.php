@@ -106,7 +106,8 @@ class partition_manager
 	public function set_meta_keyword($key_word = "")
 	{
 		$key_word = trim(strip_tags($key_word));
-		$key_word = eregi_replace("[\n\l\t]+", " , ", $key_word);
+		$key_word = eregi_replace("[\n\l\t\r]+", " , ", $key_word);
+		//$key_word = preg_replace("/\n\l\t+/", " , ", $key_word);
 		$key_word = eregi_replace("( ){2,}", " ", $key_word );
 //		$key_word = eregi_replace("(, ){2,}", " ", $key_word );
 		$key_word = htmlentities($key_word,ENT_QUOTES, "UTF-8");
@@ -322,6 +323,7 @@ class partition_manager
 										type='prt' and 
 										modid='".$this->DATA['MOD_DATA']['modid']."' and
 										id='".$partition_id."'";
+						
 						return mysql_query($query);
 					}
 				}
@@ -369,7 +371,8 @@ class partition_manager
 						//теперь надо проверить нужно ли обновлять линк к каталогу
 						if((int)$this->DATA['pid'] != $partition_info['pid']) // ведётся ли перелинковка
 						{
-							if(!eregi("(/index\.php)",$partition_info['link']))
+							if(strpos("/index.php",$partition_info['link']) === false)
+//							if(!eregi("(/index\.php)",$partition_info['link']))
 								return true; // раздел прилинкован конкретно к каталогу а значит этот линк не меняется ( т е нет index.php?data=....)
 							
 							$new_parent_partition = $this->get_partition($this->DATA['pid']);
@@ -377,7 +380,9 @@ class partition_manager
 								return false;
 							
 							$path = $new_parent_partition['link'];
-							if(eregi("(index\.php)", $path))
+							
+							if(strpos("index.php",$path) !== false)
+//							if(eregi("(index\.php)", $path))
 							{
 								$index_pos = strpos($path, "/index.php");
 								if($index_pos===false)
@@ -396,8 +401,11 @@ class partition_manager
 											type='prt' and 
 											modid='".$this->DATA['MOD_DATA']['modid']."' and
 											id='".$this->DATA['id']."'";
+							//echo $query;exit;
 							return mysql_query($query);		
-						}						
+						}
+						else	
+							return true;					
 					}
 				}
 			}			
@@ -875,7 +883,7 @@ class partition_manager
 								id='".$this->DATA['id']."' and
 								type='prt' and 
 								modid='".$this->DATA['MOD_DATA']['modid']."'" ;
-//				echo $query."<br>";
+				//echo $query."<br>";
 				return mysql_query($query);
 			}
 		}
