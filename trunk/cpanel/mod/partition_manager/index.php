@@ -204,6 +204,8 @@ switch ($sp)
 			$partition_manager_obj->set_penname(std_lib::POST('penname'));
 			$partition_manager_obj->set_access_level(std_lib::POST('access_level'));
 			
+			//$partition_manager_obj->save_partition();
+			
 			if($partition_manager_obj->save_partition())
 			{
 				$MOD_MESSAGE = "Раздел сайта с заглавием '".htmlentities(std_lib::POST('title'),ENT_QUOTES, "UTF-8")."' успешно обновлён ";
@@ -299,8 +301,7 @@ switch ($sp)
 		
 		break;
 	case "rm_category": //* удаление категории
-		$id = ( isset($HTTP_POST_VARS['id']) ) ? $HTTP_POST_VARS['id'] : $HTTP_GET_VARS['id'];
-		
+		$id = std_lib::POST_GET('id');
 		
 		$result ="";
 		if(is_array($id))
