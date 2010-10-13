@@ -55,10 +55,10 @@ $partition_manager_obj->create_root_partition();
 $item_manager_obj = new item_manager($SYS, $ThisModuleInfo, $MY_USER_DATA);
 
 // проверяем необходимость отображения системного сообщения
-$msg =  stripcslashes(trim(rawurldecode(trim($_GET['msg']))));
+$msg =  stripcslashes(trim(rawurldecode(trim(std_lib::GET('msg')))));
 if($msg != "") $DOCUMENT['MSG'] = $msg;
 		
-$err_msg = stripcslashes(trim(rawurldecode(trim($_GET['errmsg']))));
+$err_msg = stripcslashes(trim(rawurldecode(trim(std_lib::GET('errmsg')))));
 if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
 switch ($sp)
@@ -121,7 +121,7 @@ switch ($sp)
 		//------------------
 		break;
 	case "get_ls_category":
-		$prt_id = std_lib::POST_GET('prt_id')
+		$prt_id = std_lib::POST_GET('prt_id');
 		$xml = $partition_manager_obj->get_xml_category_list_for_partition((int)$prt_id);
 		header ("content-type: text/xml");
 		echo $xml;		
@@ -210,20 +210,20 @@ switch ($sp)
 			{
 				
 				
-				$item_manager_obj->set_text(std_lib::POST('text')$_POST['']);
-				$item_manager_obj->set_meta_keyword(std_lib::POST('meta_keyword')$_POST['']);
-				$item_manager_obj->set_meta_description(std_lib::POST('meta_description')$_POST['']);
-				$item_manager_obj->set_owner_id(std_lib::POST('owner_partition')$_POST['']);
-				$item_manager_obj->set_category_id(std_lib::POST('category_id')$_POST['']);
+				$item_manager_obj->set_text(std_lib::POST('text'));
+				$item_manager_obj->set_meta_keyword(std_lib::POST('meta_keyword'));
+				$item_manager_obj->set_meta_description(std_lib::POST('meta_description'));
+				$item_manager_obj->set_owner_id(std_lib::POST('owner_partition'));
+				$item_manager_obj->set_category_id(std_lib::POST('category_id'));
 									
-				$item_manager_obj->set_status(std_lib::POST('publish')$_POST['']);
-				$item_manager_obj->set_penname(std_lib::POST('penname')$_POST['']);
-				$item_manager_obj->set_access_level(std_lib::POST('access_level')$_POST['']);
+				$item_manager_obj->set_status(std_lib::POST('publish'));
+				$item_manager_obj->set_penname(std_lib::POST('penname'));
+				$item_manager_obj->set_access_level(std_lib::POST('access_level'));
 				
 				if($item_manager_obj->save_item())
 				{
-					$MOD_MESSAGE = "Статья сайта с заглавием '".htmlentities(std_lib::POST('title')$_POST[''],ENT_QUOTES, "UTF-8")."' успешно обновлёна ";
-					header("Location: index.php?p=item&prt_id=".(int)std_lib::POST('owner_partition')$_POST['']."msg=".rawurlencode($MOD_MESSAGE));
+					$MOD_MESSAGE = "Статья сайта с заглавием '".htmlentities(std_lib::POST('title'),ENT_QUOTES, "UTF-8")."' успешно обновлёна ";
+					header("Location: index.php?p=item&prt_id=".(int)std_lib::POST('owner_partition')."msg=".rawurlencode($MOD_MESSAGE));
 					exit;
 				}
 				else 
