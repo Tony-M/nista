@@ -13,14 +13,9 @@ $DOCUMENT['mod']['data'] = array(); // очищаем данные модуля 
 //
 // Set sp
 //
-if( isset( $HTTP_POST_VARS['sp'] ) || isset( $HTTP_GET_VARS['sp'] ) )
-{
-        $sp = ( isset($HTTP_POST_VARS['sp']) ) ? $HTTP_POST_VARS['sp'] : $HTTP_GET_VARS['sp'];
-}
-else
-{
-        $sp = 'ind';
-}
+$sp = std_lib::POST_GET('sp');
+if($sp=="")$sp = 'ind';
+
 if(!class_exists("tpl_manager"))
 {
 	header("Location: index.php");
@@ -36,24 +31,24 @@ switch ($sp)
 	default:
 	case "ind":
 		// проверяем необходимость отображения системного сообщения
-		$msg = trim(rawurldecode(trim($_GET['msg'])));
+		$msg = trim(rawurldecode(trim(std_lib::GET('msg'))));
 		if($msg != "") $DOCUMENT['MSG'] = $msg;
 		
-		$err_msg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$err_msg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
 		$DOCUMENT['mod']['data']['file_content'] = $template_data;
 		break;
 	case "add_tpl": //** Форма добавления новгого layout
 		// проверяем необходимость отображения системного сообщения об ошибках
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 	
 		$MOD_TEMPALE = "layout_form.tpl";
 		$MOD_ACTION = 'upload_tpl';
 		break;
 	case "upload_tpl"://** Загрузка и создание новго Layout
-		$title = trim($_POST['title']);
+		$title = trim(std_lib::POST('title'));
 		$description = trim($_POST['description']);
 		
 		$MOD_MESSAGE = ""; //сообщение об ошибках или удачах
@@ -101,7 +96,7 @@ switch ($sp)
 		break;
 	case "add_zone": //** Форма добавления новой информационной зоны
 		// проверяем необходимость отображения системного сообщения об ошибках
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 	
 		$MOD_TEMPALE = "zone_form.tpl";
@@ -111,10 +106,10 @@ switch ($sp)
 		//print_r(array_splice($template_data['layout'],1,1));
 		break;
 	case "edit_zone":
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		
-		$zone_name = trim($_GET['zone_name']);
+		$zone_name = trim(std_lib::GET('zone_name'));
 		$DOCUMENT['mod']['data']['current_zone']=$tpl_manager_obj->get_zone_info($zone_name);
 		if($DOCUMENT['mod']['data']['current_zone'] == false)
 		{
@@ -127,9 +122,9 @@ switch ($sp)
 		$MOD_ACTION = 'update_zone';
 		break;
 	case "create_zone": //** создание новой информационной зоны
-		$name = trim($_POST['name']);
-		$title = trim($_POST['title']);
-		$description = trim($_POST['description']);
+		$name = trim(std_lib::POST('name'));
+		$title = trim(std_lib::POST('title'));
+		$description = trim(std_lib::POST('description'));
 		
 		
 		if($name == "")
@@ -156,10 +151,10 @@ switch ($sp)
 		
 		break;
 	case "update_zone":
-		$name = trim($_POST['name']);
-		$current_name = trim($_POST['current_name']);
-		$title = trim($_POST['title']);
-		$description = trim($_POST['description']);
+		$name = trim(std_lib::POST('name'));
+		$current_name = trim(std_lib::POST('current_name'));
+		$title = trim(std_lib::POST('title'));
+		$description = trim(std_lib::POST('description'));
 		
 		if(($current_name=="") || ($title==""))
 		{
@@ -186,7 +181,7 @@ switch ($sp)
 		
 		break;
 	case "ls_zone_link":
-		$zone_name = trim($_GET['zone_name']);
+		$zone_name = trim(std_lib::GET('zone_name'));
 				
 		if($zone_name != "")
 		{
@@ -247,10 +242,10 @@ switch ($sp)
 		}
 		break;
 	case "zone_link_update":
-		$link_file = $_POST['link_file'];
+		$link_file = std_lib::POST('link_file');
 		
-		$unlink_file = $_POST['unlink_file'];
-		$zone_name = $_POST['zone_name'];
+		$unlink_file = std_lib::POST('unlink_file');
+		$zone_name = std_lib::POST('zone_name');
 		
 		
 		// подлинковка зоны к лайауту
@@ -278,10 +273,10 @@ switch ($sp)
 		exit;
 		break;		
 	case "ls_layout_zones":
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 	
-		$file = trim($_GET['file']);
+		$file = trim(std_lib::GET('file'));
 		$DOCUMENT['mod']['data']['current_layout'] = $tpl_manager_obj->get_layout_info($file);
 		
 		$linked_zones = $tpl_manager_obj->get_layout_zones($file);
@@ -304,10 +299,10 @@ switch ($sp)
 		
 	case "update_link_layout":
 		
-		$link_zone = $_POST['link_zone'];		
-		$unlink_zone = $_POST['unlink_zone'];
+		$link_zone = std_lib::POST('link_zone');		
+		$unlink_zone = std_lib::POST('unlink_zone');
 		
-		$layout_file = $_POST['layout_file'];
+		$layout_file = std_lib::POST('layout_file');
 		
 		
 		// подлинковка зоны к лайауту
@@ -337,16 +332,16 @@ switch ($sp)
 		break;		
 	case "add_menu": //** Форма добавления шаблона меню
 		// проверяем необходимость отображения системного сообщения об ошибках
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 	
 		$MOD_TEMPALE = "menu_form.tpl";
 		$MOD_ACTION = 'create_menu';
 		break;
 	case "create_menu":
-		$name = ( isset($HTTP_POST_VARS['name']) ) ? $HTTP_POST_VARS['name'] : $HTTP_GET_VARS['name'];
-		$title = ( isset($HTTP_POST_VARS['title']) ) ? $HTTP_POST_VARS['title'] : $HTTP_GET_VARS['title'];
-		$description = ( isset($HTTP_POST_VARS['description']) ) ? $HTTP_POST_VARS['description'] : $HTTP_GET_VARS['description'];
+		$name = std_lib::POST_GET('name');
+		$title = std_lib::POST_GET('title');
+		$description = std_lib::POST_GET('description');
 				
 		$MOD_MESSAGE = ""; //сообщение об ошибках или удачах
 			
@@ -395,19 +390,19 @@ switch ($sp)
 		$MOD_TEMPALE = "ls_menu.tpl";
 		
 		// проверяем необходимость отображения системного сообщения
-		$msg = trim(rawurldecode(trim($_GET['msg'])));
+		$msg = trim(rawurldecode(trim(std_lib::GET('msg'))));
 		if($msg != "") $DOCUMENT['MSG'] = $msg;
 		
-		$err_msg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$err_msg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($err_msg != "") $DOCUMENT['ERR_MSG'] = $err_msg;
 		
 		$DOCUMENT['mod']['data']['file_content'] = $template_data;
 		break;
 	case "edit_menu":
-		$errmsg = trim(rawurldecode(trim($_GET['errmsg'])));
+		$errmsg = trim(rawurldecode(trim(std_lib::GET('errmsg'))));
 		if($errmsg != "") $DOCUMENT['ERR_MSG'] = $errmsg;
 		
-		$menu_name = trim($_GET['menu_name']);
+		$menu_name = trim(std_lib::GET('menu_name'));
 		$DOCUMENT['mod']['data']['current_menu']=$tpl_manager_obj->get_menu_info($menu_name);
 		if($DOCUMENT['mod']['data']['current_menu'] == false)
 		{
@@ -420,10 +415,10 @@ switch ($sp)
 		$MOD_ACTION = 'update_menu';
 		break;
 	case "update_menu":
-		$name = ( isset($HTTP_POST_VARS['name']) ) ? $HTTP_POST_VARS['name'] : $HTTP_GET_VARS['name'];
-		$current_name = ( isset($HTTP_POST_VARS['current_name']) ) ? $HTTP_POST_VARS['current_name'] : $HTTP_GET_VARS['current_name'];
-		$title = ( isset($HTTP_POST_VARS['title']) ) ? $HTTP_POST_VARS['title'] : $HTTP_GET_VARS['title'];
-		$description = ( isset($HTTP_POST_VARS['description']) ) ? $HTTP_POST_VARS['description'] : $HTTP_GET_VARS['description'];
+		$name = std_lib::POST_GET('name');
+		$current_name = std_lib::POST_GET('current_name');
+		$title = std_lib::POST_GET('title');
+		$description = std_lib::POST_GET('description');
 				
 		$MOD_MESSAGE = ""; //сообщение об ошибках или удачах
 			
